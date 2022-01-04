@@ -1,83 +1,47 @@
 
 # Program
 
-The course takes place on each working day from 9am – 1pm
-(CEST). Short breaks will be scheduled between sessions.
+The workshop takes place on the 13th and 14th of January from 11am – 6pm
+(EET). Short breaks will be scheduled between sessions.
 
-The hands-on sessions consists of a set of questions and example
-data. Solve the exercises by taking advantage of the online examples
-and resources that are pointed out in the study material. There is
-often more than one way to solve a given task. It is assumed that you
+The practical sessions consists of a set of example
+multi-omics analysis workflows. It is assumed that you
 have already installed the required software. Do not hesitate to ask
 support from the course assistants.
 
-## Day 1: from raw sequences to ecological data analysis
+## Day 1
 
 **Lectures**
 
- * Microbiota analysis: association studies vs. causality; microbiota sequencing methods (16S, shotgun, metagenomics) - by dr. Tom Ederveen (Radboud UMC Nijmegen, The Netherlands)
+ * Metagenomics - Kata
+ 
+ * Metabolomics - Pande
+ 
+ * Multiomics - Leo
 
- * DNA isolation and 16S rRNA gene sequencing; bioinformatics step 1: from raw sequences to OTU table in a biom file – by Tom Ederveen (Radboudumc Nijmegen, The Netherlands)
+**Practical**
 
-
-**Demo & Practical**
-
- * Importing data to R for interactive data analysis 
-
- * Task: initialize reproducible report
+ * Data import and exploration
+ 
+ * Beta diversity
 
 ----------------------------------------------------------------
 
-## Day 2 - Alpha diversity 
+## Day 2
 
-**Demo**
+**Lectures**
 
-- Microbiome data exploration
+ * ML - Matti
+ 
+ * Gergely individual-based modeling
+ 
+ * Data integration - Leo
 
-**Lecture**
+**Practical ML**
 
-- Key concepts in microbiome data science
-
-**Practical**
-
-- Alpha diversity: estimation, analysis, and visualization 
-
-----------------------------------------------------------------
-
-## Day 3 - Beta diversity
-
-**Demo**
-
-- Community similarity 
-
-**Practical**
-
-- Beta diversity: estimation, analysis, and visualization
-
------------------------------------------------------------------
-
-## Day 4- Differential abundance
-
-**Lecture**
-
-- Differential abundance analysis methods 
-
-
-**Practical**
-
-- Differential abundance in practice
-
-
-**Lecture**
-
-- Overview of microbiota data science methods & concepts
-
------------------------------------------------------------------
-
-## Day 5 : Presentations & closing
-
-**Student presentations** on microbiome data analytics
-
-
-
-
+ * Unsupervised learning: UMAP clustering
+ 
+ * Supervised learning: Random forest
+ 
+ * Model selection and evaluation
+ 
