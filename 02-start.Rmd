@@ -2,10 +2,10 @@
 # Getting started
 
 
-## Checklist (before the course)
+## Checklist (before the workshop)
 
 Install the following software in advance in order to avoid
-unnecessary delays and leaving more time for the course contents.
+unnecessary delays and leaving more time for the workshop contents.
 
 
 * [R (version >4.1.0)](https://www.r-project.org/) 
@@ -17,13 +17,9 @@ unnecessary delays and leaving more time for the course contents.
 
 * Install and load the required R packages
 
-* After a successful installation you can start with the
-  case study examples in this training material
-
 
 ## Support and resources
 
-For additional reading and online material, see [Material](material.html) section
 
 For online support on installation and other matters, you can join us at:
 
@@ -40,8 +36,10 @@ the R session. Only uninstalled packages are installed.
 ```{r warning = FALSE, message = FALSE}
 # List of packages that we need from cran and bioc 
 cran_pkg <- c("BiocManager", "bookdown", "dplyr", "ecodist", "ggplot2", 
-              "gridExtra", "kableExtra", "knitr", "scales", "vegan")
-bioc_pkg <- c("ANCOMBC", "ape", "DESeq2",  "DirichletMultinomial", "mia", "miaViz")
+              "gridExtra", "kableExtra", "knitr", "scales", "vegan", "caret",
+              "ranger", "stringr")
+bioc_pkg <- c("ANCOMBC", "ape", "DESeq2",  "DirichletMultinomial", "mia",
+              "miaViz", "microbiomeDataSets")
 
 # Gets those packages that are already installed
 cran_pkg_already_installed <- cran_pkg[ cran_pkg %in% installed.packages() ]

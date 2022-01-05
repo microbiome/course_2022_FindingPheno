@@ -1,5 +1,5 @@
-book_filename: radboud2021_material
-pagetitle: "Microbiome Analysis with R/Bioconductor"
+book_filename: FindingPheno2022_material
+pagetitle: "Multi-omics Analysis with R/Bioconductor"
 delete_merged_file: true
 new_session: true
 language:
@@ -10,14 +10,9 @@ rmd_files:
   - index.Rmd
   - 01-program.Rmd
   - 02-start.Rmd
-  - 03-reproduciblereporting.Rmd
-  - 04-import.Rmd
-  - 05-explore.Rmd
-  - 06-alpha.Rmd
-  - 07-beta.Rmd
-  - 08-abundance.Rmd
-  - 09-material.Rmd
-  - 10-community-typing.Rmd
-  - 11-misc.Rmd
-  - 12-Solutions.Rmd
-  - 90-Labs.Rmd
+  - 03-import.Rmd
+  - 04-explore.Rmd
+  - 05-beta.Rmd
+  - 06-unsupML.Rmd
+  - 07-supML.Rmd
+  - 08-tuning.Rmd
