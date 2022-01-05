@@ -51,8 +51,6 @@ preprocessing to statistical analysis and reproducible reporting.
 
 
 
-
-
 ## Acknowledgments
 
 **Citation** "Introduction to miaverse (2021). Tuomas Borman, Henrik Eckermann, Chouaib Benchraka, Leo Lahti. URL: https://microbiome.github.io".
