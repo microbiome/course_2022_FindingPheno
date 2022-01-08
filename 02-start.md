@@ -38,9 +38,8 @@ the R session. Only uninstalled packages are installed.
 # List of packages that we need from cran and bioc 
 cran_pkg <- c("BiocManager", "bookdown", "dplyr", "ecodist", "ggplot2", 
               "gridExtra", "kableExtra", "knitr", "scales", "vegan", "caret",
-              "ranger", "stringr", "pheatmap")
-bioc_pkg <- c("ANCOMBC", "ape", "DESeq2",  "DirichletMultinomial", "mia",
-              "miaViz", "microbiomeDataSets")
+              "ranger", "stringr", "pheatmap", "patchwork", "pdp")
+bioc_pkg <- c("mia", "miaViz", "microbiomeDataSets")
 
 # Gets those packages that are already installed
 cran_pkg_already_installed <- cran_pkg[ cran_pkg %in% installed.packages() ]
@@ -83,28 +82,26 @@ as.data.frame(loaded)
 ```
 
 ```
-##                      loaded
-## mia                    TRUE
-## miaViz                 TRUE
-## ANCOMBC                TRUE
-## ape                    TRUE
-## DESeq2                 TRUE
-## DirichletMultinomial   TRUE
-## microbiomeDataSets     TRUE
-## BiocManager            TRUE
-## bookdown               TRUE
-## dplyr                  TRUE
-## ecodist                TRUE
-## ggplot2                TRUE
-## gridExtra              TRUE
-## kableExtra             TRUE
-## knitr                  TRUE
-## scales                 TRUE
-## vegan                  TRUE
-## caret                  TRUE
-## ranger                 TRUE
-## stringr                TRUE
-## pheatmap               TRUE
+##                    loaded
+## mia                  TRUE
+## miaViz               TRUE
+## microbiomeDataSets   TRUE
+## BiocManager          TRUE
+## bookdown             TRUE
+## dplyr                TRUE
+## ecodist              TRUE
+## ggplot2              TRUE
+## gridExtra            TRUE
+## kableExtra           TRUE
+## knitr                TRUE
+## scales               TRUE
+## vegan                TRUE
+## caret                TRUE
+## ranger               TRUE
+## stringr              TRUE
+## pheatmap             TRUE
+## patchwork            TRUE
+## pdp                  TRUE
 ```
 
 

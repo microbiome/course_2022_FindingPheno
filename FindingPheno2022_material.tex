@@ -315,9 +315,8 @@ the R session. Only uninstalled packages are installed.
 \CommentTok{\# List of packages that we need from cran and bioc }
 \NormalTok{cran\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\StringTok{"bookdown"}\NormalTok{, }\StringTok{"dplyr"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }
               \StringTok{"gridExtra"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"scales"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"caret"}\NormalTok{,}
-              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{)}
-\NormalTok{bioc\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"ANCOMBC"}\NormalTok{, }\StringTok{"ape"}\NormalTok{, }\StringTok{"DESeq2"}\NormalTok{,  }\StringTok{"DirichletMultinomial"}\NormalTok{, }\StringTok{"mia"}\NormalTok{,}
-              \StringTok{"miaViz"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{)}
+              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{)}
+\NormalTok{bioc\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"mia"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{)}
 
 \CommentTok{\# Gets those packages that are already installed}
 \NormalTok{cran\_pkg\_already\_installed }\OtherTok{\textless{}{-}}\NormalTok{ cran\_pkg[ cran\_pkg }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{() ]}
@@ -364,28 +363,26 @@ mia and miaViz are prioritized. Packages that are loaded first have higher prior
 \end{Shaded}
 
 \begin{verbatim}
-##                      loaded
-## mia                    TRUE
-## miaViz                 TRUE
-## ANCOMBC                TRUE
-## ape                    TRUE
-## DESeq2                 TRUE
-## DirichletMultinomial   TRUE
-## microbiomeDataSets     TRUE
-## BiocManager            TRUE
-## bookdown               TRUE
-## dplyr                  TRUE
-## ecodist                TRUE
-## ggplot2                TRUE
-## gridExtra              TRUE
-## kableExtra             TRUE
-## knitr                  TRUE
-## scales                 TRUE
-## vegan                  TRUE
-## caret                  TRUE
-## ranger                 TRUE
-## stringr                TRUE
-## pheatmap               TRUE
+##                    loaded
+## mia                  TRUE
+## miaViz               TRUE
+## microbiomeDataSets   TRUE
+## BiocManager          TRUE
+## bookdown             TRUE
+## dplyr                TRUE
+## ecodist              TRUE
+## ggplot2              TRUE
+## gridExtra            TRUE
+## kableExtra           TRUE
+## knitr                TRUE
+## scales               TRUE
+## vegan                TRUE
+## caret                TRUE
+## ranger               TRUE
+## stringr              TRUE
+## pheatmap             TRUE
+## patchwork            TRUE
+## pdp                  TRUE
 \end{verbatim}
 
 \hypertarget{data}{%
@@ -1233,7 +1230,89 @@ Cross-correlation of both data and visualization:
 \hypertarget{supervised-learning}{%
 \chapter{Supervised learning}\label{supervised-learning}}
 
-Coming up\ldots{}
+\hypertarget{random-forests}{%
+\section{Random Forests}\label{random-forests}}
+
+Creating a dataframe for modeling butyrate levels:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{butyrate\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{cbind}\NormalTok{(y, x))}
+\NormalTok{butyrate\_df }\OtherTok{\textless{}{-}}\NormalTok{ butyrate\_df[,}\FunctionTok{which}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(butyrate\_df) }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Butyrate"}\NormalTok{, }\FunctionTok{colnames}\NormalTok{(x)))]}
+\end{Highlighting}
+\end{Shaded}
+
+Performing nested cross validation, making train and test (validation) sets:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(caret)}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{trainIndex }\OtherTok{\textless{}{-}} \FunctionTok{createDataPartition}\NormalTok{(butyrate\_df}\SpecialCharTok{$}\NormalTok{Butyrate, }\AttributeTok{p =}\NormalTok{ .}\DecValTok{8}\NormalTok{, }\AttributeTok{list =} \ConstantTok{FALSE}\NormalTok{, }\AttributeTok{times =} \DecValTok{1}\NormalTok{)}
+\NormalTok{butyrate\_df\_train }\OtherTok{\textless{}{-}}\NormalTok{ butyrate\_df[trainIndex,]}
+\NormalTok{butyrate\_df\_test }\OtherTok{\textless{}{-}}\NormalTok{ butyrate\_df[}\SpecialCharTok{{-}}\NormalTok{trainIndex,]}
+\end{Highlighting}
+\end{Shaded}
+
+Train models with 5-fold CV repeated 5 times:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{42}\NormalTok{)}
+\NormalTok{fitControl }\OtherTok{\textless{}{-}} \FunctionTok{trainControl}\NormalTok{(}\AttributeTok{method =} \StringTok{"repeatedcv"}\NormalTok{, }\AttributeTok{number =} \DecValTok{5}\NormalTok{, }\AttributeTok{repeats =} \DecValTok{5}\NormalTok{)}
+\NormalTok{rfFit1 }\OtherTok{\textless{}{-}} \FunctionTok{train}\NormalTok{(Butyrate }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data =}\NormalTok{ butyrate\_df\_train, }
+                \AttributeTok{method =} \StringTok{"ranger"}\NormalTok{, }
+                \AttributeTok{trControl =}\NormalTok{ fitControl,}
+                \AttributeTok{importance =} \StringTok{"permutation"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Measure performance by prediction on test data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{test\_predictions }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(rfFit1, }\AttributeTok{newdata =}\NormalTok{ butyrate\_df\_test)}
+
+\CommentTok{\# Plot predicted vs observed}
+\NormalTok{pred\_obs }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{predicted =}\NormalTok{ test\_predictions, }\AttributeTok{observed =}\NormalTok{ butyrate\_df\_test}\SpecialCharTok{$}\NormalTok{Butyrate)}
+\FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pred\_obs, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{predicted, }\AttributeTok{y=}\NormalTok{observed)) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{5}\NormalTok{, }\AttributeTok{color =} \StringTok{"orange"}\NormalTok{) }\SpecialCharTok{+} 
+  \FunctionTok{xlab}\NormalTok{(}\StringTok{"Predicted butyrate concentration"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{ylab}\NormalTok{(}\StringTok{"Observed butyrate concentration"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{lims}\NormalTok{(}\AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{5}\NormalTok{), }\AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{5}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{linetype =} \DecValTok{5}\NormalTok{, }\AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\CommentTok{\# Plot a perfect fit line}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-supML_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+Examining model by ploting feature importance:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{varImp}\NormalTok{(rfFit1))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-supML_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+We could investigate association directions by making partial dependence plots:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(patchwork)}
+\FunctionTok{library}\NormalTok{(pdp)}
+\CommentTok{\# Calculate and plot partial dependence}
+\NormalTok{top\_features }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(}\FunctionTok{varImp}\NormalTok{(rfFit1)}\SpecialCharTok{$}\NormalTok{importance)[}\FunctionTok{order}\NormalTok{(}\FunctionTok{varImp}\NormalTok{(rfFit1)}\SpecialCharTok{$}\NormalTok{importance[,}\StringTok{"Overall"}\NormalTok{], }\AttributeTok{decreasing =} \ConstantTok{TRUE}\NormalTok{)[}\DecValTok{1}\SpecialCharTok{:}\DecValTok{6}\NormalTok{]]}
+\NormalTok{pd\_plots }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}\ConstantTok{NULL}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (feature }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(top\_features)) \{}
+\NormalTok{  pd\_plots[[feature]] }\OtherTok{\textless{}{-}} \FunctionTok{partial}\NormalTok{(rfFit1, }\AttributeTok{pred.var =}\NormalTok{ top\_features[feature], }\AttributeTok{rug =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{autoplot}\NormalTok{() }\SpecialCharTok{+} 
+    \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FunctionTok{mean}\NormalTok{(butyrate\_df\_train}\SpecialCharTok{$}\NormalTok{Butyrate), }\AttributeTok{linetype =} \DecValTok{2}\NormalTok{, }\AttributeTok{color =} \StringTok{"gray"}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# Show the mean of the training data as a dashed line}
+    \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits=}\FunctionTok{c}\NormalTok{(}\FloatTok{1.5}\NormalTok{,}\FloatTok{2.3}\NormalTok{)) }\CommentTok{\# Harmonize the scale of yhat on all plots}
+\NormalTok{\}}
+\FunctionTok{wrap\_plots}\NormalTok{(pd\_plots)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-supML_files/figure-latex/unnamed-chunk-7-1.pdf}
 
 \hypertarget{model-selection-and-evaluation}{%
 \chapter{Model selection and evaluation}\label{model-selection-and-evaluation}}
