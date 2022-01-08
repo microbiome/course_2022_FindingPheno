@@ -315,7 +315,7 @@ the R session. Only uninstalled packages are installed.
 \CommentTok{\# List of packages that we need from cran and bioc }
 \NormalTok{cran\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\StringTok{"bookdown"}\NormalTok{, }\StringTok{"dplyr"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }
               \StringTok{"gridExtra"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"scales"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"caret"}\NormalTok{,}
-              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{)}
+              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{)}
 \NormalTok{bioc\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"ANCOMBC"}\NormalTok{, }\StringTok{"ape"}\NormalTok{, }\StringTok{"DESeq2"}\NormalTok{,  }\StringTok{"DirichletMultinomial"}\NormalTok{, }\StringTok{"mia"}\NormalTok{,}
               \StringTok{"miaViz"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{)}
 
@@ -385,6 +385,7 @@ mia and miaViz are prioritized. Packages that are loaded first have higher prior
 ## caret                  TRUE
 ## ranger                 TRUE
 ## stringr                TRUE
+## pheatmap               TRUE
 \end{verbatim}
 
 \hypertarget{data}{%
@@ -1110,7 +1111,124 @@ A dedicated section presenting examples on community typing is in the
 \hypertarget{unsupervised-learning}{%
 \chapter{Unsupervised learning}\label{unsupervised-learning}}
 
-Coming up\ldots{}
+\hypertarget{biclustering}{%
+\section{Biclustering}\label{biclustering}}
+
+Exploring metabolomic data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\CommentTok{\# Threshold: metabolites whose (cv \textgreater{} +threshold or cv \textless{} {-}threshold), will be included}
+\NormalTok{cv\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.5}
+\NormalTok{metabolite\_trans }\OtherTok{\textless{}{-}} \StringTok{"nmr"}
+
+\CommentTok{\# Get the data}
+\NormalTok{metabolite\_tse }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{2}\NormalTok{]]}
+
+\CommentTok{\# Calculate coeffieicnt of variation of individual metabolites}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{cv =} \FunctionTok{apply}\NormalTok{(}\FunctionTok{assay}\NormalTok{(metabolite\_tse, metabolite\_trans), }\DecValTok{1}\NormalTok{, }
+                            \ControlFlowTok{function}\NormalTok{(x)\{}\FunctionTok{sd}\NormalTok{(x)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(x)\}))}
+
+\CommentTok{\# Plot them as a histogram, and show a line that is used as a threshold}
+\NormalTok{plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ cv)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins =} \DecValTok{50}\NormalTok{, }\AttributeTok{color=}\StringTok{"darkred"}\NormalTok{, }\AttributeTok{fill=}\StringTok{"lightblue"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"CV"}\NormalTok{, }\AttributeTok{y =} \StringTok{"metabolite frequency"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Distribution of coefficient of }
+\StringTok{       variation of log10 concentration of metabolites"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ cv\_threshold, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(cv\_threshold, }\DecValTok{6}\NormalTok{, }\AttributeTok{label =} 
+                  \FunctionTok{paste0}\NormalTok{(}\StringTok{"CV threshold ("}\NormalTok{, cv\_threshold, }\StringTok{")"}\NormalTok{), }\AttributeTok{vjust =} \DecValTok{2}\NormalTok{, }\AttributeTok{angle=}\DecValTok{90}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \SpecialCharTok{{-}}\NormalTok{cv\_threshold, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{cv\_threshold, }\DecValTok{6}\NormalTok{, }\AttributeTok{label =} 
+                  \FunctionTok{paste0}\NormalTok{(}\StringTok{"CV threshold ("}\NormalTok{, }\SpecialCharTok{{-}}\NormalTok{cv\_threshold, }\StringTok{")"}\NormalTok{), }\AttributeTok{vjust =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\AttributeTok{angle=}\DecValTok{90}\NormalTok{))}
+
+\NormalTok{plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+Subsetting metabolomic data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Get those metabolites that are over threshold}
+\NormalTok{metabolites\_over\_th }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(df[df}\SpecialCharTok{$}\NormalTok{cv }\SpecialCharTok{\textgreater{}}\NormalTok{ cv\_threshold }\SpecialCharTok{|} 
+\NormalTok{                                     df}\SpecialCharTok{$}\NormalTok{cv }\SpecialCharTok{\textless{}} \SpecialCharTok{{-}}\NormalTok{cv\_threshold, , }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{])}
+\CommentTok{\# Ignore those metabolites that do not have name / are NA}
+\NormalTok{metabolites\_over\_th }\OtherTok{\textless{}{-}}\NormalTok{ metabolites\_over\_th[}\SpecialCharTok{!}\FunctionTok{str\_detect}\NormalTok{(metabolites\_over\_th, }\StringTok{"NA"}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+Preprocessing microbiome and metabolomic data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rank }\OtherTok{\textless{}{-}} \StringTok{"Genus"}
+\NormalTok{prevalence }\OtherTok{\textless{}{-}} \FloatTok{0.2}
+\NormalTok{detection }\OtherTok{\textless{}{-}} \FloatTok{0.001}
+\NormalTok{taxa\_trans }\OtherTok{\textless{}{-}}  \StringTok{"rclr"}
+
+\CommentTok{\# Get bacterial data}
+\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{1}\NormalTok{]]}
+\CommentTok{\# Agglomerate at Genus level}
+\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{agglomerateByRank}\NormalTok{(taxa\_tse, }\AttributeTok{rank =}\NormalTok{ rank)}
+\CommentTok{\# Do CLR transformation}
+\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{transformSamples}\NormalTok{(taxa\_tse, }\AttributeTok{method =} \StringTok{"rclr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Subset metabolite data}
+\NormalTok{metabolite\_tse }\OtherTok{\textless{}{-}}\NormalTok{ metabolite\_tse[metabolites\_over\_th, ]}
+
+\CommentTok{\# Subset bacterial data by its prevalence. Bacteria whose prevalences are over }
+\CommentTok{\# threshold are included}
+\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{subsetByPrevalentTaxa}\NormalTok{(taxa\_tse, }
+                                  \AttributeTok{prevalence =}\NormalTok{ prevalence, }
+                                  \AttributeTok{detection =}\NormalTok{ detection)}
+
+\CommentTok{\# Remove uncultured and ambiguous(as it\textquotesingle{}s hard to interpret their results)}
+\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}}\NormalTok{ taxa\_tse[}\SpecialCharTok{{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"uncultured|Ambiguous\_taxa"}\NormalTok{, }\FunctionTok{names}\NormalTok{(taxa\_tse)),]}
+\end{Highlighting}
+\end{Shaded}
+
+Cross-correlation of both data and visualization:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(pheatmap)}
+\CommentTok{\# Define data sets to cross{-}correlate}
+\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{assay}\NormalTok{(taxa\_tse, taxa\_trans))}
+\NormalTok{y }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{assay}\NormalTok{(metabolite\_tse, }\StringTok{"nmr"}\NormalTok{))}
+\CommentTok{\# If there are duplicated taxa names, makes them unique}
+\FunctionTok{colnames}\NormalTok{(x) }\OtherTok{\textless{}{-}} \FunctionTok{str\_remove}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(x), }\FunctionTok{paste0}\NormalTok{(rank, }\StringTok{":"}\NormalTok{))}
+\FunctionTok{colnames}\NormalTok{(x) }\OtherTok{\textless{}{-}} \FunctionTok{make.unique}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(x))}
+
+\CommentTok{\# Cross correlate data sets}
+\NormalTok{correlations }\OtherTok{\textless{}{-}}\NormalTok{ microbiome}\SpecialCharTok{::}\FunctionTok{associate}\NormalTok{(x, y, }\AttributeTok{method =} \StringTok{"spearman"}\NormalTok{, }\AttributeTok{mode =} \StringTok{"matrix"}\NormalTok{)}
+
+\CommentTok{\# For plotting purpose, convert p{-}values, under 0.05 are marked with "X"}
+\NormalTok{p\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.01}
+\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{p.adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold, }\StringTok{"X"}\NormalTok{, }\StringTok{""}\NormalTok{)}
+
+\CommentTok{\# Scale colors}
+\NormalTok{breaks }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }
+              \AttributeTok{length.out =} \FunctionTok{ifelse}\NormalTok{( }\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))}\SpecialCharTok{\textgreater{}}\DecValTok{5}\NormalTok{, }
+                                   \DecValTok{2}\SpecialCharTok{*}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }\DecValTok{10}\NormalTok{ ) )}
+\NormalTok{colors }\OtherTok{\textless{}{-}} \FunctionTok{colorRampPalette}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"darkblue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"white"}\NormalTok{, }
+                             \StringTok{"red"}\NormalTok{, }\StringTok{"darkred"}\NormalTok{))(}\FunctionTok{length}\NormalTok{(breaks)}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# Create a heatmap}
+\FunctionTok{pheatmap}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor, }\AttributeTok{display\_numbers =}\NormalTok{ p\_values,}
+               \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Correlations between bacteria and metabolites }
+\StringTok{              (statistically significant associations (p \textless{} 0.05) marked with X)"}\NormalTok{),}
+               \AttributeTok{fontsize =} \DecValTok{10}\NormalTok{,}
+               \AttributeTok{breaks =}\NormalTok{ breaks,}
+               \AttributeTok{color =}\NormalTok{ colors, }
+               \AttributeTok{fontsize\_number =} \DecValTok{20}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-5-1.pdf}
 
 \hypertarget{supervised-learning}{%
 \chapter{Supervised learning}\label{supervised-learning}}

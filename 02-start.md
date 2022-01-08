@@ -38,7 +38,7 @@ the R session. Only uninstalled packages are installed.
 # List of packages that we need from cran and bioc 
 cran_pkg <- c("BiocManager", "bookdown", "dplyr", "ecodist", "ggplot2", 
               "gridExtra", "kableExtra", "knitr", "scales", "vegan", "caret",
-              "ranger", "stringr")
+              "ranger", "stringr", "pheatmap")
 bioc_pkg <- c("ANCOMBC", "ape", "DESeq2",  "DirichletMultinomial", "mia",
               "miaViz", "microbiomeDataSets")
 
@@ -104,6 +104,7 @@ as.data.frame(loaded)
 ## caret                  TRUE
 ## ranger                 TRUE
 ## stringr                TRUE
+## pheatmap               TRUE
 ```
 
 
