@@ -24,7 +24,7 @@
 <meta name="author" content="University of Turku" />
 
 
-<meta name="date" content="2022-01-05" />
+<meta name="date" content="2022-01-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -444,6 +444,26 @@ names. We can fetch those from our rowData. Here we use Genus level names:</p>
 <span id="cb32-6"><a href="beta-diversity.html#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> names) <span class="co"># Adds new labels</span></span>
 <span id="cb32-7"><a href="beta-diversity.html#cb32-7" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot</span></code></pre></div>
 <p><img src="05-beta_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>The same test can be conducted using the oridination from PCoA as follows:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="beta-diversity.html#cb33-1" aria-hidden="true" tabindex="-1"></a>bray_curtis_pcoa_df<span class="sc">$</span>Diet <span class="ot">&lt;-</span> <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet</span>
+<span id="cb33-2"><a href="beta-diversity.html#cb33-2" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb33-3"><a href="beta-diversity.html#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(pc <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;pcoa1&quot;</span>, <span class="st">&quot;pcoa2&quot;</span>)){</span>
+<span id="cb33-4"><a href="beta-diversity.html#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creates a formula from objects</span></span>
+<span id="cb33-5"><a href="beta-diversity.html#cb33-5" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste0</span>(pc, <span class="st">&quot; ~ &quot;</span>, <span class="st">&quot;Diet&quot;</span>))</span>
+<span id="cb33-6"><a href="beta-diversity.html#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Does the permanova analysis</span></span>
+<span id="cb33-7"><a href="beta-diversity.html#cb33-7" aria-hidden="true" tabindex="-1"></a>  p_values[[pc]] <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis</span>(formula, <span class="at">data =</span> bray_curtis_pcoa_df,</span>
+<span id="cb33-8"><a href="beta-diversity.html#cb33-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">permutations =</span> <span class="dv">9999</span>, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span></span>
+<span id="cb33-9"><a href="beta-diversity.html#cb33-9" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">$</span>aov.tab[<span class="st">&quot;Diet&quot;</span>, <span class="st">&quot;Pr(&gt;F)&quot;</span>]</span>
+<span id="cb33-10"><a href="beta-diversity.html#cb33-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb33-11"><a href="beta-diversity.html#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-12"><a href="beta-diversity.html#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a plot</span></span>
+<span id="cb33-13"><a href="beta-diversity.html#cb33-13" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> bray_curtis_pcoa_df, <span class="fu">aes_string</span>(<span class="at">x =</span> <span class="st">&quot;pcoa1&quot;</span>, <span class="at">y =</span> <span class="st">&quot;pcoa2&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Diet&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb33-14"><a href="beta-diversity.html#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb33-15"><a href="beta-diversity.html#cb33-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;PCoA beta diversity ordination for microbiome samples&quot;</span>), <span class="at">x =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC1 (p = &quot;</span>, p_values[[<span class="st">&quot;pcoa1&quot;</span>]], <span class="st">&quot;)&quot;</span>), <span class="at">y =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC2 (p = &quot;</span>, p_values[[<span class="st">&quot;pcoa2&quot;</span>]], <span class="st">&quot;)&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb33-16"><a href="beta-diversity.html#cb33-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="dv">12</span>) </span>
+<span id="cb33-17"><a href="beta-diversity.html#cb33-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-18"><a href="beta-diversity.html#cb33-18" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
+<p><img src="05-beta_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>There are many alternative and complementary methods for analysing
 community composition. For more examples, see a dedicated section on
 beta diversity in the <a href="https://microbiome.github.io/OMA/microbiome-diversity.html#beta-diversity">online

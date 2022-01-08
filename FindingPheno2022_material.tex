@@ -6,7 +6,7 @@
   oneside]{book}
 \title{Introduction to multi-omics data analysis}
 \author{University of Turku}
-\date{2022-01-05}
+\date{2022-01-08}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -1068,6 +1068,33 @@ names. We can fetch those from our rowData. Here we use Genus level names:
 \end{Shaded}
 
 \includegraphics{05-beta_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+The same test can be conducted using the oridination from PCoA as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bray\_curtis\_pcoa\_df}\SpecialCharTok{$}\NormalTok{Diet }\OtherTok{\textless{}{-}} \FunctionTok{colData}\NormalTok{(mae)}\SpecialCharTok{$}\NormalTok{Diet}
+\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(pc }\ControlFlowTok{in} \FunctionTok{c}\NormalTok{(}\StringTok{"pcoa1"}\NormalTok{, }\StringTok{"pcoa2"}\NormalTok{))\{}
+  \CommentTok{\# Creates a formula from objects}
+\NormalTok{  formula }\OtherTok{\textless{}{-}} \FunctionTok{as.formula}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(pc, }\StringTok{" \textasciitilde{} "}\NormalTok{, }\StringTok{"Diet"}\NormalTok{))}
+  \CommentTok{\# Does the permanova analysis}
+\NormalTok{  p\_values[[pc]] }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{adonis}\NormalTok{(formula, }\AttributeTok{data =}\NormalTok{ bray\_curtis\_pcoa\_df,}
+                                  \AttributeTok{permutations =} \DecValTok{9999}\NormalTok{, }\AttributeTok{method =} \StringTok{"euclidean"}
+\NormalTok{  )}\SpecialCharTok{$}\NormalTok{aov.tab[}\StringTok{"Diet"}\NormalTok{, }\StringTok{"Pr(\textgreater{}F)"}\NormalTok{]}
+\NormalTok{\}}
+
+\CommentTok{\# Creates a plot}
+\NormalTok{plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ bray\_curtis\_pcoa\_df, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =} \StringTok{"pcoa1"}\NormalTok{, }\AttributeTok{y =} \StringTok{"pcoa2"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Diet"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PCoA beta diversity ordination for microbiome samples"}\NormalTok{), }\AttributeTok{x =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC1 (p = "}\NormalTok{, p\_values[[}\StringTok{"pcoa1"}\NormalTok{]], }\StringTok{")"}\NormalTok{), }\AttributeTok{y =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC2 (p = "}\NormalTok{, p\_values[[}\StringTok{"pcoa2"}\NormalTok{]], }\StringTok{")"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{(}\DecValTok{12}\NormalTok{) }
+
+\NormalTok{plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{05-beta_files/figure-latex/unnamed-chunk-3-1.pdf}
 
 There are many alternative and complementary methods for analysing
 community composition. For more examples, see a dedicated section on
