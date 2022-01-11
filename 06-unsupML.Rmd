@@ -25,6 +25,12 @@ mae[[1]] <- transformCounts(mae[[1]], method = "relabundance")
 
 # Unsupervised learning
 
+Unsupervised learning is a part of machine learning where we try to find information
+from unknown data. It is also called data mining. Usually this means finding of
+clusters, for instance. Cluster refers to group of samples/features that are similar
+between each other. For example, based on clinical data we can try to find patient 
+groups that have similar response to used drug.
+
 ## Biclustering
 
 Biclustering is a clustering method, which simultaneously clusters rows and columns.
