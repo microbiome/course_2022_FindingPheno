@@ -198,8 +198,6 @@ div.csl-indent {
 <li class="chapter" data-level="6.1" data-path="beta-diversity.html"><a href="beta-diversity.html#examples-of-pcoa-with-different-settings"><i class="fa fa-check"></i><b>6.1</b> Examples of PCoA with different settings</a>
 <ul>
 <li class="chapter" data-level="6.1.1" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-bray-curtis"><i class="fa fa-check"></i><b>6.1.1</b> PCoA for ASV-level data with Bray-Curtis</a></li>
-<li class="chapter" data-level="6.1.2" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-aitchison-distance"><i class="fa fa-check"></i><b>6.1.2</b> PCoA for ASV-level data with Aitchison distance</a></li>
-<li class="chapter" data-level="6.1.3" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-aggregated-to-phylum-level"><i class="fa fa-check"></i><b>6.1.3</b> PCoA aggregated to Phylum level</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="beta-diversity.html"><a href="beta-diversity.html#highlighting-external-variables"><i class="fa fa-check"></i><b>6.2</b> Highlighting external variables</a></li>
 <li class="chapter" data-level="6.3" data-path="beta-diversity.html"><a href="beta-diversity.html#estimating-associations-with-an-external-variable"><i class="fa fa-check"></i><b>6.3</b> Estimating associations with an external variable</a></li>
@@ -239,10 +237,7 @@ div.csl-indent {
 <p>Beta diversity is another name for sample dissimilarity. It quantifies
 differences in the overall taxonomic composition between two samples.</p>
 <p>Common indices include Bray-Curtis, Unifrac, Jaccard index, and the
-Aitchison distance. Each of these (dis)similarity measures emphasizes
-different aspects. For example, UniFrac incorporates phylogenetic
-information, and Jaccard index ignores exact abundances and considers
-only presence/absence values. For more background information
+Aitchison distance. For more background information
 and examples, you can check the dedicated section in <a href="https://microbiome.github.io/OMA/microbiome-diversity.html#beta-diversity">online
 book</a>.</p>
 <div id="examples-of-pcoa-with-different-settings" class="section level2" number="6.1">
@@ -266,8 +261,7 @@ visualized on a two (or three) dimensional display.</p>
 <p>Let us next look at some concrete examples.</p>
 <div id="pcoa-for-asv-level-data-with-bray-curtis" class="section level3" number="6.1.1">
 <h3><span class="header-section-number">6.1.1</span> PCoA for ASV-level data with Bray-Curtis</h3>
-<p>Let us start with PCoA based on a Bray-Curtis dissimilarity matrix
-calculated at Genus level abundances.</p>
+<p>Let us start with PCoA based on a Bray-Curtis dissimilarity matrix.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="beta-diversity.html#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pick the relative abundance table</span></span>
 <span id="cb25-2"><a href="beta-diversity.html#cb25-2" aria-hidden="true" tabindex="-1"></a>rel_abund_assay <span class="ot">&lt;-</span> <span class="fu">assays</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>relabundance</span>
 <span id="cb25-3"><a href="beta-diversity.html#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -291,81 +285,10 @@ calculated at Genus level abundances.</p>
 <span id="cb25-21"><a href="beta-diversity.html#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;PC1&quot;</span>,</span>
 <span id="cb25-22"><a href="beta-diversity.html#cb25-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;PC2&quot;</span>, </span>
 <span id="cb25-23"><a href="beta-diversity.html#cb25-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Bray-Curtis PCoA&quot;</span>) <span class="sc">+</span></span>
-<span id="cb25-24"><a href="beta-diversity.html#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>)) <span class="co"># makes titles smaller</span></span>
+<span id="cb25-24"><a href="beta-diversity.html#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="dv">12</span>) <span class="co"># makes titles smaller</span></span>
 <span id="cb25-25"><a href="beta-diversity.html#cb25-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-26"><a href="beta-diversity.html#cb25-26" aria-hidden="true" tabindex="-1"></a>bray_curtis_plot</span></code></pre></div>
 <p><img src="05-beta_files/figure-html/pcoa_asv_bc-1.png" width="672" /></p>
-</div>
-<div id="pcoa-for-asv-level-data-with-aitchison-distance" class="section level3" number="6.1.2">
-<h3><span class="header-section-number">6.1.2</span> PCoA for ASV-level data with Aitchison distance</h3>
-<p>Now the same using Aitchison distance. This metric corresponds to
-Euclidean distances between CLR transformed sample abundance vectors.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="beta-diversity.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Does clr transformation. Pseudocount is added, because data contains zeros. </span></span>
-<span id="cb26-2"><a href="beta-diversity.html#cb26-2" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">transformCounts</span>(mae[[<span class="dv">1</span>]], <span class="at">method =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
-<span id="cb26-3"><a href="beta-diversity.html#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="beta-diversity.html#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets clr table</span></span>
-<span id="cb26-5"><a href="beta-diversity.html#cb26-5" aria-hidden="true" tabindex="-1"></a>clr_assay <span class="ot">&lt;-</span> <span class="fu">assays</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>clr</span>
-<span id="cb26-6"><a href="beta-diversity.html#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-7"><a href="beta-diversity.html#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Transposes it to get taxa to columns</span></span>
-<span id="cb26-8"><a href="beta-diversity.html#cb26-8" aria-hidden="true" tabindex="-1"></a>clr_assay <span class="ot">&lt;-</span> <span class="fu">t</span>(clr_assay)</span>
-<span id="cb26-9"><a href="beta-diversity.html#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-10"><a href="beta-diversity.html#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculates Euclidean distances between samples. Because taxa is in columns,</span></span>
-<span id="cb26-11"><a href="beta-diversity.html#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co"># it is used to compare different samples.</span></span>
-<span id="cb26-12"><a href="beta-diversity.html#cb26-12" aria-hidden="true" tabindex="-1"></a>euclidean_dist <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">vegdist</span>(clr_assay, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span>)</span>
-<span id="cb26-13"><a href="beta-diversity.html#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-14"><a href="beta-diversity.html#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Does principal coordinate analysis</span></span>
-<span id="cb26-15"><a href="beta-diversity.html#cb26-15" aria-hidden="true" tabindex="-1"></a>euclidean_pcoa <span class="ot">&lt;-</span> ecodist<span class="sc">::</span><span class="fu">pco</span>(euclidean_dist)</span>
-<span id="cb26-16"><a href="beta-diversity.html#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-17"><a href="beta-diversity.html#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a data frame from principal coordinates</span></span>
-<span id="cb26-18"><a href="beta-diversity.html#cb26-18" aria-hidden="true" tabindex="-1"></a>euclidean_pcoa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pcoa1 =</span> euclidean_pcoa<span class="sc">$</span>vectors[,<span class="dv">1</span>], </span>
-<span id="cb26-19"><a href="beta-diversity.html#cb26-19" aria-hidden="true" tabindex="-1"></a>                                <span class="at">pcoa2 =</span> euclidean_pcoa<span class="sc">$</span>vectors[,<span class="dv">2</span>])</span>
-<span id="cb26-20"><a href="beta-diversity.html#cb26-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-21"><a href="beta-diversity.html#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates the plot</span></span>
-<span id="cb26-22"><a href="beta-diversity.html#cb26-22" aria-hidden="true" tabindex="-1"></a>euclidean_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> euclidean_pcoa_df, <span class="fu">aes</span>(<span class="at">x=</span>pcoa1, <span class="at">y=</span>pcoa2)) <span class="sc">+</span></span>
-<span id="cb26-23"><a href="beta-diversity.html#cb26-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb26-24"><a href="beta-diversity.html#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;PC1&quot;</span>,</span>
-<span id="cb26-25"><a href="beta-diversity.html#cb26-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;PC2&quot;</span>,</span>
-<span id="cb26-26"><a href="beta-diversity.html#cb26-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Euclidean PCoA with CLR transformation&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-27"><a href="beta-diversity.html#cb26-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)) <span class="co"># makes titles smaller</span></span>
-<span id="cb26-28"><a href="beta-diversity.html#cb26-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-29"><a href="beta-diversity.html#cb26-29" aria-hidden="true" tabindex="-1"></a>euclidean_plot</span></code></pre></div>
-<p><img src="05-beta_files/figure-html/pcoa_asv_aitchison-1.png" width="672" /></p>
-</div>
-<div id="pcoa-aggregated-to-phylum-level" class="section level3" number="6.1.3">
-<h3><span class="header-section-number">6.1.3</span> PCoA aggregated to Phylum level</h3>
-<p>We use again the Aitchison distances in this example but this time applied to the phylum level.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="beta-diversity.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Does clr transformation. Psuedocount is added, because data contains zeros. </span></span>
-<span id="cb27-2"><a href="beta-diversity.html#cb27-2" aria-hidden="true" tabindex="-1"></a>se_phylum <span class="ot">&lt;-</span> <span class="fu">transformCounts</span>(se_phylum, <span class="at">method =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
-<span id="cb27-3"><a href="beta-diversity.html#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="beta-diversity.html#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets clr table</span></span>
-<span id="cb27-5"><a href="beta-diversity.html#cb27-5" aria-hidden="true" tabindex="-1"></a>clr_phylum_assay <span class="ot">&lt;-</span> <span class="fu">assays</span>(se_phylum)<span class="sc">$</span>clr</span>
-<span id="cb27-6"><a href="beta-diversity.html#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="beta-diversity.html#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Transposes it to get taxa to columns</span></span>
-<span id="cb27-8"><a href="beta-diversity.html#cb27-8" aria-hidden="true" tabindex="-1"></a>clr_phylum_assay <span class="ot">&lt;-</span> <span class="fu">t</span>(clr_phylum_assay)</span>
-<span id="cb27-9"><a href="beta-diversity.html#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-10"><a href="beta-diversity.html#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculates Euclidean distances between samples. Because taxa is in columns,</span></span>
-<span id="cb27-11"><a href="beta-diversity.html#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co"># it is used to compare different samples.</span></span>
-<span id="cb27-12"><a href="beta-diversity.html#cb27-12" aria-hidden="true" tabindex="-1"></a>euclidean_phylum_dist <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">vegdist</span>(clr_assay, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span>)</span>
-<span id="cb27-13"><a href="beta-diversity.html#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-14"><a href="beta-diversity.html#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Does principal coordinate analysis</span></span>
-<span id="cb27-15"><a href="beta-diversity.html#cb27-15" aria-hidden="true" tabindex="-1"></a>euclidean_phylum_pcoa <span class="ot">&lt;-</span> ecodist<span class="sc">::</span><span class="fu">pco</span>(euclidean_phylum_dist)</span>
-<span id="cb27-16"><a href="beta-diversity.html#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-17"><a href="beta-diversity.html#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a data frame from principal coordinates</span></span>
-<span id="cb27-18"><a href="beta-diversity.html#cb27-18" aria-hidden="true" tabindex="-1"></a>euclidean_phylum_pcoa_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb27-19"><a href="beta-diversity.html#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">pcoa1 =</span> euclidean_phylum_pcoa<span class="sc">$</span>vectors[,<span class="dv">1</span>], </span>
-<span id="cb27-20"><a href="beta-diversity.html#cb27-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">pcoa2 =</span> euclidean_phylum_pcoa<span class="sc">$</span>vectors[,<span class="dv">2</span>])</span>
-<span id="cb27-21"><a href="beta-diversity.html#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-22"><a href="beta-diversity.html#cb27-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a plot</span></span>
-<span id="cb27-23"><a href="beta-diversity.html#cb27-23" aria-hidden="true" tabindex="-1"></a>euclidean_phylum_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> euclidean_phylum_pcoa_df,</span>
-<span id="cb27-24"><a href="beta-diversity.html#cb27-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x=</span>pcoa1, <span class="at">y=</span>pcoa2)) <span class="sc">+</span></span>
-<span id="cb27-25"><a href="beta-diversity.html#cb27-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb27-26"><a href="beta-diversity.html#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;PC1&quot;</span>,</span>
-<span id="cb27-27"><a href="beta-diversity.html#cb27-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;PC2&quot;</span>,</span>
-<span id="cb27-28"><a href="beta-diversity.html#cb27-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Aitchison distances at Phylum level&quot;</span>) <span class="sc">+</span>  </span>
-<span id="cb27-29"><a href="beta-diversity.html#cb27-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)) <span class="co"># makes titles smaller</span></span>
-<span id="cb27-30"><a href="beta-diversity.html#cb27-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-31"><a href="beta-diversity.html#cb27-31" aria-hidden="true" tabindex="-1"></a>euclidean_phylum_plot</span></code></pre></div>
-<p><img src="05-beta_files/figure-html/pcoa_phylum_aitchison-1.png" width="672" /></p>
 </div>
 </div>
 <div id="highlighting-external-variables" class="section level2" number="6.2">
@@ -373,23 +296,19 @@ Euclidean distances between CLR transformed sample abundance vectors.</p>
 <p>We can map other variables on the same plot for example by coloring
 the points accordingly.</p>
 <p>The following is an example with a discrete grouping variable (Diet) shown with colors:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="beta-diversity.html#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Adds the variable we later use for coloring to the data frame</span></span>
-<span id="cb28-2"><a href="beta-diversity.html#cb28-2" aria-hidden="true" tabindex="-1"></a>euclidean_diet_pcoa_df <span class="ot">&lt;-</span> <span class="fu">cbind</span>(euclidean_pcoa_df,</span>
-<span id="cb28-3"><a href="beta-diversity.html#cb28-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">Diet =</span> <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet)</span>
-<span id="cb28-4"><a href="beta-diversity.html#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="beta-diversity.html#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a plot</span></span>
-<span id="cb28-6"><a href="beta-diversity.html#cb28-6" aria-hidden="true" tabindex="-1"></a>euclidean_diet_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> euclidean_diet_pcoa_df, </span>
-<span id="cb28-7"><a href="beta-diversity.html#cb28-7" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">aes</span>(<span class="at">x=</span>pcoa1, <span class="at">y=</span>pcoa2,</span>
-<span id="cb28-8"><a href="beta-diversity.html#cb28-8" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">color =</span> Diet)) <span class="sc">+</span></span>
-<span id="cb28-9"><a href="beta-diversity.html#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb28-10"><a href="beta-diversity.html#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;PC1&quot;</span>,</span>
-<span id="cb28-11"><a href="beta-diversity.html#cb28-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;PC2&quot;</span>,</span>
-<span id="cb28-12"><a href="beta-diversity.html#cb28-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;PCoA with Aitchison distances&quot;</span>) <span class="sc">+</span></span>
-<span id="cb28-13"><a href="beta-diversity.html#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)) <span class="co"># makes titles smaller</span></span>
-<span id="cb28-14"><a href="beta-diversity.html#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-15"><a href="beta-diversity.html#cb28-15" aria-hidden="true" tabindex="-1"></a>euclidean_diet_plot</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="beta-diversity.html#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add diet information to data.frame</span></span>
+<span id="cb26-2"><a href="beta-diversity.html#cb26-2" aria-hidden="true" tabindex="-1"></a>bray_curtis_pcoa_df<span class="sc">$</span>Diet <span class="ot">&lt;-</span> <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet</span>
+<span id="cb26-3"><a href="beta-diversity.html#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="beta-diversity.html#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a plot</span></span>
+<span id="cb26-5"><a href="beta-diversity.html#cb26-5" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> bray_curtis_pcoa_df, <span class="fu">aes_string</span>(<span class="at">x =</span> <span class="st">&quot;pcoa1&quot;</span>, <span class="at">y =</span> <span class="st">&quot;pcoa2&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Diet&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb26-6"><a href="beta-diversity.html#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb26-7"><a href="beta-diversity.html#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;PC1&quot;</span>,</span>
+<span id="cb26-8"><a href="beta-diversity.html#cb26-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;PC2&quot;</span>, </span>
+<span id="cb26-9"><a href="beta-diversity.html#cb26-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Bray-Curtis PCoA&quot;</span>) <span class="sc">+</span></span>
+<span id="cb26-10"><a href="beta-diversity.html#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="dv">12</span>) </span>
+<span id="cb26-11"><a href="beta-diversity.html#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-12"><a href="beta-diversity.html#cb26-12" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <p><img src="05-beta_files/figure-html/pcoa_genus-1.png" width="672" /></p>
-<p>PCoA plot in some cases could also be overlayed with a continuous variable. (<a href="https://microbiome.github.io/course_2022_miaverse/beta-diversity.html#pcoa-plot-with-continuous-variable">see example</a>)</p>
 </div>
 <div id="estimating-associations-with-an-external-variable" class="section level2" number="6.3">
 <h2><span class="header-section-number">6.3</span> Estimating associations with an external variable</h2>
@@ -402,73 +321,73 @@ multivariate analysis of variance (PERMANOVA). This method takes as
 input the abundance table, which measure of distance you want to base
 the test on and a formula that tells the model how you think the
 variables are associated with each other.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="beta-diversity.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First we get the relative abundance table</span></span>
-<span id="cb29-2"><a href="beta-diversity.html#cb29-2" aria-hidden="true" tabindex="-1"></a>rel_abund_assay <span class="ot">&lt;-</span> <span class="fu">assays</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>relabundance</span>
-<span id="cb29-3"><a href="beta-diversity.html#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="beta-diversity.html#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># again transpose it to get taxa to columns</span></span>
-<span id="cb29-5"><a href="beta-diversity.html#cb29-5" aria-hidden="true" tabindex="-1"></a>rel_abund_assay <span class="ot">&lt;-</span> <span class="fu">t</span>(rel_abund_assay)</span>
-<span id="cb29-6"><a href="beta-diversity.html#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-7"><a href="beta-diversity.html#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># then we can perform the method</span></span>
-<span id="cb29-8"><a href="beta-diversity.html#cb29-8" aria-hidden="true" tabindex="-1"></a>permanova_diet <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis</span>(rel_abund_assay <span class="sc">~</span> Diet,</span>
-<span id="cb29-9"><a href="beta-diversity.html#cb29-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">data =</span> <span class="fu">colData</span>(mae),</span>
-<span id="cb29-10"><a href="beta-diversity.html#cb29-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">permutations =</span> <span class="dv">99</span>)</span>
-<span id="cb29-11"><a href="beta-diversity.html#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-12"><a href="beta-diversity.html#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co"># we can obtain a the p value for our predictor:</span></span>
-<span id="cb29-13"><a href="beta-diversity.html#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;The test result p-value: &quot;</span>, </span>
-<span id="cb29-14"><a href="beta-diversity.html#cb29-14" aria-hidden="true" tabindex="-1"></a>              <span class="fu">as.data.frame</span>(permanova_diet<span class="sc">$</span>aov.tab)[<span class="st">&quot;Diet&quot;</span>, <span class="st">&quot;Pr(&gt;F)&quot;</span>]))</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="beta-diversity.html#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># First we get the relative abundance table</span></span>
+<span id="cb27-2"><a href="beta-diversity.html#cb27-2" aria-hidden="true" tabindex="-1"></a>rel_abund_assay <span class="ot">&lt;-</span> <span class="fu">assays</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>relabundance</span>
+<span id="cb27-3"><a href="beta-diversity.html#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="beta-diversity.html#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># again transpose it to get taxa to columns</span></span>
+<span id="cb27-5"><a href="beta-diversity.html#cb27-5" aria-hidden="true" tabindex="-1"></a>rel_abund_assay <span class="ot">&lt;-</span> <span class="fu">t</span>(rel_abund_assay)</span>
+<span id="cb27-6"><a href="beta-diversity.html#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="beta-diversity.html#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># then we can perform the method</span></span>
+<span id="cb27-8"><a href="beta-diversity.html#cb27-8" aria-hidden="true" tabindex="-1"></a>permanova_diet <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis</span>(rel_abund_assay <span class="sc">~</span> Diet,</span>
+<span id="cb27-9"><a href="beta-diversity.html#cb27-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">data =</span> <span class="fu">colData</span>(mae),</span>
+<span id="cb27-10"><a href="beta-diversity.html#cb27-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">permutations =</span> <span class="dv">99</span>)</span>
+<span id="cb27-11"><a href="beta-diversity.html#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="beta-diversity.html#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co"># we can obtain a the p value for our predictor:</span></span>
+<span id="cb27-13"><a href="beta-diversity.html#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;The test result p-value: &quot;</span>, </span>
+<span id="cb27-14"><a href="beta-diversity.html#cb27-14" aria-hidden="true" tabindex="-1"></a>              <span class="fu">as.data.frame</span>(permanova_diet<span class="sc">$</span>aov.tab)[<span class="st">&quot;Diet&quot;</span>, <span class="st">&quot;Pr(&gt;F)&quot;</span>]))</span></code></pre></div>
 <pre><code>## [1] &quot;The test result p-value: 0.01&quot;</code></pre>
 <p>The diet variable is significantly associated with
 microbiota composition (p-value is less than 0.05).</p>
 <p>We can visualize those taxa whose abundances drive the
 differences between diets. We first need to extract the model
 coefficients of taxa:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="beta-diversity.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets the coefficients</span></span>
-<span id="cb31-2"><a href="beta-diversity.html#cb31-2" aria-hidden="true" tabindex="-1"></a>coef <span class="ot">&lt;-</span> <span class="fu">coefficients</span>(permanova_diet)[<span class="st">&quot;Diet1&quot;</span>,]</span>
-<span id="cb31-3"><a href="beta-diversity.html#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-4"><a href="beta-diversity.html#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets the highest coefficients</span></span>
-<span id="cb31-5"><a href="beta-diversity.html#cb31-5" aria-hidden="true" tabindex="-1"></a>top.coef <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">head</span>(coef[<span class="fu">rev</span>(<span class="fu">order</span>(<span class="fu">abs</span>(coef)))],<span class="dv">20</span>))</span>
-<span id="cb31-6"><a href="beta-diversity.html#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-7"><a href="beta-diversity.html#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plots the coefficients</span></span>
-<span id="cb31-8"><a href="beta-diversity.html#cb31-8" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> top.coef,</span>
-<span id="cb31-9"><a href="beta-diversity.html#cb31-9" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">y =</span> <span class="fu">factor</span>(<span class="fu">names</span>(top.coef),</span>
-<span id="cb31-10"><a href="beta-diversity.html#cb31-10" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">unique</span>(<span class="fu">names</span>(top.coef)))),</span>
-<span id="cb31-11"><a href="beta-diversity.html#cb31-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
-<span id="cb31-12"><a href="beta-diversity.html#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">&quot;identity&quot;</span>) <span class="sc">+</span></span>
-<span id="cb31-13"><a href="beta-diversity.html#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;&quot;</span>, <span class="at">y=</span><span class="st">&quot;&quot;</span>, <span class="at">title=</span><span class="st">&quot;Top Taxa&quot;</span>) <span class="sc">+</span></span>
-<span id="cb31-14"><a href="beta-diversity.html#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
-<span id="cb31-15"><a href="beta-diversity.html#cb31-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-16"><a href="beta-diversity.html#cb31-16" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="beta-diversity.html#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets the coefficients</span></span>
+<span id="cb29-2"><a href="beta-diversity.html#cb29-2" aria-hidden="true" tabindex="-1"></a>coef <span class="ot">&lt;-</span> <span class="fu">coefficients</span>(permanova_diet)[<span class="st">&quot;Diet1&quot;</span>,]</span>
+<span id="cb29-3"><a href="beta-diversity.html#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="beta-diversity.html#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets the highest coefficients</span></span>
+<span id="cb29-5"><a href="beta-diversity.html#cb29-5" aria-hidden="true" tabindex="-1"></a>top.coef <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">head</span>(coef[<span class="fu">rev</span>(<span class="fu">order</span>(<span class="fu">abs</span>(coef)))],<span class="dv">20</span>))</span>
+<span id="cb29-6"><a href="beta-diversity.html#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="beta-diversity.html#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plots the coefficients</span></span>
+<span id="cb29-8"><a href="beta-diversity.html#cb29-8" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="fu">data.frame</span>(<span class="at">x =</span> top.coef,</span>
+<span id="cb29-9"><a href="beta-diversity.html#cb29-9" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">y =</span> <span class="fu">factor</span>(<span class="fu">names</span>(top.coef),</span>
+<span id="cb29-10"><a href="beta-diversity.html#cb29-10" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">unique</span>(<span class="fu">names</span>(top.coef)))),</span>
+<span id="cb29-11"><a href="beta-diversity.html#cb29-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)) <span class="sc">+</span></span>
+<span id="cb29-12"><a href="beta-diversity.html#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">&quot;identity&quot;</span>) <span class="sc">+</span></span>
+<span id="cb29-13"><a href="beta-diversity.html#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;&quot;</span>, <span class="at">y=</span><span class="st">&quot;&quot;</span>, <span class="at">title=</span><span class="st">&quot;Top Taxa&quot;</span>) <span class="sc">+</span></span>
+<span id="cb29-14"><a href="beta-diversity.html#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>()</span>
+<span id="cb29-15"><a href="beta-diversity.html#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="beta-diversity.html#cb29-16" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot</span></code></pre></div>
 <p><img src="05-beta_files/figure-html/permanova_coefs-1.png" width="672" /></p>
 <p>The above plot shows taxa as code names, and it is hard to tell which
 bacterial groups they represent. However, it is easy to add human readable
 names. We can fetch those from our rowData. Here we use Genus level names:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="beta-diversity.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets corresponding Genus level names and stores them to top.coef</span></span>
-<span id="cb32-2"><a href="beta-diversity.html#cb32-2" aria-hidden="true" tabindex="-1"></a>names <span class="ot">&lt;-</span> <span class="fu">rowData</span>(mae[[<span class="dv">1</span>]])[<span class="fu">names</span>(top.coef), ][,<span class="st">&quot;Genus&quot;</span>]</span>
-<span id="cb32-3"><a href="beta-diversity.html#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-4"><a href="beta-diversity.html#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Adds new labels to the plot</span></span>
-<span id="cb32-5"><a href="beta-diversity.html#cb32-5" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot <span class="ot">&lt;-</span> top_taxa_coeffient_plot <span class="sc">+</span></span>
-<span id="cb32-6"><a href="beta-diversity.html#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> names) <span class="co"># Adds new labels</span></span>
-<span id="cb32-7"><a href="beta-diversity.html#cb32-7" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="beta-diversity.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets corresponding Genus level names and stores them to top.coef</span></span>
+<span id="cb30-2"><a href="beta-diversity.html#cb30-2" aria-hidden="true" tabindex="-1"></a>names <span class="ot">&lt;-</span> <span class="fu">rowData</span>(mae[[<span class="dv">1</span>]])[<span class="fu">names</span>(top.coef), ][,<span class="st">&quot;Genus&quot;</span>]</span>
+<span id="cb30-3"><a href="beta-diversity.html#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="beta-diversity.html#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Adds new labels to the plot</span></span>
+<span id="cb30-5"><a href="beta-diversity.html#cb30-5" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot <span class="ot">&lt;-</span> top_taxa_coeffient_plot <span class="sc">+</span></span>
+<span id="cb30-6"><a href="beta-diversity.html#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_discrete</span>(<span class="at">labels =</span> names) <span class="co"># Adds new labels</span></span>
+<span id="cb30-7"><a href="beta-diversity.html#cb30-7" aria-hidden="true" tabindex="-1"></a>top_taxa_coeffient_plot</span></code></pre></div>
 <p><img src="05-beta_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<p>The same test can be conducted using the oridination from PCoA as follows:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="beta-diversity.html#cb33-1" aria-hidden="true" tabindex="-1"></a>bray_curtis_pcoa_df<span class="sc">$</span>Diet <span class="ot">&lt;-</span> <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet</span>
-<span id="cb33-2"><a href="beta-diversity.html#cb33-2" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb33-3"><a href="beta-diversity.html#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(pc <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;pcoa1&quot;</span>, <span class="st">&quot;pcoa2&quot;</span>)){</span>
-<span id="cb33-4"><a href="beta-diversity.html#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creates a formula from objects</span></span>
-<span id="cb33-5"><a href="beta-diversity.html#cb33-5" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste0</span>(pc, <span class="st">&quot; ~ &quot;</span>, <span class="st">&quot;Diet&quot;</span>))</span>
-<span id="cb33-6"><a href="beta-diversity.html#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Does the permanova analysis</span></span>
-<span id="cb33-7"><a href="beta-diversity.html#cb33-7" aria-hidden="true" tabindex="-1"></a>  p_values[[pc]] <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis</span>(formula, <span class="at">data =</span> bray_curtis_pcoa_df,</span>
-<span id="cb33-8"><a href="beta-diversity.html#cb33-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">permutations =</span> <span class="dv">9999</span>, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span></span>
-<span id="cb33-9"><a href="beta-diversity.html#cb33-9" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">$</span>aov.tab[<span class="st">&quot;Diet&quot;</span>, <span class="st">&quot;Pr(&gt;F)&quot;</span>]</span>
-<span id="cb33-10"><a href="beta-diversity.html#cb33-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb33-11"><a href="beta-diversity.html#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-12"><a href="beta-diversity.html#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a plot</span></span>
-<span id="cb33-13"><a href="beta-diversity.html#cb33-13" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> bray_curtis_pcoa_df, <span class="fu">aes_string</span>(<span class="at">x =</span> <span class="st">&quot;pcoa1&quot;</span>, <span class="at">y =</span> <span class="st">&quot;pcoa2&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Diet&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb33-14"><a href="beta-diversity.html#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb33-15"><a href="beta-diversity.html#cb33-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;PCoA beta diversity ordination for microbiome samples&quot;</span>), <span class="at">x =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC1 (p = &quot;</span>, p_values[[<span class="st">&quot;pcoa1&quot;</span>]], <span class="st">&quot;)&quot;</span>), <span class="at">y =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC2 (p = &quot;</span>, p_values[[<span class="st">&quot;pcoa2&quot;</span>]], <span class="st">&quot;)&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb33-16"><a href="beta-diversity.html#cb33-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>(<span class="dv">12</span>) </span>
-<span id="cb33-17"><a href="beta-diversity.html#cb33-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-18"><a href="beta-diversity.html#cb33-18" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
+<p>The same test can be conducted using the ordination from PCoA as follows:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="beta-diversity.html#cb31-1" aria-hidden="true" tabindex="-1"></a>bray_curtis_pcoa_df<span class="sc">$</span>Diet <span class="ot">&lt;-</span> <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet</span>
+<span id="cb31-2"><a href="beta-diversity.html#cb31-2" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb31-3"><a href="beta-diversity.html#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(pc <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;pcoa1&quot;</span>, <span class="st">&quot;pcoa2&quot;</span>)){</span>
+<span id="cb31-4"><a href="beta-diversity.html#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Creates a formula from objects</span></span>
+<span id="cb31-5"><a href="beta-diversity.html#cb31-5" aria-hidden="true" tabindex="-1"></a>  formula <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(<span class="fu">paste0</span>(pc, <span class="st">&quot; ~ &quot;</span>, <span class="st">&quot;Diet&quot;</span>))</span>
+<span id="cb31-6"><a href="beta-diversity.html#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Does the permanova analysis</span></span>
+<span id="cb31-7"><a href="beta-diversity.html#cb31-7" aria-hidden="true" tabindex="-1"></a>  p_values[[pc]] <span class="ot">&lt;-</span> vegan<span class="sc">::</span><span class="fu">adonis</span>(formula, <span class="at">data =</span> bray_curtis_pcoa_df,</span>
+<span id="cb31-8"><a href="beta-diversity.html#cb31-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">permutations =</span> <span class="dv">9999</span>, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span></span>
+<span id="cb31-9"><a href="beta-diversity.html#cb31-9" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">$</span>aov.tab[<span class="st">&quot;Diet&quot;</span>, <span class="st">&quot;Pr(&gt;F)&quot;</span>]</span>
+<span id="cb31-10"><a href="beta-diversity.html#cb31-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-11"><a href="beta-diversity.html#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="beta-diversity.html#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Creates a plot</span></span>
+<span id="cb31-13"><a href="beta-diversity.html#cb31-13" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> bray_curtis_pcoa_df, <span class="fu">aes_string</span>(<span class="at">x =</span> <span class="st">&quot;pcoa1&quot;</span>, <span class="at">y =</span> <span class="st">&quot;pcoa2&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Diet&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb31-14"><a href="beta-diversity.html#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb31-15"><a href="beta-diversity.html#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(<span class="st">&quot;PCoA beta diversity ordination for microbiome samples&quot;</span>), <span class="at">x =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC1 (p = &quot;</span>, p_values[[<span class="st">&quot;pcoa1&quot;</span>]], <span class="st">&quot;)&quot;</span>), <span class="at">y =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC2 (p = &quot;</span>, p_values[[<span class="st">&quot;pcoa2&quot;</span>]], <span class="st">&quot;)&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb31-16"><a href="beta-diversity.html#cb31-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_bw</span>() </span>
+<span id="cb31-17"><a href="beta-diversity.html#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-18"><a href="beta-diversity.html#cb31-18" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <p><img src="05-beta_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
 <p>There are many alternative and complementary methods for analysing
 community composition. For more examples, see a dedicated section on

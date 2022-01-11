@@ -347,7 +347,7 @@ the R session. Only uninstalled packages are installed.
 \CommentTok{\# List of packages that we need from cran and bioc }
 \NormalTok{cran\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\StringTok{"bookdown"}\NormalTok{, }\StringTok{"dplyr"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }
               \StringTok{"gridExtra"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"scales"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"caret"}\NormalTok{,}
-              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{)}
+              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{, }\StringTok{"biclust"}\NormalTok{)}
 \NormalTok{bioc\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"mia"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{)}
 
 \CommentTok{\# Gets those packages that are already installed}
@@ -415,6 +415,7 @@ mia and miaViz are prioritized. Packages that are loaded first have higher prior
 ## pheatmap             TRUE
 ## patchwork            TRUE
 ## pdp                  TRUE
+## biclust              TRUE
 \end{verbatim}
 
 \hypertarget{data}{%
@@ -827,10 +828,7 @@ Beta diversity is another name for sample dissimilarity. It quantifies
 differences in the overall taxonomic composition between two samples.
 
 Common indices include Bray-Curtis, Unifrac, Jaccard index, and the
-Aitchison distance. Each of these (dis)similarity measures emphasizes
-different aspects. For example, UniFrac incorporates phylogenetic
-information, and Jaccard index ignores exact abundances and considers
-only presence/absence values. For more background information
+Aitchison distance. For more background information
 and examples, you can check the dedicated section in \href{https://microbiome.github.io/OMA/microbiome-diversity.html\#beta-diversity}{online
 book}.
 
@@ -861,8 +859,7 @@ Let us next look at some concrete examples.
 \hypertarget{pcoa-for-asv-level-data-with-bray-curtis}{%
 \subsection{PCoA for ASV-level data with Bray-Curtis}\label{pcoa-for-asv-level-data-with-bray-curtis}}
 
-Let us start with PCoA based on a Bray-Curtis dissimilarity matrix
-calculated at Genus level abundances.
+Let us start with PCoA based on a Bray-Curtis dissimilarity matrix.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -889,98 +886,13 @@ calculated at Genus level abundances.
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"PC1"}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"PC2"}\NormalTok{, }
        \AttributeTok{title =} \StringTok{"Bray{-}Curtis PCoA"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{10}\NormalTok{)) }\CommentTok{\# makes titles smaller}
+  \FunctionTok{theme\_bw}\NormalTok{(}\DecValTok{12}\NormalTok{) }\CommentTok{\# makes titles smaller}
 
 \NormalTok{bray\_curtis\_plot}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{05-beta_files/figure-latex/pcoa_asv_bc-1.pdf}
-
-\hypertarget{pcoa-for-asv-level-data-with-aitchison-distance}{%
-\subsection{PCoA for ASV-level data with Aitchison distance}\label{pcoa-for-asv-level-data-with-aitchison-distance}}
-
-Now the same using Aitchison distance. This metric corresponds to
-Euclidean distances between CLR transformed sample abundance vectors.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Does clr transformation. Pseudocount is added, because data contains zeros. }
-\NormalTok{mae[[}\DecValTok{1}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{transformCounts}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\AttributeTok{method =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
-
-\CommentTok{\# Gets clr table}
-\NormalTok{clr\_assay }\OtherTok{\textless{}{-}} \FunctionTok{assays}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]])}\SpecialCharTok{$}\NormalTok{clr}
-
-\CommentTok{\# Transposes it to get taxa to columns}
-\NormalTok{clr\_assay }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(clr\_assay)}
-
-\CommentTok{\# Calculates Euclidean distances between samples. Because taxa is in columns,}
-\CommentTok{\# it is used to compare different samples.}
-\NormalTok{euclidean\_dist }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{vegdist}\NormalTok{(clr\_assay, }\AttributeTok{method =} \StringTok{"euclidean"}\NormalTok{)}
-
-\CommentTok{\# Does principal coordinate analysis}
-\NormalTok{euclidean\_pcoa }\OtherTok{\textless{}{-}}\NormalTok{ ecodist}\SpecialCharTok{::}\FunctionTok{pco}\NormalTok{(euclidean\_dist)}
-
-\CommentTok{\# Creates a data frame from principal coordinates}
-\NormalTok{euclidean\_pcoa\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{pcoa1 =}\NormalTok{ euclidean\_pcoa}\SpecialCharTok{$}\NormalTok{vectors[,}\DecValTok{1}\NormalTok{], }
-                                \AttributeTok{pcoa2 =}\NormalTok{ euclidean\_pcoa}\SpecialCharTok{$}\NormalTok{vectors[,}\DecValTok{2}\NormalTok{])}
-
-\CommentTok{\# Creates the plot}
-\NormalTok{euclidean\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ euclidean\_pcoa\_df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{pcoa1, }\AttributeTok{y=}\NormalTok{pcoa2)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"PC1"}\NormalTok{,}
-       \AttributeTok{y =} \StringTok{"PC2"}\NormalTok{,}
-       \AttributeTok{title =} \StringTok{"Euclidean PCoA with CLR transformation"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{12}\NormalTok{)) }\CommentTok{\# makes titles smaller}
-
-\NormalTok{euclidean\_plot}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{05-beta_files/figure-latex/pcoa_asv_aitchison-1.pdf}
-
-\hypertarget{pcoa-aggregated-to-phylum-level}{%
-\subsection{PCoA aggregated to Phylum level}\label{pcoa-aggregated-to-phylum-level}}
-
-We use again the Aitchison distances in this example but this time applied to the phylum level.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Does clr transformation. Psuedocount is added, because data contains zeros. }
-\NormalTok{se\_phylum }\OtherTok{\textless{}{-}} \FunctionTok{transformCounts}\NormalTok{(se\_phylum, }\AttributeTok{method =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
-
-\CommentTok{\# Gets clr table}
-\NormalTok{clr\_phylum\_assay }\OtherTok{\textless{}{-}} \FunctionTok{assays}\NormalTok{(se\_phylum)}\SpecialCharTok{$}\NormalTok{clr}
-
-\CommentTok{\# Transposes it to get taxa to columns}
-\NormalTok{clr\_phylum\_assay }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(clr\_phylum\_assay)}
-
-\CommentTok{\# Calculates Euclidean distances between samples. Because taxa is in columns,}
-\CommentTok{\# it is used to compare different samples.}
-\NormalTok{euclidean\_phylum\_dist }\OtherTok{\textless{}{-}}\NormalTok{ vegan}\SpecialCharTok{::}\FunctionTok{vegdist}\NormalTok{(clr\_assay, }\AttributeTok{method =} \StringTok{"euclidean"}\NormalTok{)}
-
-\CommentTok{\# Does principal coordinate analysis}
-\NormalTok{euclidean\_phylum\_pcoa }\OtherTok{\textless{}{-}}\NormalTok{ ecodist}\SpecialCharTok{::}\FunctionTok{pco}\NormalTok{(euclidean\_phylum\_dist)}
-
-\CommentTok{\# Creates a data frame from principal coordinates}
-\NormalTok{euclidean\_phylum\_pcoa\_df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
-  \AttributeTok{pcoa1 =}\NormalTok{ euclidean\_phylum\_pcoa}\SpecialCharTok{$}\NormalTok{vectors[,}\DecValTok{1}\NormalTok{], }
-  \AttributeTok{pcoa2 =}\NormalTok{ euclidean\_phylum\_pcoa}\SpecialCharTok{$}\NormalTok{vectors[,}\DecValTok{2}\NormalTok{])}
-
-\CommentTok{\# Creates a plot}
-\NormalTok{euclidean\_phylum\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ euclidean\_phylum\_pcoa\_df,}
-  \FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{pcoa1, }\AttributeTok{y=}\NormalTok{pcoa2)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"PC1"}\NormalTok{,}
-       \AttributeTok{y =} \StringTok{"PC2"}\NormalTok{,}
-       \AttributeTok{title =} \StringTok{"Aitchison distances at Phylum level"}\NormalTok{) }\SpecialCharTok{+}  
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{12}\NormalTok{)) }\CommentTok{\# makes titles smaller}
-
-\NormalTok{euclidean\_phylum\_plot}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{05-beta_files/figure-latex/pcoa_phylum_aitchison-1.pdf}
 
 \hypertarget{highlighting-external-variables}{%
 \section{Highlighting external variables}\label{highlighting-external-variables}}
@@ -992,27 +904,22 @@ The following is an example with a discrete grouping variable (Diet) shown with 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Adds the variable we later use for coloring to the data frame}
-\NormalTok{euclidean\_diet\_pcoa\_df }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(euclidean\_pcoa\_df,}
-                             \AttributeTok{Diet =} \FunctionTok{colData}\NormalTok{(mae)}\SpecialCharTok{$}\NormalTok{Diet)}
+\CommentTok{\# Add diet information to data.frame}
+\NormalTok{bray\_curtis\_pcoa\_df}\SpecialCharTok{$}\NormalTok{Diet }\OtherTok{\textless{}{-}} \FunctionTok{colData}\NormalTok{(mae)}\SpecialCharTok{$}\NormalTok{Diet}
 
 \CommentTok{\# Creates a plot}
-\NormalTok{euclidean\_diet\_plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ euclidean\_diet\_pcoa\_df, }
-                                        \FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{pcoa1, }\AttributeTok{y=}\NormalTok{pcoa2,}
-                                            \AttributeTok{color =}\NormalTok{ Diet)) }\SpecialCharTok{+}
+\NormalTok{plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ bray\_curtis\_pcoa\_df, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =} \StringTok{"pcoa1"}\NormalTok{, }\AttributeTok{y =} \StringTok{"pcoa2"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Diet"}\NormalTok{)) }\SpecialCharTok{+}
   \FunctionTok{geom\_point}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"PC1"}\NormalTok{,}
-       \AttributeTok{y =} \StringTok{"PC2"}\NormalTok{,}
-       \AttributeTok{title =} \StringTok{"PCoA with Aitchison distances"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{theme}\NormalTok{(}\AttributeTok{title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{12}\NormalTok{)) }\CommentTok{\# makes titles smaller}
+       \AttributeTok{y =} \StringTok{"PC2"}\NormalTok{, }
+       \AttributeTok{title =} \StringTok{"Bray{-}Curtis PCoA"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_bw}\NormalTok{(}\DecValTok{12}\NormalTok{) }
 
-\NormalTok{euclidean\_diet\_plot}
+\NormalTok{plot}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{05-beta_files/figure-latex/pcoa_genus-1.pdf}
-
-PCoA plot in some cases could also be overlayed with a continuous variable. (\href{https://microbiome.github.io/course_2022_miaverse/beta-diversity.html\#pcoa-plot-with-continuous-variable}{see example})
 
 \hypertarget{estimating-associations-with-an-external-variable}{%
 \section{Estimating associations with an external variable}\label{estimating-associations-with-an-external-variable}}
@@ -1099,7 +1006,7 @@ names. We can fetch those from our rowData. Here we use Genus level names:
 
 \includegraphics{05-beta_files/figure-latex/unnamed-chunk-2-1.pdf}
 
-The same test can be conducted using the oridination from PCoA as follows:
+The same test can be conducted using the ordination from PCoA as follows:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1118,7 +1025,7 @@ The same test can be conducted using the oridination from PCoA as follows:
 \NormalTok{plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ bray\_curtis\_pcoa\_df, }\FunctionTok{aes\_string}\NormalTok{(}\AttributeTok{x =} \StringTok{"pcoa1"}\NormalTok{, }\AttributeTok{y =} \StringTok{"pcoa2"}\NormalTok{, }\AttributeTok{color =} \StringTok{"Diet"}\NormalTok{)) }\SpecialCharTok{+}
   \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{3}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PCoA beta diversity ordination for microbiome samples"}\NormalTok{), }\AttributeTok{x =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC1 (p = "}\NormalTok{, p\_values[[}\StringTok{"pcoa1"}\NormalTok{]], }\StringTok{")"}\NormalTok{), }\AttributeTok{y =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"PC2 (p = "}\NormalTok{, p\_values[[}\StringTok{"pcoa2"}\NormalTok{]], }\StringTok{")"}\NormalTok{)) }\SpecialCharTok{+}
-  \FunctionTok{theme\_bw}\NormalTok{(}\DecValTok{12}\NormalTok{) }
+  \FunctionTok{theme\_bw}\NormalTok{() }
 
 \NormalTok{plot}
 \end{Highlighting}
@@ -1140,10 +1047,29 @@ A dedicated section presenting examples on community typing is in the
 \hypertarget{unsupervised-learning}{%
 \chapter{Unsupervised learning}\label{unsupervised-learning}}
 
+Unsupervised learning is a part of machine learning where we try to find information
+from unknown data. It is also called data mining. Usually this means finding of
+clusters, for instance. Cluster refers to group of samples/features that are similar
+between each other. For example, based on clinical data we can try to find patient
+groups that have similar response to used drug.
+
 \hypertarget{biclustering}{%
 \section{Biclustering}\label{biclustering}}
 
-Exploring metabolomic data:
+Biclustering is a clustering method, which simultaneously clusters rows and columns.
+In this example, the aim is to find clusters where subset of taxa share similar
+pattern over subset of metabolites. In our case, we try to find clusters where
+taxa and metabolites correlate similarly.
+
+Check more from OMA which has dedicated chapter on
+\href{https://microbiome.github.io/OMA/biclustering.html}{biclustering}.
+
+First, we subset metabolite data so that it includes fewer metabolites. We use
+coefficient of variation as a subset criteria. Meaning of this is that, if concentration
+of metabolite does not vary, concentration does not differ between samples.
+
+By doing that, we avoid unnecessary multiple testing, and we focus only on interesting
+metabolites.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1155,7 +1081,7 @@ Exploring metabolomic data:
 \CommentTok{\# Get the data}
 \NormalTok{metabolite\_tse }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{2}\NormalTok{]]}
 
-\CommentTok{\# Calculate coeffieicnt of variation of individual metabolites}
+\CommentTok{\# Calculate coefficient of variation of individual metabolites}
 \NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{cv =} \FunctionTok{apply}\NormalTok{(}\FunctionTok{assay}\NormalTok{(metabolite\_tse, metabolite\_trans), }\DecValTok{1}\NormalTok{, }
                             \ControlFlowTok{function}\NormalTok{(x)\{}\FunctionTok{sd}\NormalTok{(x)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(x)\}))}
 
@@ -1190,21 +1116,21 @@ Subsetting metabolomic data:
 \end{Highlighting}
 \end{Shaded}
 
-Preprocessing microbiome and metabolomic data:
+After that, we subset microbiome data by filtering rarest taxa off-
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{rank }\OtherTok{\textless{}{-}} \StringTok{"Genus"}
 \NormalTok{prevalence }\OtherTok{\textless{}{-}} \FloatTok{0.2}
 \NormalTok{detection }\OtherTok{\textless{}{-}} \FloatTok{0.001}
-\NormalTok{taxa\_trans }\OtherTok{\textless{}{-}}  \StringTok{"rclr"}
+\NormalTok{taxa\_trans }\OtherTok{\textless{}{-}}  \StringTok{"clr"}
 
 \CommentTok{\# Get bacterial data}
 \NormalTok{taxa\_tse }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{1}\NormalTok{]]}
 \CommentTok{\# Agglomerate at Genus level}
 \NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{agglomerateByRank}\NormalTok{(taxa\_tse, }\AttributeTok{rank =}\NormalTok{ rank)}
 \CommentTok{\# Do CLR transformation}
-\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{transformSamples}\NormalTok{(taxa\_tse, }\AttributeTok{method =} \StringTok{"rclr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
+\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{transformSamples}\NormalTok{(taxa\_tse, }\AttributeTok{method =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
 
 \CommentTok{\# Subset metabolite data}
 \NormalTok{metabolite\_tse }\OtherTok{\textless{}{-}}\NormalTok{ metabolite\_tse[metabolites\_over\_th, ]}
@@ -1220,24 +1146,25 @@ Preprocessing microbiome and metabolomic data:
 \end{Highlighting}
 \end{Shaded}
 
-Cross-correlation of both data and visualization:
+After subsetting, we can perform cross-correlation analysis. With cross-correlation
+analysis we can answer the question ``If the abundance of this taxon is high, is the
+concentration of metabolite high?'', for instance.
+
+Check OMA book's dedicated chapther on
+\href{https://microbiome.github.io/OMA/multi-assay_analyses.html}{multi-assay analyses}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(pheatmap)}
-\CommentTok{\# Define data sets to cross{-}correlate}
-\NormalTok{x }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{assay}\NormalTok{(taxa\_tse, taxa\_trans))}
-\NormalTok{y }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(}\FunctionTok{assay}\NormalTok{(metabolite\_tse, }\StringTok{"nmr"}\NormalTok{))}
-\CommentTok{\# If there are duplicated taxa names, makes them unique}
-\FunctionTok{colnames}\NormalTok{(x) }\OtherTok{\textless{}{-}} \FunctionTok{str\_remove}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(x), }\FunctionTok{paste0}\NormalTok{(rank, }\StringTok{":"}\NormalTok{))}
-\FunctionTok{colnames}\NormalTok{(x) }\OtherTok{\textless{}{-}} \FunctionTok{make.unique}\NormalTok{(}\FunctionTok{colnames}\NormalTok{(x))}
 
 \CommentTok{\# Cross correlate data sets}
-\NormalTok{correlations }\OtherTok{\textless{}{-}}\NormalTok{ microbiome}\SpecialCharTok{::}\FunctionTok{associate}\NormalTok{(x, y, }\AttributeTok{method =} \StringTok{"spearman"}\NormalTok{, }\AttributeTok{mode =} \StringTok{"matrix"}\NormalTok{)}
+\NormalTok{correlations }\OtherTok{\textless{}{-}} \FunctionTok{testExperimentCrossCorrelation}\NormalTok{(taxa\_tse, metabolite\_tse, }
+                                               \AttributeTok{abund\_values1 =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{abund\_values2 =} \StringTok{"nmr"}\NormalTok{,}
+                                               \AttributeTok{method =} \StringTok{"spearman"}\NormalTok{, }\AttributeTok{mode =} \StringTok{"matrix"}\NormalTok{)}
 
 \CommentTok{\# For plotting purpose, convert p{-}values, under 0.05 are marked with "X"}
 \NormalTok{p\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.01}
-\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{p.adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold, }\StringTok{"X"}\NormalTok{, }\StringTok{""}\NormalTok{)}
+\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{p\_adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold, }\StringTok{"X"}\NormalTok{, }\StringTok{""}\NormalTok{)}
 
 \CommentTok{\# Scale colors}
 \NormalTok{breaks }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }
@@ -1253,11 +1180,210 @@ Cross-correlation of both data and visualization:
                \AttributeTok{fontsize =} \DecValTok{10}\NormalTok{,}
                \AttributeTok{breaks =}\NormalTok{ breaks,}
                \AttributeTok{color =}\NormalTok{ colors, }
-               \AttributeTok{fontsize\_number =} \DecValTok{20}\NormalTok{)}
+               \AttributeTok{fontsize\_number =} \DecValTok{10}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+Finally, we can find biclusters from cross-correlation data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Load package}
+\FunctionTok{library}\NormalTok{(biclust)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: MASS
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'MASS'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: grid
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'grid'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:Biostrings':
+## 
+##     pattern
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: colorspace
+\end{verbatim}
+
+\begin{verbatim}
+## Loading required package: lattice
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Find biclusters}
+\NormalTok{bc }\OtherTok{\textless{}{-}} \FunctionTok{biclust}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor, }\AttributeTok{method=}\FunctionTok{BCPlaid}\NormalTok{(), }\AttributeTok{fit.model =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ m,}
+              \AttributeTok{background =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{shuffle =} \DecValTok{100}\NormalTok{, }\AttributeTok{back.fit =} \DecValTok{0}\NormalTok{, }\AttributeTok{max.layers =} \DecValTok{10}\NormalTok{,}
+              \AttributeTok{iter.startup =} \DecValTok{10}\NormalTok{, }\AttributeTok{iter.layer =} \DecValTok{100}\NormalTok{, }\AttributeTok{verbose =} \ConstantTok{FALSE}\NormalTok{)}
+
+\NormalTok{bc}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## An object of class Biclust 
+## 
+## call:
+##  biclust(x = correlations$cor, method = BCPlaid(), fit.model = y ~ 
+##      m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
+## 
+## Number of Clusters found:  4 
+## 
+## First  4  Cluster sizes:
+##                    BC 1 BC 2 BC 3 BC 4
+## Number of Rows:      12   13    8    5
+## Number of Columns:    3    5    4    5
+\end{verbatim}
+
+To get cluster information into right format, we can use functions from OMA book.
+They add cluster for those features that were not assigned to any cluster.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Functions for obtaining biclust information}
+
+\CommentTok{\# Get clusters for rows and columns}
+\NormalTok{.get\_biclusters\_from\_biclust }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(bc, assay)\{}
+  \CommentTok{\# Get cluster information for columns and rows}
+\NormalTok{  bc\_columns }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(bc}\SpecialCharTok{@}\NormalTok{NumberxCol)}
+\NormalTok{  bc\_columns }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(bc\_columns)}
+\NormalTok{  bc\_rows }\OtherTok{\textless{}{-}}\NormalTok{ bc}\SpecialCharTok{@}\NormalTok{RowxNumber}
+\NormalTok{  bc\_rows }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(bc\_rows)}
+  
+  \CommentTok{\# Get data into right format}
+\NormalTok{  bc\_columns }\OtherTok{\textless{}{-}} \FunctionTok{.manipulate\_bc\_data}\NormalTok{(bc\_columns, assay, }\StringTok{"col"}\NormalTok{)}
+\NormalTok{  bc\_rows }\OtherTok{\textless{}{-}} \FunctionTok{.manipulate\_bc\_data}\NormalTok{(bc\_rows, assay, }\StringTok{"row"}\NormalTok{)}
+  
+  \FunctionTok{return}\NormalTok{(}\FunctionTok{list}\NormalTok{(}\AttributeTok{bc\_columns =}\NormalTok{ bc\_columns, }\AttributeTok{bc\_rows =}\NormalTok{ bc\_rows))}
+\NormalTok{\}}
+
+\CommentTok{\# Input clusters, and how many observations there should be, i.e., the number of samples or features}
+\NormalTok{.manipulate\_bc\_data }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(bc\_clusters, assay, row\_col)\{}
+  \CommentTok{\# Get right dimension}
+\NormalTok{  dim }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(row\_col }\SpecialCharTok{==} \StringTok{"col"}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(assay), }\FunctionTok{nrow}\NormalTok{(assay))}
+  \CommentTok{\# Get column/row names}
+  \ControlFlowTok{if}\NormalTok{( row\_col }\SpecialCharTok{==} \StringTok{"col"}\NormalTok{ )\{}
+\NormalTok{    names }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(assay)}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
+\NormalTok{    names }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(assay)}
+\NormalTok{  \}}
+  
+  \CommentTok{\# If no clusters were found, create one. Otherwise create additional cluster which}
+  \CommentTok{\# contain those samples that are not included in clusters that were found.}
+  \ControlFlowTok{if}\NormalTok{( }\FunctionTok{nrow}\NormalTok{(bc\_clusters) }\SpecialCharTok{!=}\NormalTok{ dim )\{}
+\NormalTok{      bc\_clusters }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{cluster =} \FunctionTok{rep}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{, dim))}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+      \CommentTok{\# Create additional cluster that includes those samples/features that}
+      \CommentTok{\# are not included in other clusters.}
+\NormalTok{      vec }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{rowSums}\NormalTok{(bc\_clusters) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{)}
+      \CommentTok{\# If additional cluster contains samples, then add it}
+      \ControlFlowTok{if}\NormalTok{ ( }\FunctionTok{any}\NormalTok{(vec) )\{}
+\NormalTok{          bc\_clusters }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(bc\_clusters, vec)}
+\NormalTok{      \}}
+\NormalTok{  \}}
+  \CommentTok{\# Adjust row and column names}
+  \FunctionTok{rownames}\NormalTok{(bc\_clusters) }\OtherTok{\textless{}{-}}\NormalTok{ names}
+  \FunctionTok{colnames}\NormalTok{(bc\_clusters) }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"cluster\_"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(bc\_clusters))}
+  \FunctionTok{return}\NormalTok{(bc\_clusters)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Then we can use the functions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Get biclusters}
+\NormalTok{bcs }\OtherTok{\textless{}{-}} \FunctionTok{.get\_biclusters\_from\_biclust}\NormalTok{(bc, correlations}\SpecialCharTok{$}\NormalTok{cor)}
+
+\NormalTok{bicluster\_rows }\OtherTok{\textless{}{-}}\NormalTok{ bcs}\SpecialCharTok{$}\NormalTok{bc\_rows}
+\NormalTok{bicluster\_columns }\OtherTok{\textless{}{-}}\NormalTok{ bcs}\SpecialCharTok{$}\NormalTok{bc\_columns}
+
+\CommentTok{\# Print biclusters for rows}
+\FunctionTok{head}\NormalTok{(bicluster\_rows)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                               cluster_1 cluster_2 cluster_3 cluster_4 cluster_5
+## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE     FALSE
+## Genus:Lactobacillus               FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE     FALSE
+## Genus:Lactococcus                 FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Mucispirillum               FALSE     FALSE     FALSE     FALSE      TRUE
+\end{verbatim}
+
+Now, we can add bicluster information into the heatmap that we already made.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Convert boolean values into factors}
+\NormalTok{bicluster\_columns }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(bicluster\_columns, }\DecValTok{2}\NormalTok{, as.factor))}
+\NormalTok{bicluster\_rows }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(bicluster\_rows, }\DecValTok{2}\NormalTok{, as.factor))}
+
+\CommentTok{\# Adjust colors for all clusters}
+\ControlFlowTok{if}\NormalTok{( }\FunctionTok{ncol}\NormalTok{(bicluster\_rows) }\SpecialCharTok{\textgreater{}} \FunctionTok{ncol}\NormalTok{(bicluster\_columns) )\{}
+\NormalTok{  cluster\_names }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(bicluster\_rows)}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{  cluster\_names }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(bicluster\_columns)}
+\NormalTok{\}}
+\NormalTok{annotation\_colors }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\ControlFlowTok{for}\NormalTok{(name }\ControlFlowTok{in}\NormalTok{ cluster\_names)\{}
+\NormalTok{  annotation\_colors[[name]] }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"TRUE"} \OtherTok{=} \StringTok{"red"}\NormalTok{, }\StringTok{"FALSE"} \OtherTok{=} \StringTok{"white"}\NormalTok{)}
+\NormalTok{\}}
+
+\CommentTok{\# Get correlation values that are over thresholds}
+\NormalTok{p\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.01}
+\NormalTok{corr\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.6}
+\NormalTok{corr\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{p\_adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold }\SpecialCharTok{\&} 
+                          \FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor)}\SpecialCharTok{\textgreater{}}\NormalTok{corr\_threshold , }\FunctionTok{round}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor,}\DecValTok{1}\NormalTok{), }\StringTok{""}\NormalTok{)}
+
+\CommentTok{\# Create a heatmap}
+\FunctionTok{pheatmap}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor,}
+         \AttributeTok{annotation\_col =}\NormalTok{ bicluster\_columns, }
+         \AttributeTok{annotation\_row =}\NormalTok{ bicluster\_rows,}
+         \AttributeTok{annotation\_colors =}\NormalTok{ annotation\_colors,}
+         \AttributeTok{display\_numbers =}\NormalTok{ corr\_values,}
+               \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Correlations between bacteria and metabolites }
+\StringTok{              (correlation over threshold (corr \textgreater{} "}\NormalTok{, corr\_threshold,}
+              \StringTok{", p \textless{} "}\NormalTok{, p\_threshold,}\StringTok{") marked)"}\NormalTok{),}
+               \AttributeTok{fontsize =} \DecValTok{10}\NormalTok{,}
+               \AttributeTok{breaks =}\NormalTok{ breaks,}
+               \AttributeTok{color =}\NormalTok{ colors, }
+               \AttributeTok{fontsize\_number =} \DecValTok{6}\NormalTok{, }
+         \AttributeTok{number\_color =} \StringTok{"yellow"}\NormalTok{,}
+         \AttributeTok{annotation\_legend =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-9-1.pdf}
 
 \hypertarget{supervised-learning}{%
 \chapter{Supervised learning}\label{supervised-learning}}

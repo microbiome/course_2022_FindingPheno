@@ -38,7 +38,7 @@ the R session. Only uninstalled packages are installed.
 # List of packages that we need from cran and bioc 
 cran_pkg <- c("BiocManager", "bookdown", "dplyr", "ecodist", "ggplot2", 
               "gridExtra", "kableExtra", "knitr", "scales", "vegan", "caret",
-              "ranger", "stringr", "pheatmap", "patchwork", "pdp")
+              "ranger", "stringr", "pheatmap", "patchwork", "pdp", "biclust")
 bioc_pkg <- c("mia", "miaViz", "microbiomeDataSets")
 
 # Gets those packages that are already installed
@@ -102,6 +102,7 @@ as.data.frame(loaded)
 ## pheatmap             TRUE
 ## patchwork            TRUE
 ## pdp                  TRUE
+## biclust              TRUE
 ```
 
 

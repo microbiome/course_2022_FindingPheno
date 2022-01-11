@@ -198,8 +198,6 @@ div.csl-indent {
 <li class="chapter" data-level="6.1" data-path="beta-diversity.html"><a href="beta-diversity.html#examples-of-pcoa-with-different-settings"><i class="fa fa-check"></i><b>6.1</b> Examples of PCoA with different settings</a>
 <ul>
 <li class="chapter" data-level="6.1.1" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-bray-curtis"><i class="fa fa-check"></i><b>6.1.1</b> PCoA for ASV-level data with Bray-Curtis</a></li>
-<li class="chapter" data-level="6.1.2" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-aitchison-distance"><i class="fa fa-check"></i><b>6.1.2</b> PCoA for ASV-level data with Aitchison distance</a></li>
-<li class="chapter" data-level="6.1.3" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-aggregated-to-phylum-level"><i class="fa fa-check"></i><b>6.1.3</b> PCoA aggregated to Phylum level</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="beta-diversity.html"><a href="beta-diversity.html#highlighting-external-variables"><i class="fa fa-check"></i><b>6.2</b> Highlighting external variables</a></li>
 <li class="chapter" data-level="6.3" data-path="beta-diversity.html"><a href="beta-diversity.html#estimating-associations-with-an-external-variable"><i class="fa fa-check"></i><b>6.3</b> Estimating associations with an external variable</a></li>
@@ -236,98 +234,252 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="unsupervised-learning" class="section level1" number="7">
 <h1><span class="header-section-number">Chapter 7</span> Unsupervised learning</h1>
+<p>Unsupervised learning is a part of machine learning where we try to find information
+from unknown data. It is also called data mining. Usually this means finding of
+clusters, for instance. Cluster refers to group of samples/features that are similar
+between each other. For example, based on clinical data we can try to find patient
+groups that have similar response to used drug.</p>
 <div id="biclustering" class="section level2" number="7.1">
 <h2><span class="header-section-number">7.1</span> Biclustering</h2>
-<p>Exploring metabolomic data:</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="unsupervised-learning.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb34-2"><a href="unsupervised-learning.html#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Threshold: metabolites whose (cv &gt; +threshold or cv &lt; -threshold), will be included</span></span>
-<span id="cb34-3"><a href="unsupervised-learning.html#cb34-3" aria-hidden="true" tabindex="-1"></a>cv_threshold <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
-<span id="cb34-4"><a href="unsupervised-learning.html#cb34-4" aria-hidden="true" tabindex="-1"></a>metabolite_trans <span class="ot">&lt;-</span> <span class="st">&quot;nmr&quot;</span></span>
-<span id="cb34-5"><a href="unsupervised-learning.html#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-6"><a href="unsupervised-learning.html#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the data</span></span>
-<span id="cb34-7"><a href="unsupervised-learning.html#cb34-7" aria-hidden="true" tabindex="-1"></a>metabolite_tse <span class="ot">&lt;-</span> mae[[<span class="dv">2</span>]]</span>
-<span id="cb34-8"><a href="unsupervised-learning.html#cb34-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-9"><a href="unsupervised-learning.html#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate coeffieicnt of variation of individual metabolites</span></span>
-<span id="cb34-10"><a href="unsupervised-learning.html#cb34-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">cv =</span> <span class="fu">apply</span>(<span class="fu">assay</span>(metabolite_tse, metabolite_trans), <span class="dv">1</span>, </span>
-<span id="cb34-11"><a href="unsupervised-learning.html#cb34-11" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">function</span>(x){<span class="fu">sd</span>(x)<span class="sc">/</span><span class="fu">mean</span>(x)}))</span>
-<span id="cb34-12"><a href="unsupervised-learning.html#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-13"><a href="unsupervised-learning.html#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot them as a histogram, and show a line that is used as a threshold</span></span>
-<span id="cb34-14"><a href="unsupervised-learning.html#cb34-14" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> cv)) <span class="sc">+</span></span>
-<span id="cb34-15"><a href="unsupervised-learning.html#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>, <span class="at">color=</span><span class="st">&quot;darkred&quot;</span>, <span class="at">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="sc">+</span></span>
-<span id="cb34-16"><a href="unsupervised-learning.html#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;CV&quot;</span>, <span class="at">y =</span> <span class="st">&quot;metabolite frequency&quot;</span>, </span>
-<span id="cb34-17"><a href="unsupervised-learning.html#cb34-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Distribution of coefficient of </span></span>
-<span id="cb34-18"><a href="unsupervised-learning.html#cb34-18" aria-hidden="true" tabindex="-1"></a><span class="st">       variation of log10 concentration of metabolites&quot;</span>) <span class="sc">+</span></span>
-<span id="cb34-19"><a href="unsupervised-learning.html#cb34-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> cv_threshold, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb34-20"><a href="unsupervised-learning.html#cb34-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(cv_threshold, <span class="dv">6</span>, <span class="at">label =</span> </span>
-<span id="cb34-21"><a href="unsupervised-learning.html#cb34-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste0</span>(<span class="st">&quot;CV threshold (&quot;</span>, cv_threshold, <span class="st">&quot;)&quot;</span>), <span class="at">vjust =</span> <span class="dv">2</span>, <span class="at">angle=</span><span class="dv">90</span>)) <span class="sc">+</span></span>
-<span id="cb34-22"><a href="unsupervised-learning.html#cb34-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="sc">-</span>cv_threshold, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb34-23"><a href="unsupervised-learning.html#cb34-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="sc">-</span>cv_threshold, <span class="dv">6</span>, <span class="at">label =</span> </span>
-<span id="cb34-24"><a href="unsupervised-learning.html#cb34-24" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste0</span>(<span class="st">&quot;CV threshold (&quot;</span>, <span class="sc">-</span>cv_threshold, <span class="st">&quot;)&quot;</span>), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">angle=</span><span class="dv">90</span>))</span>
-<span id="cb34-25"><a href="unsupervised-learning.html#cb34-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-26"><a href="unsupervised-learning.html#cb34-26" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
+<p>Biclustering is a clustering method, which simultaneously clusters rows and columns.
+In this example, the aim is to find clusters where subset of taxa share similar
+pattern over subset of metabolites. In our case, we try to find clusters where
+taxa and metabolites correlate similarly.</p>
+<p>Check more from OMA which has dedicated chapter on
+<a href="https://microbiome.github.io/OMA/biclustering.html">biclustering</a>.</p>
+<p>First, we subset metabolite data so that it includes fewer metabolites. We use
+coefficient of variation as a subset criteria. Meaning of this is that, if concentration
+of metabolite does not vary, concentration does not differ between samples.</p>
+<p>By doing that, we avoid unnecessary multiple testing, and we focus only on interesting
+metabolites.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="unsupervised-learning.html#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb32-2"><a href="unsupervised-learning.html#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Threshold: metabolites whose (cv &gt; +threshold or cv &lt; -threshold), will be included</span></span>
+<span id="cb32-3"><a href="unsupervised-learning.html#cb32-3" aria-hidden="true" tabindex="-1"></a>cv_threshold <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb32-4"><a href="unsupervised-learning.html#cb32-4" aria-hidden="true" tabindex="-1"></a>metabolite_trans <span class="ot">&lt;-</span> <span class="st">&quot;nmr&quot;</span></span>
+<span id="cb32-5"><a href="unsupervised-learning.html#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="unsupervised-learning.html#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the data</span></span>
+<span id="cb32-7"><a href="unsupervised-learning.html#cb32-7" aria-hidden="true" tabindex="-1"></a>metabolite_tse <span class="ot">&lt;-</span> mae[[<span class="dv">2</span>]]</span>
+<span id="cb32-8"><a href="unsupervised-learning.html#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="unsupervised-learning.html#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate coefficient of variation of individual metabolites</span></span>
+<span id="cb32-10"><a href="unsupervised-learning.html#cb32-10" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">cv =</span> <span class="fu">apply</span>(<span class="fu">assay</span>(metabolite_tse, metabolite_trans), <span class="dv">1</span>, </span>
+<span id="cb32-11"><a href="unsupervised-learning.html#cb32-11" aria-hidden="true" tabindex="-1"></a>                            <span class="cf">function</span>(x){<span class="fu">sd</span>(x)<span class="sc">/</span><span class="fu">mean</span>(x)}))</span>
+<span id="cb32-12"><a href="unsupervised-learning.html#cb32-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-13"><a href="unsupervised-learning.html#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot them as a histogram, and show a line that is used as a threshold</span></span>
+<span id="cb32-14"><a href="unsupervised-learning.html#cb32-14" aria-hidden="true" tabindex="-1"></a>plot <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> cv)) <span class="sc">+</span></span>
+<span id="cb32-15"><a href="unsupervised-learning.html#cb32-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>, <span class="at">color=</span><span class="st">&quot;darkred&quot;</span>, <span class="at">fill=</span><span class="st">&quot;lightblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb32-16"><a href="unsupervised-learning.html#cb32-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;CV&quot;</span>, <span class="at">y =</span> <span class="st">&quot;metabolite frequency&quot;</span>, </span>
+<span id="cb32-17"><a href="unsupervised-learning.html#cb32-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">&quot;Distribution of coefficient of </span></span>
+<span id="cb32-18"><a href="unsupervised-learning.html#cb32-18" aria-hidden="true" tabindex="-1"></a><span class="st">       variation of log10 concentration of metabolites&quot;</span>) <span class="sc">+</span></span>
+<span id="cb32-19"><a href="unsupervised-learning.html#cb32-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> cv_threshold, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb32-20"><a href="unsupervised-learning.html#cb32-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(cv_threshold, <span class="dv">6</span>, <span class="at">label =</span> </span>
+<span id="cb32-21"><a href="unsupervised-learning.html#cb32-21" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste0</span>(<span class="st">&quot;CV threshold (&quot;</span>, cv_threshold, <span class="st">&quot;)&quot;</span>), <span class="at">vjust =</span> <span class="dv">2</span>, <span class="at">angle=</span><span class="dv">90</span>)) <span class="sc">+</span></span>
+<span id="cb32-22"><a href="unsupervised-learning.html#cb32-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="sc">-</span>cv_threshold, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb32-23"><a href="unsupervised-learning.html#cb32-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="sc">-</span>cv_threshold, <span class="dv">6</span>, <span class="at">label =</span> </span>
+<span id="cb32-24"><a href="unsupervised-learning.html#cb32-24" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste0</span>(<span class="st">&quot;CV threshold (&quot;</span>, <span class="sc">-</span>cv_threshold, <span class="st">&quot;)&quot;</span>), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">angle=</span><span class="dv">90</span>))</span>
+<span id="cb32-25"><a href="unsupervised-learning.html#cb32-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-26"><a href="unsupervised-learning.html#cb32-26" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
 <p><img src="06-unsupML_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>Subsetting metabolomic data:</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="unsupervised-learning.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get those metabolites that are over threshold</span></span>
-<span id="cb35-2"><a href="unsupervised-learning.html#cb35-2" aria-hidden="true" tabindex="-1"></a>metabolites_over_th <span class="ot">&lt;-</span> <span class="fu">rownames</span>(df[df<span class="sc">$</span>cv <span class="sc">&gt;</span> cv_threshold <span class="sc">|</span> </span>
-<span id="cb35-3"><a href="unsupervised-learning.html#cb35-3" aria-hidden="true" tabindex="-1"></a>                                     df<span class="sc">$</span>cv <span class="sc">&lt;</span> <span class="sc">-</span>cv_threshold, , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb35-4"><a href="unsupervised-learning.html#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore those metabolites that do not have name / are NA</span></span>
-<span id="cb35-5"><a href="unsupervised-learning.html#cb35-5" aria-hidden="true" tabindex="-1"></a>metabolites_over_th <span class="ot">&lt;-</span> metabolites_over_th[<span class="sc">!</span><span class="fu">str_detect</span>(metabolites_over_th, <span class="st">&quot;NA&quot;</span>)]</span></code></pre></div>
-<p>Preprocessing microbiome and metabolomic data:</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="unsupervised-learning.html#cb36-1" aria-hidden="true" tabindex="-1"></a>rank <span class="ot">&lt;-</span> <span class="st">&quot;Genus&quot;</span></span>
-<span id="cb36-2"><a href="unsupervised-learning.html#cb36-2" aria-hidden="true" tabindex="-1"></a>prevalence <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
-<span id="cb36-3"><a href="unsupervised-learning.html#cb36-3" aria-hidden="true" tabindex="-1"></a>detection <span class="ot">&lt;-</span> <span class="fl">0.001</span></span>
-<span id="cb36-4"><a href="unsupervised-learning.html#cb36-4" aria-hidden="true" tabindex="-1"></a>taxa_trans <span class="ot">&lt;-</span>  <span class="st">&quot;rclr&quot;</span></span>
-<span id="cb36-5"><a href="unsupervised-learning.html#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-6"><a href="unsupervised-learning.html#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get bacterial data</span></span>
-<span id="cb36-7"><a href="unsupervised-learning.html#cb36-7" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> mae[[<span class="dv">1</span>]]</span>
-<span id="cb36-8"><a href="unsupervised-learning.html#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Agglomerate at Genus level</span></span>
-<span id="cb36-9"><a href="unsupervised-learning.html#cb36-9" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> <span class="fu">agglomerateByRank</span>(taxa_tse, <span class="at">rank =</span> rank)</span>
-<span id="cb36-10"><a href="unsupervised-learning.html#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Do CLR transformation</span></span>
-<span id="cb36-11"><a href="unsupervised-learning.html#cb36-11" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> <span class="fu">transformSamples</span>(taxa_tse, <span class="at">method =</span> <span class="st">&quot;rclr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
-<span id="cb36-12"><a href="unsupervised-learning.html#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-13"><a href="unsupervised-learning.html#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset metabolite data</span></span>
-<span id="cb36-14"><a href="unsupervised-learning.html#cb36-14" aria-hidden="true" tabindex="-1"></a>metabolite_tse <span class="ot">&lt;-</span> metabolite_tse[metabolites_over_th, ]</span>
-<span id="cb36-15"><a href="unsupervised-learning.html#cb36-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-16"><a href="unsupervised-learning.html#cb36-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset bacterial data by its prevalence. Bacteria whose prevalences are over </span></span>
-<span id="cb36-17"><a href="unsupervised-learning.html#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="co"># threshold are included</span></span>
-<span id="cb36-18"><a href="unsupervised-learning.html#cb36-18" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> <span class="fu">subsetByPrevalentTaxa</span>(taxa_tse, </span>
-<span id="cb36-19"><a href="unsupervised-learning.html#cb36-19" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">prevalence =</span> prevalence, </span>
-<span id="cb36-20"><a href="unsupervised-learning.html#cb36-20" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">detection =</span> detection)</span>
-<span id="cb36-21"><a href="unsupervised-learning.html#cb36-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-22"><a href="unsupervised-learning.html#cb36-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove uncultured and ambiguous(as it&#39;s hard to interpret their results)</span></span>
-<span id="cb36-23"><a href="unsupervised-learning.html#cb36-23" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> taxa_tse[<span class="sc">-</span><span class="fu">grep</span>(<span class="st">&quot;uncultured|Ambiguous_taxa&quot;</span>, <span class="fu">names</span>(taxa_tse)),]</span></code></pre></div>
-<p>Cross-correlation of both data and visualization:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="unsupervised-learning.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
-<span id="cb37-2"><a href="unsupervised-learning.html#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define data sets to cross-correlate</span></span>
-<span id="cb37-3"><a href="unsupervised-learning.html#cb37-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(taxa_tse, taxa_trans))</span>
-<span id="cb37-4"><a href="unsupervised-learning.html#cb37-4" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">assay</span>(metabolite_tse, <span class="st">&quot;nmr&quot;</span>))</span>
-<span id="cb37-5"><a href="unsupervised-learning.html#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If there are duplicated taxa names, makes them unique</span></span>
-<span id="cb37-6"><a href="unsupervised-learning.html#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(x) <span class="ot">&lt;-</span> <span class="fu">str_remove</span>(<span class="fu">colnames</span>(x), <span class="fu">paste0</span>(rank, <span class="st">&quot;:&quot;</span>))</span>
-<span id="cb37-7"><a href="unsupervised-learning.html#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(x) <span class="ot">&lt;-</span> <span class="fu">make.unique</span>(<span class="fu">colnames</span>(x))</span>
-<span id="cb37-8"><a href="unsupervised-learning.html#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-9"><a href="unsupervised-learning.html#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross correlate data sets</span></span>
-<span id="cb37-10"><a href="unsupervised-learning.html#cb37-10" aria-hidden="true" tabindex="-1"></a>correlations <span class="ot">&lt;-</span> microbiome<span class="sc">::</span><span class="fu">associate</span>(x, y, <span class="at">method =</span> <span class="st">&quot;spearman&quot;</span>, <span class="at">mode =</span> <span class="st">&quot;matrix&quot;</span>)</span>
-<span id="cb37-11"><a href="unsupervised-learning.html#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-12"><a href="unsupervised-learning.html#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="co"># For plotting purpose, convert p-values, under 0.05 are marked with &quot;X&quot;</span></span>
-<span id="cb37-13"><a href="unsupervised-learning.html#cb37-13" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb37-14"><a href="unsupervised-learning.html#cb37-14" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(correlations<span class="sc">$</span>p.adj<span class="sc">&lt;</span>p_threshold, <span class="st">&quot;X&quot;</span>, <span class="st">&quot;&quot;</span>)</span>
-<span id="cb37-15"><a href="unsupervised-learning.html#cb37-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-16"><a href="unsupervised-learning.html#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Scale colors</span></span>
-<span id="cb37-17"><a href="unsupervised-learning.html#cb37-17" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))), <span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))), </span>
-<span id="cb37-18"><a href="unsupervised-learning.html#cb37-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">length.out =</span> <span class="fu">ifelse</span>( <span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))<span class="sc">&gt;</span><span class="dv">5</span>, </span>
-<span id="cb37-19"><a href="unsupervised-learning.html#cb37-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="dv">2</span><span class="sc">*</span><span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))), <span class="dv">10</span> ) )</span>
-<span id="cb37-20"><a href="unsupervised-learning.html#cb37-20" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;darkblue&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;white&quot;</span>, </span>
-<span id="cb37-21"><a href="unsupervised-learning.html#cb37-21" aria-hidden="true" tabindex="-1"></a>                             <span class="st">&quot;red&quot;</span>, <span class="st">&quot;darkred&quot;</span>))(<span class="fu">length</span>(breaks)<span class="sc">-</span><span class="dv">1</span>)</span>
-<span id="cb37-22"><a href="unsupervised-learning.html#cb37-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-23"><a href="unsupervised-learning.html#cb37-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
-<span id="cb37-24"><a href="unsupervised-learning.html#cb37-24" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(correlations<span class="sc">$</span>cor, <span class="at">display_numbers =</span> p_values,</span>
-<span id="cb37-25"><a href="unsupervised-learning.html#cb37-25" aria-hidden="true" tabindex="-1"></a>               <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
-<span id="cb37-26"><a href="unsupervised-learning.html#cb37-26" aria-hidden="true" tabindex="-1"></a><span class="st">              (statistically significant associations (p &lt; 0.05) marked with X)&quot;</span>),</span>
-<span id="cb37-27"><a href="unsupervised-learning.html#cb37-27" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize =</span> <span class="dv">10</span>,</span>
-<span id="cb37-28"><a href="unsupervised-learning.html#cb37-28" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks,</span>
-<span id="cb37-29"><a href="unsupervised-learning.html#cb37-29" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> colors, </span>
-<span id="cb37-30"><a href="unsupervised-learning.html#cb37-30" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize_number =</span> <span class="dv">20</span>)</span></code></pre></div>
-<p><img src="06-unsupML_files/figure-html/unnamed-chunk-5-1.png" width="960" /></p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="unsupervised-learning.html#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get those metabolites that are over threshold</span></span>
+<span id="cb33-2"><a href="unsupervised-learning.html#cb33-2" aria-hidden="true" tabindex="-1"></a>metabolites_over_th <span class="ot">&lt;-</span> <span class="fu">rownames</span>(df[df<span class="sc">$</span>cv <span class="sc">&gt;</span> cv_threshold <span class="sc">|</span> </span>
+<span id="cb33-3"><a href="unsupervised-learning.html#cb33-3" aria-hidden="true" tabindex="-1"></a>                                     df<span class="sc">$</span>cv <span class="sc">&lt;</span> <span class="sc">-</span>cv_threshold, , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb33-4"><a href="unsupervised-learning.html#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore those metabolites that do not have name / are NA</span></span>
+<span id="cb33-5"><a href="unsupervised-learning.html#cb33-5" aria-hidden="true" tabindex="-1"></a>metabolites_over_th <span class="ot">&lt;-</span> metabolites_over_th[<span class="sc">!</span><span class="fu">str_detect</span>(metabolites_over_th, <span class="st">&quot;NA&quot;</span>)]</span></code></pre></div>
+<p>After that, we subset microbiome data by filtering rarest taxa off-</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="unsupervised-learning.html#cb34-1" aria-hidden="true" tabindex="-1"></a>rank <span class="ot">&lt;-</span> <span class="st">&quot;Genus&quot;</span></span>
+<span id="cb34-2"><a href="unsupervised-learning.html#cb34-2" aria-hidden="true" tabindex="-1"></a>prevalence <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb34-3"><a href="unsupervised-learning.html#cb34-3" aria-hidden="true" tabindex="-1"></a>detection <span class="ot">&lt;-</span> <span class="fl">0.001</span></span>
+<span id="cb34-4"><a href="unsupervised-learning.html#cb34-4" aria-hidden="true" tabindex="-1"></a>taxa_trans <span class="ot">&lt;-</span>  <span class="st">&quot;clr&quot;</span></span>
+<span id="cb34-5"><a href="unsupervised-learning.html#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="unsupervised-learning.html#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Get bacterial data</span></span>
+<span id="cb34-7"><a href="unsupervised-learning.html#cb34-7" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> mae[[<span class="dv">1</span>]]</span>
+<span id="cb34-8"><a href="unsupervised-learning.html#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Agglomerate at Genus level</span></span>
+<span id="cb34-9"><a href="unsupervised-learning.html#cb34-9" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> <span class="fu">agglomerateByRank</span>(taxa_tse, <span class="at">rank =</span> rank)</span>
+<span id="cb34-10"><a href="unsupervised-learning.html#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Do CLR transformation</span></span>
+<span id="cb34-11"><a href="unsupervised-learning.html#cb34-11" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> <span class="fu">transformSamples</span>(taxa_tse, <span class="at">method =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
+<span id="cb34-12"><a href="unsupervised-learning.html#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="unsupervised-learning.html#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset metabolite data</span></span>
+<span id="cb34-14"><a href="unsupervised-learning.html#cb34-14" aria-hidden="true" tabindex="-1"></a>metabolite_tse <span class="ot">&lt;-</span> metabolite_tse[metabolites_over_th, ]</span>
+<span id="cb34-15"><a href="unsupervised-learning.html#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="unsupervised-learning.html#cb34-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset bacterial data by its prevalence. Bacteria whose prevalences are over </span></span>
+<span id="cb34-17"><a href="unsupervised-learning.html#cb34-17" aria-hidden="true" tabindex="-1"></a><span class="co"># threshold are included</span></span>
+<span id="cb34-18"><a href="unsupervised-learning.html#cb34-18" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> <span class="fu">subsetByPrevalentTaxa</span>(taxa_tse, </span>
+<span id="cb34-19"><a href="unsupervised-learning.html#cb34-19" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">prevalence =</span> prevalence, </span>
+<span id="cb34-20"><a href="unsupervised-learning.html#cb34-20" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">detection =</span> detection)</span>
+<span id="cb34-21"><a href="unsupervised-learning.html#cb34-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-22"><a href="unsupervised-learning.html#cb34-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove uncultured and ambiguous(as it&#39;s hard to interpret their results)</span></span>
+<span id="cb34-23"><a href="unsupervised-learning.html#cb34-23" aria-hidden="true" tabindex="-1"></a>taxa_tse <span class="ot">&lt;-</span> taxa_tse[<span class="sc">-</span><span class="fu">grep</span>(<span class="st">&quot;uncultured|Ambiguous_taxa&quot;</span>, <span class="fu">names</span>(taxa_tse)),]</span></code></pre></div>
+<p>After subsetting, we can perform cross-correlation analysis. With cross-correlation
+analysis we can answer the question “If the abundance of this taxon is high, is the
+concentration of metabolite high?” for instance.</p>
+<p>Check OMA book’s dedicated chapther on
+<a href="https://microbiome.github.io/OMA/multi-assay_analyses.html">multi-assay analyses</a>.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="unsupervised-learning.html#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb35-2"><a href="unsupervised-learning.html#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="unsupervised-learning.html#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Cross correlate data sets</span></span>
+<span id="cb35-4"><a href="unsupervised-learning.html#cb35-4" aria-hidden="true" tabindex="-1"></a>correlations <span class="ot">&lt;-</span> <span class="fu">testExperimentCrossCorrelation</span>(taxa_tse, metabolite_tse, </span>
+<span id="cb35-5"><a href="unsupervised-learning.html#cb35-5" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">abund_values1 =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">abund_values2 =</span> <span class="st">&quot;nmr&quot;</span>,</span>
+<span id="cb35-6"><a href="unsupervised-learning.html#cb35-6" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">method =</span> <span class="st">&quot;spearman&quot;</span>, <span class="at">mode =</span> <span class="st">&quot;matrix&quot;</span>)</span>
+<span id="cb35-7"><a href="unsupervised-learning.html#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="unsupervised-learning.html#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co"># For plotting purpose, convert p-values, under 0.05 are marked with &quot;X&quot;</span></span>
+<span id="cb35-9"><a href="unsupervised-learning.html#cb35-9" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb35-10"><a href="unsupervised-learning.html#cb35-10" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(correlations<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="st">&quot;X&quot;</span>, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb35-11"><a href="unsupervised-learning.html#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="unsupervised-learning.html#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Scale colors</span></span>
+<span id="cb35-13"><a href="unsupervised-learning.html#cb35-13" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))), <span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))), </span>
+<span id="cb35-14"><a href="unsupervised-learning.html#cb35-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">length.out =</span> <span class="fu">ifelse</span>( <span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))<span class="sc">&gt;</span><span class="dv">5</span>, </span>
+<span id="cb35-15"><a href="unsupervised-learning.html#cb35-15" aria-hidden="true" tabindex="-1"></a>                                   <span class="dv">2</span><span class="sc">*</span><span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(correlations<span class="sc">$</span>cor))), <span class="dv">10</span> ) )</span>
+<span id="cb35-16"><a href="unsupervised-learning.html#cb35-16" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;darkblue&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;white&quot;</span>, </span>
+<span id="cb35-17"><a href="unsupervised-learning.html#cb35-17" aria-hidden="true" tabindex="-1"></a>                             <span class="st">&quot;red&quot;</span>, <span class="st">&quot;darkred&quot;</span>))(<span class="fu">length</span>(breaks)<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb35-18"><a href="unsupervised-learning.html#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="unsupervised-learning.html#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
+<span id="cb35-20"><a href="unsupervised-learning.html#cb35-20" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(correlations<span class="sc">$</span>cor, <span class="at">display_numbers =</span> p_values,</span>
+<span id="cb35-21"><a href="unsupervised-learning.html#cb35-21" aria-hidden="true" tabindex="-1"></a>               <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
+<span id="cb35-22"><a href="unsupervised-learning.html#cb35-22" aria-hidden="true" tabindex="-1"></a><span class="st">              (statistically significant associations (p &lt; 0.05) marked with X)&quot;</span>),</span>
+<span id="cb35-23"><a href="unsupervised-learning.html#cb35-23" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize =</span> <span class="dv">10</span>,</span>
+<span id="cb35-24"><a href="unsupervised-learning.html#cb35-24" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks,</span>
+<span id="cb35-25"><a href="unsupervised-learning.html#cb35-25" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> colors, </span>
+<span id="cb35-26"><a href="unsupervised-learning.html#cb35-26" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize_number =</span> <span class="dv">10</span>)</span></code></pre></div>
+<p><img src="06-unsupML_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
+<p>Finally, we can find biclusters from cross-correlation data.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="unsupervised-learning.html#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load package</span></span>
+<span id="cb36-2"><a href="unsupervised-learning.html#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biclust)</span></code></pre></div>
+<pre><code>## Loading required package: MASS</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MASS&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## 
+## Attaching package: &#39;grid&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:Biostrings&#39;:
+## 
+##     pattern</code></pre>
+<pre><code>## Loading required package: colorspace</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="unsupervised-learning.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find biclusters</span></span>
+<span id="cb45-2"><a href="unsupervised-learning.html#cb45-2" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">biclust</span>(correlations<span class="sc">$</span>cor, <span class="at">method=</span><span class="fu">BCPlaid</span>(), <span class="at">fit.model =</span> y <span class="sc">~</span> m,</span>
+<span id="cb45-3"><a href="unsupervised-learning.html#cb45-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">background =</span> <span class="cn">TRUE</span>, <span class="at">shuffle =</span> <span class="dv">100</span>, <span class="at">back.fit =</span> <span class="dv">0</span>, <span class="at">max.layers =</span> <span class="dv">10</span>,</span>
+<span id="cb45-4"><a href="unsupervised-learning.html#cb45-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">iter.startup =</span> <span class="dv">10</span>, <span class="at">iter.layer =</span> <span class="dv">100</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb45-5"><a href="unsupervised-learning.html#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="unsupervised-learning.html#cb45-6" aria-hidden="true" tabindex="-1"></a>bc</span></code></pre></div>
+<pre><code>## 
+## An object of class Biclust 
+## 
+## call:
+##  biclust(x = correlations$cor, method = BCPlaid(), fit.model = y ~ 
+##      m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
+## 
+## Number of Clusters found:  4 
+## 
+## First  4  Cluster sizes:
+##                    BC 1 BC 2 BC 3 BC 4
+## Number of Rows:      12   13    8    5
+## Number of Columns:    3    5    4    5</code></pre>
+<p>To get cluster information into right format, we can use functions from OMA book.
+They add cluster for those features that were not assigned to any cluster.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="unsupervised-learning.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Functions for obtaining biclust information</span></span>
+<span id="cb47-2"><a href="unsupervised-learning.html#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="unsupervised-learning.html#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Get clusters for rows and columns</span></span>
+<span id="cb47-4"><a href="unsupervised-learning.html#cb47-4" aria-hidden="true" tabindex="-1"></a>.get_biclusters_from_biclust <span class="ot">&lt;-</span> <span class="cf">function</span>(bc, assay){</span>
+<span id="cb47-5"><a href="unsupervised-learning.html#cb47-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get cluster information for columns and rows</span></span>
+<span id="cb47-6"><a href="unsupervised-learning.html#cb47-6" aria-hidden="true" tabindex="-1"></a>  bc_columns <span class="ot">&lt;-</span> <span class="fu">t</span>(bc<span class="sc">@</span>NumberxCol)</span>
+<span id="cb47-7"><a href="unsupervised-learning.html#cb47-7" aria-hidden="true" tabindex="-1"></a>  bc_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(bc_columns)</span>
+<span id="cb47-8"><a href="unsupervised-learning.html#cb47-8" aria-hidden="true" tabindex="-1"></a>  bc_rows <span class="ot">&lt;-</span> bc<span class="sc">@</span>RowxNumber</span>
+<span id="cb47-9"><a href="unsupervised-learning.html#cb47-9" aria-hidden="true" tabindex="-1"></a>  bc_rows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(bc_rows)</span>
+<span id="cb47-10"><a href="unsupervised-learning.html#cb47-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-11"><a href="unsupervised-learning.html#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get data into right format</span></span>
+<span id="cb47-12"><a href="unsupervised-learning.html#cb47-12" aria-hidden="true" tabindex="-1"></a>  bc_columns <span class="ot">&lt;-</span> <span class="fu">.manipulate_bc_data</span>(bc_columns, assay, <span class="st">&quot;col&quot;</span>)</span>
+<span id="cb47-13"><a href="unsupervised-learning.html#cb47-13" aria-hidden="true" tabindex="-1"></a>  bc_rows <span class="ot">&lt;-</span> <span class="fu">.manipulate_bc_data</span>(bc_rows, assay, <span class="st">&quot;row&quot;</span>)</span>
+<span id="cb47-14"><a href="unsupervised-learning.html#cb47-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-15"><a href="unsupervised-learning.html#cb47-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">bc_columns =</span> bc_columns, <span class="at">bc_rows =</span> bc_rows))</span>
+<span id="cb47-16"><a href="unsupervised-learning.html#cb47-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb47-17"><a href="unsupervised-learning.html#cb47-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-18"><a href="unsupervised-learning.html#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Input clusters, and how many observations there should be, i.e., the number of samples or features</span></span>
+<span id="cb47-19"><a href="unsupervised-learning.html#cb47-19" aria-hidden="true" tabindex="-1"></a>.manipulate_bc_data <span class="ot">&lt;-</span> <span class="cf">function</span>(bc_clusters, assay, row_col){</span>
+<span id="cb47-20"><a href="unsupervised-learning.html#cb47-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get right dimension</span></span>
+<span id="cb47-21"><a href="unsupervised-learning.html#cb47-21" aria-hidden="true" tabindex="-1"></a>  dim <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(row_col <span class="sc">==</span> <span class="st">&quot;col&quot;</span>, <span class="fu">ncol</span>(assay), <span class="fu">nrow</span>(assay))</span>
+<span id="cb47-22"><a href="unsupervised-learning.html#cb47-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get column/row names</span></span>
+<span id="cb47-23"><a href="unsupervised-learning.html#cb47-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>( row_col <span class="sc">==</span> <span class="st">&quot;col&quot;</span> ){</span>
+<span id="cb47-24"><a href="unsupervised-learning.html#cb47-24" aria-hidden="true" tabindex="-1"></a>    names <span class="ot">&lt;-</span> <span class="fu">colnames</span>(assay)</span>
+<span id="cb47-25"><a href="unsupervised-learning.html#cb47-25" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span>{</span>
+<span id="cb47-26"><a href="unsupervised-learning.html#cb47-26" aria-hidden="true" tabindex="-1"></a>    names <span class="ot">&lt;-</span> <span class="fu">rownames</span>(assay)</span>
+<span id="cb47-27"><a href="unsupervised-learning.html#cb47-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb47-28"><a href="unsupervised-learning.html#cb47-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-29"><a href="unsupervised-learning.html#cb47-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># If no clusters were found, create one. Otherwise create additional cluster which</span></span>
+<span id="cb47-30"><a href="unsupervised-learning.html#cb47-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># contain those samples that are not included in clusters that were found.</span></span>
+<span id="cb47-31"><a href="unsupervised-learning.html#cb47-31" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>( <span class="fu">nrow</span>(bc_clusters) <span class="sc">!=</span> dim ){</span>
+<span id="cb47-32"><a href="unsupervised-learning.html#cb47-32" aria-hidden="true" tabindex="-1"></a>      bc_clusters <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">cluster =</span> <span class="fu">rep</span>(<span class="cn">TRUE</span>, dim))</span>
+<span id="cb47-33"><a href="unsupervised-learning.html#cb47-33" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb47-34"><a href="unsupervised-learning.html#cb47-34" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Create additional cluster that includes those samples/features that</span></span>
+<span id="cb47-35"><a href="unsupervised-learning.html#cb47-35" aria-hidden="true" tabindex="-1"></a>      <span class="co"># are not included in other clusters.</span></span>
+<span id="cb47-36"><a href="unsupervised-learning.html#cb47-36" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">rowSums</span>(bc_clusters) <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span>
+<span id="cb47-37"><a href="unsupervised-learning.html#cb47-37" aria-hidden="true" tabindex="-1"></a>      <span class="co"># If additional cluster contains samples, then add it</span></span>
+<span id="cb47-38"><a href="unsupervised-learning.html#cb47-38" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> ( <span class="fu">any</span>(vec) ){</span>
+<span id="cb47-39"><a href="unsupervised-learning.html#cb47-39" aria-hidden="true" tabindex="-1"></a>          bc_clusters <span class="ot">&lt;-</span> <span class="fu">cbind</span>(bc_clusters, vec)</span>
+<span id="cb47-40"><a href="unsupervised-learning.html#cb47-40" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb47-41"><a href="unsupervised-learning.html#cb47-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb47-42"><a href="unsupervised-learning.html#cb47-42" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Adjust row and column names</span></span>
+<span id="cb47-43"><a href="unsupervised-learning.html#cb47-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames</span>(bc_clusters) <span class="ot">&lt;-</span> names</span>
+<span id="cb47-44"><a href="unsupervised-learning.html#cb47-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(bc_clusters) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bc_clusters))</span>
+<span id="cb47-45"><a href="unsupervised-learning.html#cb47-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(bc_clusters)</span>
+<span id="cb47-46"><a href="unsupervised-learning.html#cb47-46" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Then we can use the functions.</p>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="unsupervised-learning.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get biclusters</span></span>
+<span id="cb48-2"><a href="unsupervised-learning.html#cb48-2" aria-hidden="true" tabindex="-1"></a>bcs <span class="ot">&lt;-</span> <span class="fu">.get_biclusters_from_biclust</span>(bc, correlations<span class="sc">$</span>cor)</span>
+<span id="cb48-3"><a href="unsupervised-learning.html#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="unsupervised-learning.html#cb48-4" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> bcs<span class="sc">$</span>bc_rows</span>
+<span id="cb48-5"><a href="unsupervised-learning.html#cb48-5" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> bcs<span class="sc">$</span>bc_columns</span>
+<span id="cb48-6"><a href="unsupervised-learning.html#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="unsupervised-learning.html#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
+<span id="cb48-8"><a href="unsupervised-learning.html#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
+<pre><code>##                               cluster_1 cluster_2 cluster_3 cluster_4 cluster_5
+## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE     FALSE
+## Genus:Lactobacillus               FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE     FALSE
+## Genus:Lactococcus                 FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Mucispirillum               FALSE     FALSE     FALSE     FALSE      TRUE</code></pre>
+<p>Now, we can add bicluster information into the heatmap that we already made.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="unsupervised-learning.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into factors</span></span>
+<span id="cb50-2"><a href="unsupervised-learning.html#cb50-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">apply</span>(bicluster_columns, <span class="dv">2</span>, as.factor))</span>
+<span id="cb50-3"><a href="unsupervised-learning.html#cb50-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">apply</span>(bicluster_rows, <span class="dv">2</span>, as.factor))</span>
+<span id="cb50-4"><a href="unsupervised-learning.html#cb50-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-5"><a href="unsupervised-learning.html#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust colors for all clusters</span></span>
+<span id="cb50-6"><a href="unsupervised-learning.html#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>( <span class="fu">ncol</span>(bicluster_rows) <span class="sc">&gt;</span> <span class="fu">ncol</span>(bicluster_columns) ){</span>
+<span id="cb50-7"><a href="unsupervised-learning.html#cb50-7" aria-hidden="true" tabindex="-1"></a>  cluster_names <span class="ot">&lt;-</span> <span class="fu">colnames</span>(bicluster_rows)</span>
+<span id="cb50-8"><a href="unsupervised-learning.html#cb50-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb50-9"><a href="unsupervised-learning.html#cb50-9" aria-hidden="true" tabindex="-1"></a>  cluster_names <span class="ot">&lt;-</span> <span class="fu">colnames</span>(bicluster_columns)</span>
+<span id="cb50-10"><a href="unsupervised-learning.html#cb50-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb50-11"><a href="unsupervised-learning.html#cb50-11" aria-hidden="true" tabindex="-1"></a>annotation_colors <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb50-12"><a href="unsupervised-learning.html#cb50-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(name <span class="cf">in</span> cluster_names){</span>
+<span id="cb50-13"><a href="unsupervised-learning.html#cb50-13" aria-hidden="true" tabindex="-1"></a>  annotation_colors[[name]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;TRUE&quot;</span> <span class="ot">=</span> <span class="st">&quot;red&quot;</span>, <span class="st">&quot;FALSE&quot;</span> <span class="ot">=</span> <span class="st">&quot;white&quot;</span>)</span>
+<span id="cb50-14"><a href="unsupervised-learning.html#cb50-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb50-15"><a href="unsupervised-learning.html#cb50-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-16"><a href="unsupervised-learning.html#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation values that are over thresholds</span></span>
+<span id="cb50-17"><a href="unsupervised-learning.html#cb50-17" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb50-18"><a href="unsupervised-learning.html#cb50-18" aria-hidden="true" tabindex="-1"></a>corr_threshold <span class="ot">&lt;-</span> <span class="fl">0.6</span></span>
+<span id="cb50-19"><a href="unsupervised-learning.html#cb50-19" aria-hidden="true" tabindex="-1"></a>corr_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(correlations<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold <span class="sc">&amp;</span> </span>
+<span id="cb50-20"><a href="unsupervised-learning.html#cb50-20" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">abs</span>(correlations<span class="sc">$</span>cor)<span class="sc">&gt;</span>corr_threshold , <span class="fu">round</span>(correlations<span class="sc">$</span>cor,<span class="dv">1</span>), <span class="st">&quot;&quot;</span>)</span>
+<span id="cb50-21"><a href="unsupervised-learning.html#cb50-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-22"><a href="unsupervised-learning.html#cb50-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
+<span id="cb50-23"><a href="unsupervised-learning.html#cb50-23" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(correlations<span class="sc">$</span>cor,</span>
+<span id="cb50-24"><a href="unsupervised-learning.html#cb50-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col =</span> bicluster_columns, </span>
+<span id="cb50-25"><a href="unsupervised-learning.html#cb50-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_row =</span> bicluster_rows,</span>
+<span id="cb50-26"><a href="unsupervised-learning.html#cb50-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_colors =</span> annotation_colors,</span>
+<span id="cb50-27"><a href="unsupervised-learning.html#cb50-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> corr_values,</span>
+<span id="cb50-28"><a href="unsupervised-learning.html#cb50-28" aria-hidden="true" tabindex="-1"></a>               <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
+<span id="cb50-29"><a href="unsupervised-learning.html#cb50-29" aria-hidden="true" tabindex="-1"></a><span class="st">              (correlation over threshold (corr &gt; &quot;</span>, corr_threshold,</span>
+<span id="cb50-30"><a href="unsupervised-learning.html#cb50-30" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;, p &lt; &quot;</span>, p_threshold,<span class="st">&quot;) marked)&quot;</span>),</span>
+<span id="cb50-31"><a href="unsupervised-learning.html#cb50-31" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize =</span> <span class="dv">10</span>,</span>
+<span id="cb50-32"><a href="unsupervised-learning.html#cb50-32" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks,</span>
+<span id="cb50-33"><a href="unsupervised-learning.html#cb50-33" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> colors, </span>
+<span id="cb50-34"><a href="unsupervised-learning.html#cb50-34" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize_number =</span> <span class="dv">6</span>, </span>
+<span id="cb50-35"><a href="unsupervised-learning.html#cb50-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>,</span>
+<span id="cb50-36"><a href="unsupervised-learning.html#cb50-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_legend =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<p><img src="06-unsupML_files/figure-html/unnamed-chunk-9-1.png" width="768" /></p>
 
 </div>
 </div>

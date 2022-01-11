@@ -198,8 +198,6 @@ div.csl-indent {
 <li class="chapter" data-level="6.1" data-path="beta-diversity.html"><a href="beta-diversity.html#examples-of-pcoa-with-different-settings"><i class="fa fa-check"></i><b>6.1</b> Examples of PCoA with different settings</a>
 <ul>
 <li class="chapter" data-level="6.1.1" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-bray-curtis"><i class="fa fa-check"></i><b>6.1.1</b> PCoA for ASV-level data with Bray-Curtis</a></li>
-<li class="chapter" data-level="6.1.2" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-aitchison-distance"><i class="fa fa-check"></i><b>6.1.2</b> PCoA for ASV-level data with Aitchison distance</a></li>
-<li class="chapter" data-level="6.1.3" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-aggregated-to-phylum-level"><i class="fa fa-check"></i><b>6.1.3</b> PCoA aggregated to Phylum level</a></li>
 </ul></li>
 <li class="chapter" data-level="6.2" data-path="beta-diversity.html"><a href="beta-diversity.html#highlighting-external-variables"><i class="fa fa-check"></i><b>6.2</b> Highlighting external variables</a></li>
 <li class="chapter" data-level="6.3" data-path="beta-diversity.html"><a href="beta-diversity.html#estimating-associations-with-an-external-variable"><i class="fa fa-check"></i><b>6.3</b> Estimating associations with an external variable</a></li>
@@ -264,7 +262,7 @@ the R session. Only uninstalled packages are installed.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="getting-started.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of packages that we need from cran and bioc </span></span>
 <span id="cb1-2"><a href="getting-started.html#cb1-2" aria-hidden="true" tabindex="-1"></a>cran_pkg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;bookdown&quot;</span>, <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;ecodist&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>, </span>
 <span id="cb1-3"><a href="getting-started.html#cb1-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;gridExtra&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;scales&quot;</span>, <span class="st">&quot;vegan&quot;</span>, <span class="st">&quot;caret&quot;</span>,</span>
-<span id="cb1-4"><a href="getting-started.html#cb1-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;ranger&quot;</span>, <span class="st">&quot;stringr&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, <span class="st">&quot;patchwork&quot;</span>, <span class="st">&quot;pdp&quot;</span>)</span>
+<span id="cb1-4"><a href="getting-started.html#cb1-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&quot;ranger&quot;</span>, <span class="st">&quot;stringr&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, <span class="st">&quot;patchwork&quot;</span>, <span class="st">&quot;pdp&quot;</span>, <span class="st">&quot;biclust&quot;</span>)</span>
 <span id="cb1-5"><a href="getting-started.html#cb1-5" aria-hidden="true" tabindex="-1"></a>bioc_pkg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;mia&quot;</span>, <span class="st">&quot;miaViz&quot;</span>, <span class="st">&quot;microbiomeDataSets&quot;</span>)</span>
 <span id="cb1-6"><a href="getting-started.html#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="getting-started.html#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Gets those packages that are already installed</span></span>
@@ -311,7 +309,8 @@ mia and miaViz are prioritized. Packages that are loaded first have higher prior
 ## stringr              TRUE
 ## pheatmap             TRUE
 ## patchwork            TRUE
-## pdp                  TRUE</code></pre>
+## pdp                  TRUE
+## biclust              TRUE</code></pre>
 
 </div>
 </div>

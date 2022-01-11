@@ -7,10 +7,7 @@ Beta diversity is another name for sample dissimilarity. It quantifies
 differences in the overall taxonomic composition between two samples.
 
 Common indices include Bray-Curtis, Unifrac, Jaccard index, and the
-Aitchison distance. Each of these (dis)similarity measures emphasizes
-different aspects. For example, UniFrac incorporates phylogenetic
-information, and Jaccard index ignores exact abundances and considers
-only presence/absence values. For more background information
+Aitchison distance. For more background information
 and examples, you can check the dedicated section in [online
 book](https://microbiome.github.io/OMA/microbiome-diversity.html#beta-diversity).
 
@@ -38,12 +35,9 @@ visualized on a two (or three) dimensional display.
 
 Let us next look at some concrete examples.
 
-
 ### PCoA for ASV-level data with Bray-Curtis
 
-Let us start with PCoA based on a Bray-Curtis dissimilarity matrix
-calculated at Genus level abundances.
-
+Let us start with PCoA based on a Bray-Curtis dissimilarity matrix.
 
 
 ```r
@@ -70,99 +64,12 @@ bray_curtis_plot <- ggplot(data = bray_curtis_pcoa_df, aes(x=pcoa1, y=pcoa2)) +
   labs(x = "PC1",
        y = "PC2", 
        title = "Bray-Curtis PCoA") +
-  theme(title = element_text(size = 10)) # makes titles smaller
+  theme_bw(12) # makes titles smaller
 
 bray_curtis_plot
 ```
 
 ![](05-beta_files/figure-latex/pcoa_asv_bc-1.pdf)<!-- --> 
-
-
-
-### PCoA for ASV-level data with Aitchison distance
-
-Now the same using Aitchison distance. This metric corresponds to
-Euclidean distances between CLR transformed sample abundance vectors.
-
-
-```r
-# Does clr transformation. Pseudocount is added, because data contains zeros. 
-mae[[1]] <- transformCounts(mae[[1]], method = "clr", pseudocount = 1)
-
-# Gets clr table
-clr_assay <- assays(mae[[1]])$clr
-
-# Transposes it to get taxa to columns
-clr_assay <- t(clr_assay)
-
-# Calculates Euclidean distances between samples. Because taxa is in columns,
-# it is used to compare different samples.
-euclidean_dist <- vegan::vegdist(clr_assay, method = "euclidean")
-
-# Does principal coordinate analysis
-euclidean_pcoa <- ecodist::pco(euclidean_dist)
-
-# Creates a data frame from principal coordinates
-euclidean_pcoa_df <- data.frame(pcoa1 = euclidean_pcoa$vectors[,1], 
-                                pcoa2 = euclidean_pcoa$vectors[,2])
-
-# Creates the plot
-euclidean_plot <- ggplot(data = euclidean_pcoa_df, aes(x=pcoa1, y=pcoa2)) +
-  geom_point() +
-  labs(x = "PC1",
-       y = "PC2",
-       title = "Euclidean PCoA with CLR transformation") +
-  theme(title = element_text(size = 12)) # makes titles smaller
-
-euclidean_plot
-```
-
-![](05-beta_files/figure-latex/pcoa_asv_aitchison-1.pdf)<!-- --> 
-
-
-### PCoA aggregated to Phylum level
-
-We use again the Aitchison distances in this example but this time applied to the phylum level.
-
-
-
-```r
-# Does clr transformation. Psuedocount is added, because data contains zeros. 
-se_phylum <- transformCounts(se_phylum, method = "clr", pseudocount = 1)
-
-# Gets clr table
-clr_phylum_assay <- assays(se_phylum)$clr
-
-# Transposes it to get taxa to columns
-clr_phylum_assay <- t(clr_phylum_assay)
-
-# Calculates Euclidean distances between samples. Because taxa is in columns,
-# it is used to compare different samples.
-euclidean_phylum_dist <- vegan::vegdist(clr_assay, method = "euclidean")
-
-# Does principal coordinate analysis
-euclidean_phylum_pcoa <- ecodist::pco(euclidean_phylum_dist)
-
-# Creates a data frame from principal coordinates
-euclidean_phylum_pcoa_df <- data.frame(
-  pcoa1 = euclidean_phylum_pcoa$vectors[,1], 
-  pcoa2 = euclidean_phylum_pcoa$vectors[,2])
-
-# Creates a plot
-euclidean_phylum_plot <- ggplot(data = euclidean_phylum_pcoa_df,
-  aes(x=pcoa1, y=pcoa2)) +
-  geom_point() +
-  labs(x = "PC1",
-       y = "PC2",
-       title = "Aitchison distances at Phylum level") +  
-  theme(title = element_text(size = 12)) # makes titles smaller
-
-euclidean_phylum_plot
-```
-
-![](05-beta_files/figure-latex/pcoa_phylum_aitchison-1.pdf)<!-- --> 
-
-
 
 ## Highlighting external variables 
 
@@ -173,27 +80,21 @@ The following is an example with a discrete grouping variable (Diet) shown with 
 
 
 ```r
-# Adds the variable we later use for coloring to the data frame
-euclidean_diet_pcoa_df <- cbind(euclidean_pcoa_df,
-                             Diet = colData(mae)$Diet)
+# Add diet information to data.frame
+bray_curtis_pcoa_df$Diet <- colData(mae)$Diet
 
 # Creates a plot
-euclidean_diet_plot <- ggplot(data = euclidean_diet_pcoa_df, 
-                                        aes(x=pcoa1, y=pcoa2,
-                                            color = Diet)) +
+plot <- ggplot(data = bray_curtis_pcoa_df, aes_string(x = "pcoa1", y = "pcoa2", color = "Diet")) +
   geom_point() +
   labs(x = "PC1",
-       y = "PC2",
-       title = "PCoA with Aitchison distances") +
-  theme(title = element_text(size = 12)) # makes titles smaller
+       y = "PC2", 
+       title = "Bray-Curtis PCoA") +
+  theme_bw(12) 
 
-euclidean_diet_plot
+plot
 ```
 
 ![](05-beta_files/figure-latex/pcoa_genus-1.pdf)<!-- --> 
-
-PCoA plot in some cases could also be overlayed with a continuous variable. ([see example](https://microbiome.github.io/course_2022_miaverse/beta-diversity.html#pcoa-plot-with-continuous-variable))
-
 
 ## Estimating associations with an external variable
 
@@ -238,7 +139,6 @@ differences between diets. We first need to extract the model
 coefficients of taxa:
 
 
-
 ```r
 # Gets the coefficients
 coef <- coefficients(permanova_diet)["Diet1",]
@@ -277,7 +177,7 @@ top_taxa_coeffient_plot
 
 ![](05-beta_files/figure-latex/unnamed-chunk-2-1.pdf)<!-- --> 
 
-The same test can be conducted using the oridination from PCoA as follows:
+The same test can be conducted using the ordination from PCoA as follows:
 
 
 ```r
@@ -296,13 +196,12 @@ for(pc in c("pcoa1", "pcoa2")){
 plot <- ggplot(data = bray_curtis_pcoa_df, aes_string(x = "pcoa1", y = "pcoa2", color = "Diet")) +
   geom_point(size = 3) +
   labs(title = paste0("PCoA beta diversity ordination for microbiome samples"), x = paste0("PC1 (p = ", p_values[["pcoa1"]], ")"), y = paste0("PC2 (p = ", p_values[["pcoa2"]], ")")) +
-  theme_bw(12) 
+  theme_bw() 
 
 plot
 ```
 
 ![](05-beta_files/figure-latex/unnamed-chunk-3-1.pdf)<!-- --> 
-
 
 There are many alternative and complementary methods for analysing
 community composition. For more examples, see a dedicated section on
