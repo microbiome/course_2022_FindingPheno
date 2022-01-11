@@ -63,9 +63,7 @@ Let us next look at some concrete examples.
 
 ### PCoA for ASV-level data with Bray-Curtis
 
-Let us start with PCoA based on a Bray-Curtis dissimilarity matrix
-calculated at Genus level abundances.
-
+Let us start with PCoA based on a Bray-Curtis dissimilarity matrix.
 
 ```{r pcoa_asv_bc, message=FALSE}
 # Pick the relative abundance table
@@ -91,7 +89,7 @@ bray_curtis_plot <- ggplot(data = bray_curtis_pcoa_df, aes(x=pcoa1, y=pcoa2)) +
   labs(x = "PC1",
        y = "PC2", 
        title = "Bray-Curtis PCoA") +
-  theme(title = element_text(size = 10)) # makes titles smaller
+  theme_bw(12) # makes titles smaller
 
 bray_curtis_plot
 ```
@@ -189,7 +187,7 @@ top_taxa_coeffient_plot <- top_taxa_coeffient_plot +
 top_taxa_coeffient_plot
 ```
 
-The same test can be conducted using the oridination from PCoA as follows:
+The same test can be conducted using the ordination from PCoA as follows:
 
 ```{r}
 bray_curtis_pcoa_df$Diet <- colData(mae)$Diet
