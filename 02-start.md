@@ -43,7 +43,7 @@ the R session. Only uninstalled packages are installed.
 packages <- c("BiocManager", "ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
              "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger",
             "dplyr", "miaViz", "knitr", "kableExtra", "vegan", "ecodist", "biclust",
-            "patchwork", "pdp")
+            "patchwork", "pdp", "MLmetrics", "precrec")
 ```
  
 The following script tries to load all required packages, and if they are not available, installs them.
@@ -70,6 +70,6 @@ is.installed(packages)
 ##               TRUE               TRUE               TRUE               TRUE 
 ##              vegan            ecodist            biclust          patchwork 
 ##               TRUE               TRUE               TRUE               TRUE 
-##                pdp 
-##               TRUE
+##                pdp          MLmetrics            precrec 
+##               TRUE               TRUE               TRUE
 ```

@@ -209,7 +209,9 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="8" data-path="supervised-learning.html"><a href="supervised-learning.html"><i class="fa fa-check"></i><b>8</b> Supervised learning</a>
 <ul>
-<li class="chapter" data-level="8.1" data-path="supervised-learning.html"><a href="supervised-learning.html#random-forests"><i class="fa fa-check"></i><b>8.1</b> Random Forests</a></li>
+<li class="chapter" data-level="8.1" data-path="supervised-learning.html"><a href="supervised-learning.html#data-curation"><i class="fa fa-check"></i><b>8.1</b> Data curation</a></li>
+<li class="chapter" data-level="8.2" data-path="supervised-learning.html"><a href="supervised-learning.html#regression-with-random-forests"><i class="fa fa-check"></i><b>8.2</b> Regression with random forests</a></li>
+<li class="chapter" data-level="8.3" data-path="supervised-learning.html"><a href="supervised-learning.html#classification-with-random-forests"><i class="fa fa-check"></i><b>8.3</b> Classification with random forests</a></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="model-selection-and-evaluation.html"><a href="model-selection-and-evaluation.html"><i class="fa fa-check"></i><b>9</b> Model selection and evaluation</a></li>
 <li class="divider"></li>
@@ -234,50 +236,266 @@ div.csl-indent {
             <section class="normal" id="section-">
 <div id="supervised-learning" class="section level1" number="8">
 <h1><span class="header-section-number">Chapter 8</span> Supervised learning</h1>
-<div id="random-forests" class="section level2" number="8.1">
-<h2><span class="header-section-number">8.1</span> Random Forests</h2>
+<p>Machine learning models are highly flexible and can be used to model differences in
+samples, similarly to (frequentist) statistics. However, the analysis workflow with
+these methods is very different from the frequentist analyses. These models learn
+a function to predict values of the dependent variable, given data. Between different
+models, the algorithms vary greatly, but generally all regression and classification
+models can be used similarly in a machine learning workflow.</p>
+<p>Machine learning models do not usually output p-values, but they are designed to
+predict the outcome (value or class) of the dependent variable based on data.
+Thus, if we want to know how good our model is, we need to divide our data to training
+and test (or validation) sets. The training set is used to train the model, and the
+validation set can be then used to test the model. The model can be used to predict
+the outcome of the dependent variable on the test data, and the predicted values can
+be compared to the actual known values in the test data. It is important to make sure
+that there is no data leakage between these two sets, or otherwise the validation is
+compromised.</p>
+<p>In the workshop we use random forests and the caret package to train regression and
+classification models. The models will predict butyrate concentration or discretized
+class (high/low butyrate) based on the microbiome composition.</p>
+<div id="data-curation" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> Data curation</h2>
+<p>We first make a data frame which includes only the butyrate concentration and the
+transformed genus-level microbiome data.</p>
 <p>Creating a dataframe for modeling butyrate levels:</p>
 <div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="supervised-learning.html#cb49-1" aria-hidden="true" tabindex="-1"></a>butyrate_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">cbind</span>(y, x))</span>
 <span id="cb49-2"><a href="supervised-learning.html#cb49-2" aria-hidden="true" tabindex="-1"></a>butyrate_df <span class="ot">&lt;-</span> butyrate_df[,<span class="fu">which</span>(<span class="fu">colnames</span>(butyrate_df) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Butyrate&quot;</span>, <span class="fu">colnames</span>(x)))]</span></code></pre></div>
-<p>Performing nested cross validation, making train and test (validation) sets:</p>
+<p>The caret package is used to divide the data once to 80% train and 20% test (validation)
+sets. This is to prevent data leakage and overestimation of model performance. The
+20% test set is only used to conduct the final validation of the models. The number of
+samples in this case is low (n = 40), but as we can see later on, even 8 samples is
+sufficient for estimation of the performance. Note that the data is stratified to include
+a representative distribution of butyrate concentrations on both sides of the split.
+There is some randomness inherent in the splitting, so a seed needs to be used.</p>
 <div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="supervised-learning.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
 <span id="cb50-2"><a href="supervised-learning.html#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
 <span id="cb50-3"><a href="supervised-learning.html#cb50-3" aria-hidden="true" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(butyrate_df<span class="sc">$</span>Butyrate, <span class="at">p =</span> .<span class="dv">8</span>, <span class="at">list =</span> <span class="cn">FALSE</span>, <span class="at">times =</span> <span class="dv">1</span>)</span>
 <span id="cb50-4"><a href="supervised-learning.html#cb50-4" aria-hidden="true" tabindex="-1"></a>butyrate_df_train <span class="ot">&lt;-</span> butyrate_df[trainIndex,]</span>
 <span id="cb50-5"><a href="supervised-learning.html#cb50-5" aria-hidden="true" tabindex="-1"></a>butyrate_df_test <span class="ot">&lt;-</span> butyrate_df[<span class="sc">-</span>trainIndex,]</span></code></pre></div>
-<p>Train models with 5-fold CV repeated 5 times:</p>
+</div>
+<div id="regression-with-random-forests" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> Regression with random forests</h2>
+<p>Random forests are a common and flexible ensemble learning method, which are a good starting
+point when choosing a machine learning model. We are using the ranger implementation
+of random forests, which runs quite fast compared to its alternatives in R. A wrapper
+train function from caret is used to conduct a 5-fold cross-validation, repeated 5 times
+with random partitions inside the training data. Because of the randomness, seed needs
+to be set. Note that the seed does not remain set if you re-run a random function
+without it! Specific to random forests, we are also using an option to use permutation
+importance.</p>
+<p>The train function is quite complex, and performs hyperparameter tuning while training the
+model with cross-validation. The final model included in the object is then trained on all
+input data and optimized hyperparameters.</p>
 <div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="supervised-learning.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
 <span id="cb51-2"><a href="supervised-learning.html#cb51-2" aria-hidden="true" tabindex="-1"></a>fitControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;repeatedcv&quot;</span>, <span class="at">number =</span> <span class="dv">5</span>, <span class="at">repeats =</span> <span class="dv">5</span>)</span>
 <span id="cb51-3"><a href="supervised-learning.html#cb51-3" aria-hidden="true" tabindex="-1"></a>rfFit1 <span class="ot">&lt;-</span> <span class="fu">train</span>(Butyrate <span class="sc">~</span> ., <span class="at">data =</span> butyrate_df_train, </span>
 <span id="cb51-4"><a href="supervised-learning.html#cb51-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;ranger&quot;</span>, </span>
 <span id="cb51-5"><a href="supervised-learning.html#cb51-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">trControl =</span> fitControl,</span>
 <span id="cb51-6"><a href="supervised-learning.html#cb51-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>)</span></code></pre></div>
-<p>Measure performance by prediction on test data:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="supervised-learning.html#cb52-1" aria-hidden="true" tabindex="-1"></a>test_predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(rfFit1, <span class="at">newdata =</span> butyrate_df_test)</span>
-<span id="cb52-2"><a href="supervised-learning.html#cb52-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-3"><a href="supervised-learning.html#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot predicted vs observed</span></span>
-<span id="cb52-4"><a href="supervised-learning.html#cb52-4" aria-hidden="true" tabindex="-1"></a>pred_obs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">predicted =</span> test_predictions, <span class="at">observed =</span> butyrate_df_test<span class="sc">$</span>Butyrate)</span>
-<span id="cb52-5"><a href="supervised-learning.html#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pred_obs, <span class="fu">aes</span>(<span class="at">x=</span>predicted, <span class="at">y=</span>observed)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;orange&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb52-6"><a href="supervised-learning.html#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Predicted butyrate concentration&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Observed butyrate concentration&quot;</span>) <span class="sc">+</span></span>
-<span id="cb52-7"><a href="supervised-learning.html#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>)) <span class="sc">+</span></span>
-<span id="cb52-8"><a href="supervised-learning.html#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">linetype =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="co"># Plot a perfect fit line</span></span></code></pre></div>
-<p><img src="07-supML_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<p>Examining model by ploting feature importance:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="supervised-learning.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(rfFit1))</span></code></pre></div>
+<p>Following the training, we can print out the resulting object, which shows details about
+the training. We also print out results of the final model.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="supervised-learning.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rfFit1)</span></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 32 samples
+## 28 predictors
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 5 times) 
+## Summary of sample sizes: 24, 26, 25, 28, 25, 25, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  splitrule   RMSE       Rsquared   MAE      
+##    2    variance    0.8801800  0.5870278  0.6802341
+##    2    extratrees  0.9039197  0.5888711  0.7113279
+##   15    variance    0.8604439  0.5806824  0.6573050
+##   15    extratrees  0.8678618  0.5773606  0.6682391
+##   28    variance    0.8702166  0.5663926  0.6564932
+##   28    extratrees  0.8569955  0.5883242  0.6589236
+## 
+## Tuning parameter &#39;min.node.size&#39; was held constant at a value of 5
+## RMSE was used to select the optimal model using the smallest value.
+## The final values used for the model were mtry = 28, splitrule = extratrees
+##  and min.node.size = 5.</code></pre>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="supervised-learning.html#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rfFit1<span class="sc">$</span>finalModel)</span></code></pre></div>
+<pre><code>## Ranger result
+## 
+## Call:
+##  ranger::ranger(dependent.variable.name = &quot;.outcome&quot;, data = x,      mtry = min(param$mtry, ncol(x)), min.node.size = param$min.node.size,      splitrule = as.character(param$splitrule), write.forest = TRUE,      probability = classProbs, ...) 
+## 
+## Type:                             Regression 
+## Number of trees:                  500 
+## Sample size:                      32 
+## Number of independent variables:  28 
+## Mtry:                             28 
+## Target node size:                 5 
+## Variable importance mode:         permutation 
+## Splitrule:                        extratrees 
+## Number of random splits:          1 
+## OOB prediction error (MSE):       0.8650469 
+## R squared (OOB):                  0.4563803</code></pre>
+<p>We can then compare the metrics produced in training to actual validation metrics. Here,
+the final model predicts on unseen test data samples, and metrics are calculated
+against the observed (true) values. We can also plot the predicted values against the
+observed values, and include a line to show how a perfect model would predict.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="supervised-learning.html#cb56-1" aria-hidden="true" tabindex="-1"></a>test_predictions <span class="ot">&lt;-</span> <span class="fu">predict</span>(rfFit1, <span class="at">newdata =</span> butyrate_df_test)</span>
+<span id="cb56-2"><a href="supervised-learning.html#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">postResample</span>(test_predictions, butyrate_df_test<span class="sc">$</span>Butyrate))</span></code></pre></div>
+<pre><code>##      RMSE  Rsquared       MAE 
+## 1.1129878 0.4973854 0.9576183</code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="supervised-learning.html#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot predicted vs observed</span></span>
+<span id="cb58-2"><a href="supervised-learning.html#cb58-2" aria-hidden="true" tabindex="-1"></a>pred_obs <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">predicted =</span> test_predictions, <span class="at">observed =</span> butyrate_df_test<span class="sc">$</span>Butyrate)</span>
+<span id="cb58-3"><a href="supervised-learning.html#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> pred_obs, <span class="fu">aes</span>(<span class="at">x=</span>predicted, <span class="at">y=</span>observed)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;orange&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb58-4"><a href="supervised-learning.html#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Predicted butyrate concentration&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Observed butyrate concentration&quot;</span>) <span class="sc">+</span></span>
+<span id="cb58-5"><a href="supervised-learning.html#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>)) <span class="sc">+</span></span>
+<span id="cb58-6"><a href="supervised-learning.html#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">linetype =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="co"># Plot a perfect fit line</span></span></code></pre></div>
 <p><img src="07-supML_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-<p>We could investigate association directions by making partial dependence plots:</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="supervised-learning.html#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
-<span id="cb54-2"><a href="supervised-learning.html#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pdp)</span>
-<span id="cb54-3"><a href="supervised-learning.html#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate and plot partial dependence</span></span>
-<span id="cb54-4"><a href="supervised-learning.html#cb54-4" aria-hidden="true" tabindex="-1"></a>top_features <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">varImp</span>(rfFit1)<span class="sc">$</span>importance)[<span class="fu">order</span>(<span class="fu">varImp</span>(rfFit1)<span class="sc">$</span>importance[,<span class="st">&quot;Overall&quot;</span>], <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]]</span>
-<span id="cb54-5"><a href="supervised-learning.html#cb54-5" aria-hidden="true" tabindex="-1"></a>pd_plots <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>)</span>
-<span id="cb54-6"><a href="supervised-learning.html#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (feature <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(top_features)) {</span>
-<span id="cb54-7"><a href="supervised-learning.html#cb54-7" aria-hidden="true" tabindex="-1"></a>  pd_plots[[feature]] <span class="ot">&lt;-</span> <span class="fu">partial</span>(rfFit1, <span class="at">pred.var =</span> top_features[feature], <span class="at">rug =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>() <span class="sc">+</span> </span>
-<span id="cb54-8"><a href="supervised-learning.html#cb54-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">mean</span>(butyrate_df_train<span class="sc">$</span>Butyrate), <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;gray&quot;</span>) <span class="sc">+</span> <span class="co"># Show the mean of the training data as a dashed line</span></span>
-<span id="cb54-9"><a href="supervised-learning.html#cb54-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="fl">1.5</span>,<span class="fl">2.3</span>)) <span class="co"># Harmonize the scale of yhat on all plots</span></span>
-<span id="cb54-10"><a href="supervised-learning.html#cb54-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb54-11"><a href="supervised-learning.html#cb54-11" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(pd_plots)</span></code></pre></div>
+<p>All models are wrong, but some are useful. Luckily, our model seems to be somewhat useful.
+However, we are not yet done with the model. It is important to examine how our model
+actually works. Even though the random forest can look like a “black box,” we can get
+much information out on how it ends up making specific predictions.</p>
+<p>Feature importance can be used, quite literally, to see which features are important
+for model predictions. Permutation importance is a metric calculated by shuffling the
+values of individual feature columns. Permutation importance of a feature will be high
+if such corrupted data leads to bad predictions of the model. If shuffling a feature
+does not affect the model performance negatively, its permutation importance will be low.</p>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="supervised-learning.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(rfFit1))</span></code></pre></div>
 <p><img src="07-supML_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>We can see that some genera are highly important for model predictions. The importance
+values can be highly useful, and these are often used e.g. for feature selection before
+conducting statistical (or other ML) tests. However, if we only conducted this supervised
+machine learning analysis, we would not know which features are positively and which
+ones negatively associated with butyrate levels.</p>
+<p>All black box models can however be examined through partial dependence plots. Similarly to
+validation, we can again utilize the fact that ML models are great at making new predictions.
+While the inner workings of the model are highly complex, we can assume that changing
+the values of an important feature affects the model prediction in a specific way.
+Briefly, partial dependence plots visualize the expected output of the model over the
+range of an individual input feature (up to 3 features).</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="supervised-learning.html#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb60-2"><a href="supervised-learning.html#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pdp)</span>
+<span id="cb60-3"><a href="supervised-learning.html#cb60-3" aria-hidden="true" tabindex="-1"></a>top_features <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">varImp</span>(rfFit1)<span class="sc">$</span>importance)[<span class="fu">order</span>(<span class="fu">varImp</span>(rfFit1)<span class="sc">$</span>importance[,<span class="st">&quot;Overall&quot;</span>], <span class="at">decreasing =</span> <span class="cn">TRUE</span>)[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]]</span>
+<span id="cb60-4"><a href="supervised-learning.html#cb60-4" aria-hidden="true" tabindex="-1"></a>pd_plots <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="cn">NULL</span>)</span>
+<span id="cb60-5"><a href="supervised-learning.html#cb60-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (feature <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(top_features)) {</span>
+<span id="cb60-6"><a href="supervised-learning.html#cb60-6" aria-hidden="true" tabindex="-1"></a>  pd_plots[[feature]] <span class="ot">&lt;-</span> <span class="fu">partial</span>(rfFit1, <span class="at">pred.var =</span> top_features[feature], <span class="at">rug =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>() <span class="sc">+</span> </span>
+<span id="cb60-7"><a href="supervised-learning.html#cb60-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fu">mean</span>(butyrate_df_train<span class="sc">$</span>Butyrate), <span class="at">linetype =</span> <span class="dv">2</span>, <span class="at">color =</span> <span class="st">&quot;gray&quot;</span>) <span class="sc">+</span> <span class="co"># Show the mean of the training data as a dashed line</span></span>
+<span id="cb60-8"><a href="supervised-learning.html#cb60-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_continuous</span>(<span class="at">limits=</span><span class="fu">c</span>(<span class="fl">1.5</span>,<span class="fl">2.3</span>)) <span class="co"># Harmonize the scale of yhat on all plots</span></span>
+<span id="cb60-9"><a href="supervised-learning.html#cb60-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste0</span>(<span class="st">&quot;Partial dependence of &quot;</span>, top_features[feature]))</span>
+<span id="cb60-10"><a href="supervised-learning.html#cb60-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<pre><code>## [1] &quot;Partial dependence of UBA1819&quot;
+## [1] &quot;Partial dependence of Faecalitalea&quot;
+## [1] &quot;Partial dependence of Papillibacter&quot;
+## [1] &quot;Partial dependence of Anaerostipes&quot;
+## [1] &quot;Partial dependence of Lachnoclostridium&quot;
+## [1] &quot;Partial dependence of Ruminiclostridium&quot;</code></pre>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="supervised-learning.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(pd_plots)</span></code></pre></div>
+<p><img src="07-supML_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="classification-with-random-forests" class="section level2" number="8.3">
+<h2><span class="header-section-number">8.3</span> Classification with random forests</h2>
+<p>In addition to regression, random forests can also be used for classification tasks.
+While the actual butyrate values might be important for some purposes, it can be
+expected that it is quite hard to model the concentration throughout its observed
+range accurately. As a demonstration, we can also discretize a constant variable,
+and handle the problem as a classification task. Here, we are using the median value
+of butyrate as a cutoff for high and low butyrate groups - which makes this a binary
+classification. Other ways to specify a cutoff for discretization are often more
+justified than just the mean or median. These are usually informed by previous studies
+and results.</p>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="supervised-learning.html#cb63-1" aria-hidden="true" tabindex="-1"></a>butyrate_cutoff <span class="ot">&lt;-</span> <span class="fu">median</span>(butyrate_df_test<span class="sc">$</span>Butyrate)</span>
+<span id="cb63-2"><a href="supervised-learning.html#cb63-2" aria-hidden="true" tabindex="-1"></a>butyrate_df_test_2 <span class="ot">&lt;-</span> butyrate_df_test</span>
+<span id="cb63-3"><a href="supervised-learning.html#cb63-3" aria-hidden="true" tabindex="-1"></a>butyrate_df_train_2 <span class="ot">&lt;-</span> butyrate_df_train</span>
+<span id="cb63-4"><a href="supervised-learning.html#cb63-4" aria-hidden="true" tabindex="-1"></a>butyrate_df_test_2<span class="sc">$</span>Butyrate <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(butyrate_df_test_2<span class="sc">$</span>Butyrate <span class="sc">&gt;=</span> butyrate_cutoff, <span class="st">&quot;High&quot;</span>, <span class="st">&quot;Low&quot;</span>))</span>
+<span id="cb63-5"><a href="supervised-learning.html#cb63-5" aria-hidden="true" tabindex="-1"></a>butyrate_df_train_2<span class="sc">$</span>Butyrate <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(<span class="fu">ifelse</span>(butyrate_df_train_2<span class="sc">$</span>Butyrate <span class="sc">&gt;=</span> butyrate_cutoff, <span class="st">&quot;High&quot;</span>, <span class="st">&quot;Low&quot;</span>))</span></code></pre></div>
+<p>Training of the model is very similar to regression, but we want to define two options in the
+trainControl function sent to train(). classProbs = TRUE is used to output classification
+probabilities instead of the classes themselves. This is required for calculating
+ROC-AUC values. Also, we are defining a summaryFunction which is used for evaluation
+(and hyperparameter optimization).</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="supervised-learning.html#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb64-2"><a href="supervised-learning.html#cb64-2" aria-hidden="true" tabindex="-1"></a>fitControl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;repeatedcv&quot;</span>, <span class="at">number =</span> <span class="dv">5</span>, <span class="at">repeats =</span> <span class="dv">10</span>, <span class="at">classProbs =</span> <span class="cn">TRUE</span>, <span class="at">summaryFunction =</span> twoClassSummary)</span>
+<span id="cb64-3"><a href="supervised-learning.html#cb64-3" aria-hidden="true" tabindex="-1"></a>rfFit2 <span class="ot">&lt;-</span> <span class="fu">train</span>(Butyrate <span class="sc">~</span> ., <span class="at">data =</span> butyrate_df_train_2, </span>
+<span id="cb64-4"><a href="supervised-learning.html#cb64-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;ranger&quot;</span>, </span>
+<span id="cb64-5"><a href="supervised-learning.html#cb64-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">trControl =</span> fitControl,</span>
+<span id="cb64-6"><a href="supervised-learning.html#cb64-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>)</span></code></pre></div>
+<p>We then measure performance with test data. Here, we need to construct a data frame with
+specific dimensions as an input for twoClassSummary().</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="supervised-learning.html#cb65-1" aria-hidden="true" tabindex="-1"></a>test_predictions_2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">obs =</span> butyrate_df_test_2<span class="sc">$</span>Butyrate, </span>
+<span id="cb65-2"><a href="supervised-learning.html#cb65-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">pred =</span> <span class="fu">predict</span>(rfFit2, <span class="at">newdata =</span> butyrate_df_test_2), </span>
+<span id="cb65-3"><a href="supervised-learning.html#cb65-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">predict</span>(rfFit2, <span class="at">newdata =</span> butyrate_df_test_2, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>))</span>
+<span id="cb65-4"><a href="supervised-learning.html#cb65-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb65-5"><a href="supervised-learning.html#cb65-5" aria-hidden="true" tabindex="-1"></a><span class="co">#Print out the metrics</span></span>
+<span id="cb65-6"><a href="supervised-learning.html#cb65-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rfFit2)</span></code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 32 samples
+## 28 predictors
+##  2 classes: &#39;High&#39;, &#39;Low&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold, repeated 10 times) 
+## Summary of sample sizes: 25, 25, 26, 26, 26, 26, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  splitrule   ROC        Sens       Spec     
+##    2    gini        0.8622222  0.7733333  0.8433333
+##    2    extratrees  0.8877778  0.8133333  0.8450000
+##   15    gini        0.8261111  0.7866667  0.7950000
+##   15    extratrees  0.8561111  0.8266667  0.8116667
+##   28    gini        0.8150000  0.7733333  0.7950000
+##   28    extratrees  0.8488889  0.8200000  0.8016667
+## 
+## Tuning parameter &#39;min.node.size&#39; was held constant at a value of 1
+## ROC was used to select the optimal model using the largest value.
+## The final values used for the model were mtry = 2, splitrule = extratrees
+##  and min.node.size = 1.</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="supervised-learning.html#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(rfFit2<span class="sc">$</span>finalModel)</span></code></pre></div>
+<pre><code>## Ranger result
+## 
+## Call:
+##  ranger::ranger(dependent.variable.name = &quot;.outcome&quot;, data = x,      mtry = min(param$mtry, ncol(x)), min.node.size = param$min.node.size,      splitrule = as.character(param$splitrule), write.forest = TRUE,      probability = classProbs, ...) 
+## 
+## Type:                             Probability estimation 
+## Number of trees:                  500 
+## Sample size:                      32 
+## Number of independent variables:  28 
+## Mtry:                             2 
+## Target node size:                 1 
+## Variable importance mode:         permutation 
+## Splitrule:                        extratrees 
+## Number of random splits:          1 
+## OOB prediction error (Brier s.):  0.163163</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="supervised-learning.html#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">twoClassSummary</span>(test_predictions_2, <span class="at">lev =</span> <span class="fu">c</span>(<span class="st">&quot;High&quot;</span>, <span class="st">&quot;Low&quot;</span>)))</span></code></pre></div>
+<pre><code>##   ROC  Sens  Spec 
+## 0.875 0.750 0.750</code></pre>
+<p>Often just the ROC-AUC value calculated above can suffice, for example for
+model comparisons. However, its values are not reliable in cases where the class
+distribution is skewed. In these cases we want to use area under the precision-recall curve
+(AUPRC) instead.</p>
+<p>Here is one way to calculate both with the package precrec and plot both curves.</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="supervised-learning.html#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MLmetrics)</span>
+<span id="cb71-2"><a href="supervised-learning.html#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(precrec)</span>
+<span id="cb71-3"><a href="supervised-learning.html#cb71-3" aria-hidden="true" tabindex="-1"></a>aucs <span class="ot">&lt;-</span> <span class="fu">evalmod</span>(<span class="at">scores =</span> test_predictions_2<span class="sc">$</span>Low, <span class="at">labels =</span> test_predictions_2<span class="sc">$</span>obs)</span>
+<span id="cb71-4"><a href="supervised-learning.html#cb71-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(aucs)</span></code></pre></div>
+<pre><code>## 
+##     === AUCs ===
+## 
+##      Model name Dataset ID Curve type       AUC
+##    1         m1          1        ROC 0.8750000
+##    2         m1          1        PRC 0.8722936
+## 
+## 
+##     === Input data ===
+## 
+##      Model name Dataset ID # of negatives # of positives
+##    1         m1          1              4              4</code></pre>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="supervised-learning.html#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(aucs)</span></code></pre></div>
+<p><img src="07-supML_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Finally, we can also extract and plot the feature importance from the binary
+classification model. It is interesting to compare this result to the importances
+of the same features in the regression model.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="supervised-learning.html#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(rfFit2))</span></code></pre></div>
+<p><img src="07-supML_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 
 </div>
 </div>
