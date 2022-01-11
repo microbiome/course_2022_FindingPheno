@@ -33,13 +33,13 @@ support from the course assistants.
 
  * 14:15-17:00 - Tuomas Borman and Chouaib Benchraka, Research assistants (UTU)
 
- * Topics
+ * Topics:
      
-	 * Data import and data structures
+   * Data import and data structures
 	 
-	 * Microbiome data exploration 
+   * Microbiome data exploration 
 	 
-	 * Visualization
+   * Visualization
  
  ----------------------------------------------------------------
 
