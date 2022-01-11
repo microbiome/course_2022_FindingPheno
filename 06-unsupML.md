@@ -200,12 +200,12 @@ bc
 ## 	    m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
 ## 	    iter.startup = 10, iter.layer = 100, verbose = FALSE)
 ## 
-## Number of Clusters found:  4 
+## Number of Clusters found:  3 
 ## 
-## First  4  Cluster sizes:
-##                    BC 1 BC 2 BC 3 BC 4
-## Number of Rows:      12   13    8    5
-## Number of Columns:    3    5    4    5
+## First  3  Cluster sizes:
+##                    BC 1 BC 2 BC 3
+## Number of Rows:      12   13    8
+## Number of Columns:    3    5    4
 ```
 
 To get cluster information into right format, we can use functions from OMA book.
@@ -276,13 +276,13 @@ head(bicluster_rows)
 ```
 
 ```
-##                               cluster_1 cluster_2 cluster_3 cluster_4 cluster_5
-## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE     FALSE
-## Genus:Lactobacillus               FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE     FALSE
-## Genus:Lactococcus                 FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Mucispirillum               FALSE     FALSE     FALSE     FALSE      TRUE
+##                               cluster_1 cluster_2 cluster_3 cluster_4
+## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE
+## Genus:Lactobacillus               FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE
+## Genus:Lactococcus                 FALSE     FALSE     FALSE      TRUE
+## Genus:Mucispirillum               FALSE     FALSE     FALSE      TRUE
 ```
 
 Now, we can add bicluster information into the heatmap that we already made.

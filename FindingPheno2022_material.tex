@@ -320,6 +320,10 @@ unnecessary delays and leaving more time for the workshop contents.
   but preferred. For further details, check the \href{https://www.rstudio.com/}{Rstudio home
   page}.
 \item
+  For Windows users: \href{https://cran.r-project.org/bin/windows/Rtools/rtools40.html}{Rtools};
+  Follow the instructions to install the toolkit. This might be required to compile some of the
+  packages required on this course.
+\item
   Install and load the required R packages
 \end{itemize}
 
@@ -345,77 +349,41 @@ the R session. Only uninstalled packages are installed.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# List of packages that we need from cran and bioc }
-\NormalTok{cran\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\StringTok{"bookdown"}\NormalTok{, }\StringTok{"dplyr"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }
-              \StringTok{"gridExtra"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"scales"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"caret"}\NormalTok{,}
-              \StringTok{"ranger"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{, }\StringTok{"biclust"}\NormalTok{)}
-\NormalTok{bioc\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"mia"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{)}
-
-\CommentTok{\# Gets those packages that are already installed}
-\NormalTok{cran\_pkg\_already\_installed }\OtherTok{\textless{}{-}}\NormalTok{ cran\_pkg[ cran\_pkg }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{() ]}
-\NormalTok{bioc\_pkg\_already\_installed }\OtherTok{\textless{}{-}}\NormalTok{ bioc\_pkg[ bioc\_pkg }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{() ]}
-
-\CommentTok{\# Gets those packages that need to be installed}
-\NormalTok{cran\_pkg\_to\_be\_installed }\OtherTok{\textless{}{-}} \FunctionTok{setdiff}\NormalTok{(cran\_pkg, cran\_pkg\_already\_installed)}
-\NormalTok{bioc\_pkg\_to\_be\_installed }\OtherTok{\textless{}{-}} \FunctionTok{setdiff}\NormalTok{(bioc\_pkg, bioc\_pkg\_already\_installed)}
+\NormalTok{packages }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"igraph"}\NormalTok{, }\StringTok{"ANCOMBC"}\NormalTok{,}
+             \StringTok{"microbiome"}\NormalTok{, }\StringTok{"httpuv"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{, }\StringTok{"mia"}\NormalTok{, }\StringTok{"caret"}\NormalTok{, }\StringTok{"ranger"}\NormalTok{,}
+            \StringTok{"dplyr"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"biclust"}\NormalTok{,}
+            \StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
+The following script tries to load all required packages, and if they are not available, installs them.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# If there are packages that need to be installed, installs them from CRAN}
-\ControlFlowTok{if}\NormalTok{( }\FunctionTok{length}\NormalTok{(cran\_pkg\_to\_be\_installed) ) \{}
-   \FunctionTok{install.packages}\NormalTok{(cran\_pkg\_to\_be\_installed)}
+\NormalTok{is.installed }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(pkg) \{}
+\NormalTok{  new.pkg }\OtherTok{\textless{}{-}}\NormalTok{ pkg[}\SpecialCharTok{!}\NormalTok{(pkg }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{()[, }\StringTok{"Package"}\NormalTok{])]}
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(new.pkg)) \{}
+\NormalTok{    BiocManager}\SpecialCharTok{::}\FunctionTok{install}\NormalTok{(new.pkg, }\AttributeTok{ask=}\NormalTok{T)}
+\NormalTok{  \}}
+  \FunctionTok{sapply}\NormalTok{(pkg, require, }\AttributeTok{character.only =} \ConstantTok{TRUE}\NormalTok{)}
 \NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# If there are packages that need to be installed, installs them from Bioconductor}
-\ControlFlowTok{if}\NormalTok{( }\FunctionTok{length}\NormalTok{(bioc\_pkg\_to\_be\_installed) ) \{}
-\NormalTok{   BiocManager}\SpecialCharTok{::}\FunctionTok{install}\NormalTok{(bioc\_pkg\_to\_be\_installed, }\AttributeTok{ask =}\NormalTok{ F)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-Now all required packages are installed, so let's load them into the session.
-Some function names occur in multiple packages. That is why miaverse's packages
-mia and miaViz are prioritized. Packages that are loaded first have higher priority.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Reorders bioc packages, so that mia and miaViz are first}
-\NormalTok{bioc\_pkg }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(bioc\_pkg[ bioc\_pkg }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"mia"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{) ], }
-\NormalTok{              bioc\_pkg[ }\SpecialCharTok{!}\NormalTok{bioc\_pkg }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"mia"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{) ] ) }
-
-\CommentTok{\# Loading all packages into session. Returns true if package was successfully loaded.}
-\NormalTok{loaded }\OtherTok{\textless{}{-}} \FunctionTok{sapply}\NormalTok{(}\FunctionTok{c}\NormalTok{(bioc\_pkg, cran\_pkg), require, }\AttributeTok{character.only =} \ConstantTok{TRUE}\NormalTok{)}
-\FunctionTok{as.data.frame}\NormalTok{(loaded)}
+\FunctionTok{is.installed}\NormalTok{(packages)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##                    loaded
-## mia                  TRUE
-## miaViz               TRUE
-## microbiomeDataSets   TRUE
-## BiocManager          TRUE
-## bookdown             TRUE
-## dplyr                TRUE
-## ecodist              TRUE
-## ggplot2              TRUE
-## gridExtra            TRUE
-## kableExtra           TRUE
-## knitr                TRUE
-## scales               TRUE
-## vegan                TRUE
-## caret                TRUE
-## ranger               TRUE
-## stringr              TRUE
-## pheatmap             TRUE
-## patchwork            TRUE
-## pdp                  TRUE
-## biclust              TRUE
+##        BiocManager            ggplot2           pheatmap            stringr 
+##               TRUE               TRUE               TRUE               TRUE 
+##             igraph            ANCOMBC         microbiome             httpuv 
+##               TRUE               TRUE               TRUE               TRUE 
+## microbiomeDataSets                mia              caret             ranger 
+##               TRUE               TRUE               TRUE               TRUE 
+##              dplyr             miaViz              knitr         kableExtra 
+##               TRUE               TRUE               TRUE               TRUE 
+##              vegan            ecodist            biclust          patchwork 
+##               TRUE               TRUE               TRUE               TRUE 
+##                pdp 
+##               TRUE
 \end{verbatim}
 
 \hypertarget{data}{%
@@ -1253,12 +1221,12 @@ Finally, we can find biclusters from cross-correlation data.
 ##      m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
 ##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
 ## 
-## Number of Clusters found:  4 
+## Number of Clusters found:  3 
 ## 
-## First  4  Cluster sizes:
-##                    BC 1 BC 2 BC 3 BC 4
-## Number of Rows:      12   13    8    5
-## Number of Columns:    3    5    4    5
+## First  3  Cluster sizes:
+##                    BC 1 BC 2 BC 3
+## Number of Rows:      12   13    8
+## Number of Columns:    3    5    4
 \end{verbatim}
 
 To get cluster information into right format, we can use functions from OMA book.
@@ -1331,13 +1299,13 @@ Then we can use the functions.
 \end{Shaded}
 
 \begin{verbatim}
-##                               cluster_1 cluster_2 cluster_3 cluster_4 cluster_5
-## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE     FALSE
-## Genus:Lactobacillus               FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE     FALSE
-## Genus:Lactococcus                 FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Mucispirillum               FALSE     FALSE     FALSE     FALSE      TRUE
+##                               cluster_1 cluster_2 cluster_3 cluster_4
+## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE
+## Genus:Lactobacillus               FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE
+## Genus:Lactococcus                 FALSE     FALSE     FALSE      TRUE
+## Genus:Mucispirillum               FALSE     FALSE     FALSE      TRUE
 \end{verbatim}
 
 Now, we can add bicluster information into the heatmap that we already made.

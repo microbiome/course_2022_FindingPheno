@@ -250,19 +250,19 @@ slot of TreeSE or <a href="https://microbiome.github.io/OMA/containers.html#mult
 </div>
 <div id="importing-data-in-r" class="section level2" number="4.3">
 <h2><span class="header-section-number">4.3</span> Importing data in R</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="data.html#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb6-2"><a href="data.html#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="data.html#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
-<span id="cb6-4"><a href="data.html#cb6-4" aria-hidden="true" tabindex="-1"></a>mae <span class="ot">&lt;-</span> microbiomeDataSets<span class="sc">::</span><span class="fu">HintikkaXOData</span>()</span>
-<span id="cb6-5"><a href="data.html#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="data.html#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop off those bacteria that do not include information in Phylum or lower levels</span></span>
-<span id="cb6-7"><a href="data.html#cb6-7" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> mae[[<span class="dv">1</span>]][<span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">rowData</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>Phylum), ]</span>
-<span id="cb6-8"><a href="data.html#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="data.html#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean taxonomy data, so that names do not include addtional characters</span></span>
-<span id="cb6-10"><a href="data.html#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">rowData</span>(mae[[<span class="dv">1</span>]]) <span class="ot">&lt;-</span> <span class="fu">DataFrame</span>(<span class="fu">apply</span>(<span class="fu">rowData</span>(mae[[<span class="dv">1</span>]]), <span class="dv">2</span>, </span>
-<span id="cb6-11"><a href="data.html#cb6-11" aria-hidden="true" tabindex="-1"></a>                                     str_remove, <span class="at">pattern =</span> <span class="st">&quot;._[0-9]__&quot;</span>))</span>
-<span id="cb6-12"><a href="data.html#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="data.html#cb6-13" aria-hidden="true" tabindex="-1"></a>mae</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="data.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb4-2"><a href="data.html#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="data.html#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the data</span></span>
+<span id="cb4-4"><a href="data.html#cb4-4" aria-hidden="true" tabindex="-1"></a>mae <span class="ot">&lt;-</span> microbiomeDataSets<span class="sc">::</span><span class="fu">HintikkaXOData</span>()</span>
+<span id="cb4-5"><a href="data.html#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="data.html#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop off those bacteria that do not include information in Phylum or lower levels</span></span>
+<span id="cb4-7"><a href="data.html#cb4-7" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> mae[[<span class="dv">1</span>]][<span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">rowData</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>Phylum), ]</span>
+<span id="cb4-8"><a href="data.html#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="data.html#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean taxonomy data, so that names do not include addtional characters</span></span>
+<span id="cb4-10"><a href="data.html#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">rowData</span>(mae[[<span class="dv">1</span>]]) <span class="ot">&lt;-</span> <span class="fu">DataFrame</span>(<span class="fu">apply</span>(<span class="fu">rowData</span>(mae[[<span class="dv">1</span>]]), <span class="dv">2</span>, </span>
+<span id="cb4-11"><a href="data.html#cb4-11" aria-hidden="true" tabindex="-1"></a>                                     str_remove, <span class="at">pattern =</span> <span class="st">&quot;._[0-9]__&quot;</span>))</span>
+<span id="cb4-12"><a href="data.html#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="data.html#cb4-13" aria-hidden="true" tabindex="-1"></a>mae</span></code></pre></div>
 <pre><code>## A MultiAssayExperiment object of 3 listed
 ##  experiments with user-defined names and respective classes.
 ##  Containing an ExperimentList class object of length 3:

@@ -14,6 +14,10 @@ unnecessary delays and leaving more time for the workshop contents.
   choose "Rstudio Desktop" to download the latest version. Optional
   but preferred. For further details, check the [Rstudio home
   page](https://www.rstudio.com/).
+  
+* For Windows users: [Rtools](https://cran.r-project.org/bin/windows/Rtools/rtools40.html);
+  Follow the instructions to install the toolkit. This might be required to compile some of the 
+  packages required on this course.
 
 * Install and load the required R packages
 
@@ -36,74 +40,36 @@ the R session. Only uninstalled packages are installed.
 
 ```r
 # List of packages that we need from cran and bioc 
-cran_pkg <- c("BiocManager", "bookdown", "dplyr", "ecodist", "ggplot2", 
-              "gridExtra", "kableExtra", "knitr", "scales", "vegan", "caret",
-              "ranger", "stringr", "pheatmap", "patchwork", "pdp", "biclust")
-bioc_pkg <- c("mia", "miaViz", "microbiomeDataSets")
-
-# Gets those packages that are already installed
-cran_pkg_already_installed <- cran_pkg[ cran_pkg %in% installed.packages() ]
-bioc_pkg_already_installed <- bioc_pkg[ bioc_pkg %in% installed.packages() ]
-
-# Gets those packages that need to be installed
-cran_pkg_to_be_installed <- setdiff(cran_pkg, cran_pkg_already_installed)
-bioc_pkg_to_be_installed <- setdiff(bioc_pkg, bioc_pkg_already_installed)
-```
-
-
-```r
-# If there are packages that need to be installed, installs them from CRAN
-if( length(cran_pkg_to_be_installed) ) {
-   install.packages(cran_pkg_to_be_installed)
-}
-```
-
-
-```r
-# If there are packages that need to be installed, installs them from Bioconductor
-if( length(bioc_pkg_to_be_installed) ) {
-   BiocManager::install(bioc_pkg_to_be_installed, ask = F)
-}
+packages <- c("BiocManager", "ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
+             "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger",
+            "dplyr", "miaViz", "knitr", "kableExtra", "vegan", "ecodist", "biclust",
+            "patchwork", "pdp")
 ```
  
-Now all required packages are installed, so let's load them into the session.
-Some function names occur in multiple packages. That is why miaverse's packages
-mia and miaViz are prioritized. Packages that are loaded first have higher priority.
-
+The following script tries to load all required packages, and if they are not available, installs them.
 
 ```r
-# Reorders bioc packages, so that mia and miaViz are first
-bioc_pkg <- c(bioc_pkg[ bioc_pkg %in% c("mia", "miaViz") ], 
-              bioc_pkg[ !bioc_pkg %in% c("mia", "miaViz") ] ) 
-
-# Loading all packages into session. Returns true if package was successfully loaded.
-loaded <- sapply(c(bioc_pkg, cran_pkg), require, character.only = TRUE)
-as.data.frame(loaded)
+is.installed <- function(pkg) {
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) {
+    BiocManager::install(new.pkg, ask=T)
+  }
+  sapply(pkg, require, character.only = TRUE)
+}
+is.installed(packages)
 ```
 
 ```
-##                    loaded
-## mia                  TRUE
-## miaViz               TRUE
-## microbiomeDataSets   TRUE
-## BiocManager          TRUE
-## bookdown             TRUE
-## dplyr                TRUE
-## ecodist              TRUE
-## ggplot2              TRUE
-## gridExtra            TRUE
-## kableExtra           TRUE
-## knitr                TRUE
-## scales               TRUE
-## vegan                TRUE
-## caret                TRUE
-## ranger               TRUE
-## stringr              TRUE
-## pheatmap             TRUE
-## patchwork            TRUE
-## pdp                  TRUE
-## biclust              TRUE
+##        BiocManager            ggplot2           pheatmap            stringr 
+##               TRUE               TRUE               TRUE               TRUE 
+##             igraph            ANCOMBC         microbiome             httpuv 
+##               TRUE               TRUE               TRUE               TRUE 
+## microbiomeDataSets                mia              caret             ranger 
+##               TRUE               TRUE               TRUE               TRUE 
+##              dplyr             miaViz              knitr         kableExtra 
+##               TRUE               TRUE               TRUE               TRUE 
+##              vegan            ecodist            biclust          patchwork 
+##               TRUE               TRUE               TRUE               TRUE 
+##                pdp 
+##               TRUE
 ```
-
-
-
