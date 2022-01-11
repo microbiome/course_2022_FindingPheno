@@ -39,8 +39,10 @@ the R session. Only uninstalled packages are installed.
 
 ```{r warning = FALSE, message = FALSE}
 # List of packages that we need from cran and bioc 
-packages <- c("BiocManager", "ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC", "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger")
-
+packages <- c("BiocManager", "ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
+             "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger",
+            "dplyr", "miaViz", "knitr", "kableExtra", "vegan", "ecodist", "biclust",
+            "patchwork", "pdp")
 ```
  
 The following script tries to load all required packages, and if they are not available, installs them.
@@ -54,6 +56,3 @@ is.installed <- function(pkg) {
 }
 is.installed(packages)
 ```
-
-
-
