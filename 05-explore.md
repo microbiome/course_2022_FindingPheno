@@ -1,234 +1,4 @@
 
-```
-## Loading required package: SummarizedExperiment
-```
-
-```
-## Loading required package: MatrixGenerics
-```
-
-```
-## Loading required package: matrixStats
-```
-
-```
-## 
-## Attaching package: 'MatrixGenerics'
-```
-
-```
-## The following objects are masked from 'package:matrixStats':
-## 
-##     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,
-##     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,
-##     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,
-##     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,
-##     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,
-##     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,
-##     colWeightedMeans, colWeightedMedians, colWeightedSds,
-##     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,
-##     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,
-##     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,
-##     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,
-##     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,
-##     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,
-##     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,
-##     rowWeightedSds, rowWeightedVars
-```
-
-```
-## Loading required package: GenomicRanges
-```
-
-```
-## Loading required package: stats4
-```
-
-```
-## Loading required package: BiocGenerics
-```
-
-```
-## 
-## Attaching package: 'BiocGenerics'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     IQR, mad, sd, var, xtabs
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     anyDuplicated, append, as.data.frame, basename, cbind, colnames,
-##     dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
-##     grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
-##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
-##     rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
-##     union, unique, unsplit, which.max, which.min
-```
-
-```
-## Loading required package: S4Vectors
-```
-
-```
-## 
-## Attaching package: 'S4Vectors'
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     expand.grid, I, unname
-```
-
-```
-## Loading required package: IRanges
-```
-
-```
-## Loading required package: GenomeInfoDb
-```
-
-```
-## Loading required package: Biobase
-```
-
-```
-## Welcome to Bioconductor
-## 
-##     Vignettes contain introductory material; view with
-##     'browseVignettes()'. To cite Bioconductor, see
-##     'citation("Biobase")', and for packages 'citation("pkgname")'.
-```
-
-```
-## 
-## Attaching package: 'Biobase'
-```
-
-```
-## The following object is masked from 'package:MatrixGenerics':
-## 
-##     rowMedians
-```
-
-```
-## The following objects are masked from 'package:matrixStats':
-## 
-##     anyMissing, rowMedians
-```
-
-```
-## Loading required package: SingleCellExperiment
-```
-
-```
-## Loading required package: TreeSummarizedExperiment
-```
-
-```
-## Loading required package: Biostrings
-```
-
-```
-## Loading required package: XVector
-```
-
-```
-## 
-## Attaching package: 'Biostrings'
-```
-
-```
-## The following object is masked from 'package:base':
-## 
-##     strsplit
-```
-
-```
-## Loading required package: ggplot2
-```
-
-```
-## Loading required package: ggraph
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:Biostrings':
-## 
-##     collapse, intersect, setdiff, setequal, union
-```
-
-```
-## The following object is masked from 'package:XVector':
-## 
-##     slice
-```
-
-```
-## The following object is masked from 'package:Biobase':
-## 
-##     combine
-```
-
-```
-## The following objects are masked from 'package:GenomicRanges':
-## 
-##     intersect, setdiff, union
-```
-
-```
-## The following object is masked from 'package:GenomeInfoDb':
-## 
-##     intersect
-```
-
-```
-## The following objects are masked from 'package:IRanges':
-## 
-##     collapse, desc, intersect, setdiff, slice, union
-```
-
-```
-## The following objects are masked from 'package:S4Vectors':
-## 
-##     first, intersect, rename, setdiff, setequal, union
-```
-
-```
-## The following objects are masked from 'package:BiocGenerics':
-## 
-##     combine, intersect, setdiff, union
-```
-
-```
-## The following object is masked from 'package:matrixStats':
-## 
-##     count
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-
 
 # Microbiome data exploration
 
@@ -242,28 +12,29 @@ the necessary components.
 Let us now investigate how taxonomic profiling data is organized in R.
 
 Dimensionality tells us how many taxa and samples the data
-contains. As we can see, there are 151 taxa and 27
+contains. As we can see, there are 12613 taxa and 40
 samples.
 
 
 ```r
-dim(tse)
+# mae[[1]]: indexing/retrieving the taxonomic data experiment
+dim(mae[[1]])
 ```
 
 ```
-## [1] 151  27
+## [1] 12613    40
 ```
 
 The `rowData` slot contains a taxonomic table. This includes taxonomic
-information for each of the 151 entries. With the `head()`
+information for each of the 12613 entries. With the `head()`
 command, we can print just the beginning of the table.
 
-The `rowData` seems to contain information from 6
+The `rowData` seems to contain information from 7
 different taxonomy classes.
 
 
 ```r
-knitr::kable(head(rowData(tse))) %>% 
+knitr::kable(head(rowData(mae[[1]]))) %>% 
   kableExtra::kable_styling("striped", 
                             latex_options="scale_down") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -272,32 +43,38 @@ knitr::kable(head(rowData(tse))) %>%
 \begin{table}
 \centering
 \resizebox{\linewidth}{!}{
-\begin{tabular}{l|l|l|l|l|l|l}
+\begin{tabular}{l|l|l|l|l|l|l|l}
 \hline
-  & Kingdom & Phylum & Class & Order & Family & Genus\\
+  & Phylum & Class & Order & Family & Genus & Species & OTU\\
 \hline
-1726470 & Bacteria & Bacteroidetes & Bacteroidia & Bacteroidales & Bacteroidaceae & Bacteroides\\
+GAYR01026362.62.2014 & Proteobacteria & Alphaproteobacteria & Rickettsiales & Mitochondria & Solanum melongena (eggplant) & Solanum melongena (eggplant) & GAYR01026362.62.2014\\
 \hline
-1726471 & Bacteria & Bacteroidetes & Bacteroidia & Bacteroidales & Bacteroidaceae & Bacteroides\\
+CVJT01000011.50.2173 & Firmicutes & Bacilli & Bacillales & Staphylococcaceae & Staphylococcus & Staphylococcus aureus & CVJT01000011.50.2173\\
 \hline
-17264731 & Bacteria & Bacteroidetes & Bacteroidia & Bacteroidales & Porphyromonadaceae & Parabacteroides\\
+KF625183.1.1786 & Proteobacteria & Gammaproteobacteria & Enterobacteriales & Enterobacteriaceae & Klebsiella & Klebsiella oxytoca & KF625183.1.1786\\
 \hline
-17264726 & Bacteria & Bacteroidetes & Bacteroidia & Bacteroidales & Bacteroidaceae & Bacteroides\\
+AYSG01000002.292.2076 & Firmicutes & Bacilli & Lactobacillales & Streptococcaceae & Streptococcus & Streptococcus thermophilus TH1435 & AYSG01000002.292.2076\\
 \hline
-1726472 & Bacteria & Verrucomicrobia & Verrucomicrobiae & Verrucomicrobiales & Verrucomicrobiaceae & Akkermansia\\
+CCPS01000022.154.1916 & Proteobacteria & Gammaproteobacteria & Enterobacteriales & Enterobacteriaceae & Escherichia-Shigella & Escherichia coli & CCPS01000022.154.1916\\
 \hline
-17264724 & Bacteria & Bacteroidetes & Bacteroidia & Bacteroidales & Bacteroidaceae & Bacteroides\\
+KJ923794.1.1762 & Firmicutes & Bacilli & Bacillales & Staphylococcaceae & Staphylococcus & Staphylococcus aureus & KJ923794.1.1762\\
 \hline
 \end{tabular}}
 \end{table}
 
-The colData slot contains sample metadata. It contains information for all 27 samples.
+The colData slot contains sample metadata. It contains information for all 40 samples.
 However, here only the 6 first samples are shown as we use the `head()` command. There
-are 4 columns, that contain information, e.g., about patients' status, and cohort.
+are 6 columns, that contain information, e.g., about patients' status, and cohort.
 
 
 ```r
-knitr::kable(head(colData(tse))) %>% 
+# For simplicity, classify all high-fat diets as high-fat, and all the low-fat 
+# diets as low-fat diets
+colData(mae)$Diet <- ifelse(colData(mae)$Diet == "High-fat" | 
+                              colData(mae)$Diet == "High-fat + XOS", 
+                            "High-fat", "Low-fat")
+
+knitr::kable(head(colData(mae))) %>% 
   kableExtra::kable_styling("striped", 
                             latex_options="scale_down") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -306,49 +83,46 @@ knitr::kable(head(colData(tse))) %>%
 \begin{table}
 \centering
 \resizebox{\linewidth}{!}{
-\begin{tabular}{l|l|l|l|l}
+\begin{tabular}{l|l|l|l|l|l|r}
 \hline
-  & patient\_status & cohort & patient\_status\_vs\_cohort & sample\_name\\
+  & Sample & Rat & Site & Diet & Fat & XOS\\
 \hline
-A110 & ADHD & Cohort\_1 & ADHD\_Cohort\_1 & A110\\
+C1 & C1 & 1 & Cecum & High-fat & High & 0\\
 \hline
-A12 & ADHD & Cohort\_1 & ADHD\_Cohort\_1 & A12\\
+C2 & C2 & 2 & Cecum & High-fat & High & 0\\
 \hline
-A15 & ADHD & Cohort\_1 & ADHD\_Cohort\_1 & A15\\
+C3 & C3 & 3 & Cecum & High-fat & High & 0\\
 \hline
-A19 & ADHD & Cohort\_1 & ADHD\_Cohort\_1 & A19\\
+C4 & C4 & 4 & Cecum & High-fat & High & 0\\
 \hline
-A21 & ADHD & Cohort\_2 & ADHD\_Cohort\_2 & A21\\
+C5 & C5 & 5 & Cecum & High-fat & High & 0\\
 \hline
-A23 & ADHD & Cohort\_2 & ADHD\_Cohort\_2 & A23\\
+C6 & C6 & 6 & Cecum & High-fat & High & 0\\
 \hline
 \end{tabular}}
 \end{table}
 
 From here, we can draw summaries of the sample (column) data, for
-instance to see what is the patient status distribution.
+instance to see what is the diet distribution.
 
-The command `colData(tse)$patient_status` fetches the data from the
+The command `colData(mae)$Diet` fetches the data from the
 column, and `table()` creates a table that shows how many times each
 class is present, and `sort()` sorts the table to ascending order.
 
-There are 13 
-samples from patients having ADHD, 
-and 14 control samples.
+There are 20 
+samples from mice having High-fat, 
+and 20 Low-fat.
 
 
 ```r
-sort(table(colData(tse)$patient_status))
+sort(table(colData(mae)$Diet))
 ```
 
 ```
 ## 
-##    ADHD Control 
-##      13      14
+## High-fat  Low-fat 
+##       20       20
 ```
-
-
-
 
 ### Transformations
 
@@ -365,10 +139,10 @@ as we will see later).
 
 ```r
 # Calculates relative abundances, and stores the table to assays
-tse <- transformCounts(tse, method = "relabundance")
+mae[[1]] <- transformCounts(mae[[1]], method = "relabundance")
 ```
 
-A variety of standard transformations for microbiome data are available for `TSE` data objects through [mia R package](https://microbiome.github.io/mia/reference/transformCounts.html).
+A variety of standard transformations for microbiome data are available  through [mia R package](https://microbiome.github.io/mia/reference/transformCounts.html).
 
 
 ### Aggregation
@@ -379,20 +153,20 @@ agglomerate the data at Phylum level.
 
 
 ```r
-tse_phylum <- agglomerateByRank(tse, rank = "Phylum")
+se_phylum <- agglomerateByRank(mae[[1]], rank = "Phylum")
 
 # Show dimensionality
-dim(tse_phylum)
+dim(se_phylum)
 ```
 
 ```
-## [1]  5 27
+## [1] 13 40
 ```
 
 
 
-Now there are 5 taxa and 27
-samples, meaning that there are 5 different
+Now there are 13 taxa and 40
+samples, meaning that there are 13 different
 Phylum level taxonomic groups. Looking at the `rowData` after
 agglomeration shows all Firmicutes are combined together, and all
 lower rank information is lost.
@@ -402,7 +176,7 @@ Firmicutes are summed up.
 
 
 ```r
-knitr::kable(head(rowData(tse_phylum))) %>% 
+knitr::kable(head(rowData(se_phylum))) %>% 
   kableExtra::kable_styling("striped", 
                             latex_options="scale_down") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -411,19 +185,21 @@ knitr::kable(head(rowData(tse_phylum))) %>%
 \begin{table}
 \centering
 \resizebox{\linewidth}{!}{
-\begin{tabular}{l|l|l|l|l|l|l}
+\begin{tabular}{l|l|l|l|l|l|l|l}
 \hline
-  & Kingdom & Phylum & Class & Order & Family & Genus\\
+  & Phylum & Class & Order & Family & Genus & Species & OTU\\
 \hline
-Bacteroidetes & Bacteria & Bacteroidetes & NA & NA & NA & NA\\
+Proteobacteria & Proteobacteria & NA & NA & NA & NA & NA & GAYR01026362.62.2014\\
 \hline
-Verrucomicrobia & Bacteria & Verrucomicrobia & NA & NA & NA & NA\\
+Firmicutes & Firmicutes & NA & NA & NA & NA & NA & CVJT01000011.50.2173\\
 \hline
-Proteobacteria & Bacteria & Proteobacteria & NA & NA & NA & NA\\
+Cyanobacteria & Cyanobacteria & NA & NA & NA & NA & NA & GEMN01027092.33.1623\\
 \hline
-Firmicutes & Bacteria & Firmicutes & NA & NA & NA & NA\\
+Tenericutes & Tenericutes & NA & NA & NA & NA & NA & AM277369.1.1548\\
 \hline
-Cyanobacteria & Bacteria & Cyanobacteria & NA & NA & NA & NA\\
+Deferribacteres & Deferribacteres & NA & NA & NA & NA & NA & AYGZ01000001.327.1863\\
+\hline
+Actinobacteria & Actinobacteria & NA & NA & NA & NA & NA & JGZF01000005.1.1534\\
 \hline
 \end{tabular}}
 \end{table}
@@ -440,10 +216,10 @@ agglomeration.
 
 
 ```r
-temp <- rowData(agglomerateByRank(tse, rank = "Genus"))
+temp <- rowData(agglomerateByRank(mae[[1]], rank = "Genus"))
 
-# Prints those taxa that do not have information at the Genus level
-knitr::kable(head(temp[temp$Genus == "",])) %>% 
+# Prints those taxa that do not have information at the Genus level (NA)
+knitr::kable(head(temp[which(is.na(temp$Genus)),])) %>% 
   kableExtra::kable_styling("striped", 
                             latex_options="scale_down") %>% 
   kableExtra::scroll_box(width = "100%")
@@ -452,19 +228,21 @@ knitr::kable(head(temp[temp$Genus == "",])) %>%
 \begin{table}
 \centering
 \resizebox{\linewidth}{!}{
-\begin{tabular}{l|l|l|l|l|l|l}
+\begin{tabular}{l|l|l|l|l|l|l|l}
 \hline
-  & Kingdom & Phylum & Class & Order & Family & Genus\\
+  & Phylum & Class & Order & Family & Genus & Species & OTU\\
 \hline
-Family:Lachnospiraceae & Bacteria & Firmicutes & Clostridia & Clostridiales & Lachnospiraceae & \\
+Family:uncultured & Proteobacteria & Alphaproteobacteria & Rhodospirillales & uncultured & NA & NA & JRJTB:01000:00983\\
 \hline
-Order:Bacteroidales & Bacteria & Bacteroidetes & Bacteroidia & Bacteroidales &  & \\
+Family:Ruminococcaceae & Firmicutes & Clostridia & Clostridiales & Ruminococcaceae & NA & NA & JRJTB:00751:00256\\
 \hline
-Order:Clostridiales & Bacteria & Firmicutes & Clostridia & Clostridiales &  & \\
+Order:Clostridiales & Firmicutes & Clostridia & Clostridiales & NA & NA & NA & JRJTB:03059:01977\\
 \hline
-Family:Enterobacteriaceae & Bacteria & Proteobacteria & Gammaproteobacteria & Enterobacteriales & Enterobacteriaceae & \\
+Family:Lachnospiraceae & Firmicutes & Clostridia & Clostridiales & Lachnospiraceae & NA & NA & JRJTB:00738:02832\\
 \hline
-Order:Gastranaerophilales & Bacteria & Cyanobacteria & Melainabacteria & Gastranaerophilales &  & \\
+Family:Peptostreptococcaceae & Firmicutes & Clostridia & Clostridiales & Peptostreptococcaceae & NA & NA & JRJTB:01731:00274\\
+\hline
+Family:Pasteurellaceae & Proteobacteria & Gammaproteobacteria & Pasteurellales & Pasteurellaceae & NA & NA & JRJTB:01960:01703\\
 \hline
 \end{tabular}}
 \end{table}
@@ -473,13 +251,13 @@ Here agglomeration is done similarly, but na.rm = TRUE
 
 
 ```r
-temp2 <- rowData(agglomerateByRank(tse, rank = "Genus", na.rm = TRUE))
+temp2 <- rowData(agglomerateByRank(mae[[1]], rank = "Genus", na.rm = TRUE))
 
 print(paste0("Agglomeration with na.rm = FALSE: ", dim(temp)[1], " taxa."))
 ```
 
 ```
-## [1] "Agglomeration with na.rm = FALSE: 54 taxa."
+## [1] "Agglomeration with na.rm = FALSE: 277 taxa."
 ```
 
 ```r
@@ -487,7 +265,7 @@ print(paste0("Agglomeration with na.rm = TRUE: ", dim(temp2)[1], " taxa."))
 ```
 
 ```
-## [1] "Agglomeration with na.rm = TRUE: 49 taxa."
+## [1] "Agglomeration with na.rm = TRUE: 262 taxa."
 ```
 
 The [mia
@@ -503,21 +281,14 @@ data visualization. Let us plot the Phylum level abundances.
 
 ```r
 # Here we specify "relabundance" to be abundance table that we use for plotting.
-# Note that we can use agglomerated or non-agglomerated tse as an input, because
+# Note that we can use agglomerated or non-agglomerated mae[[1]] as an input, because
 # the function agglomeration is built-in option. 
 
 # Legend does not fit into picture, so its height is reduced.
-plot_abundance <- plotAbundance(tse, abund_values="relabundance", rank = "Phylum") +
+plot_abundance <- plotAbundance(mae[[1]], abund_values="relabundance", rank = "Phylum") +
   theme(legend.key.height = unit(0.5, "cm")) +
   scale_y_continuous(label = scales::percent)
-```
 
-```
-## Scale for 'y' is already present. Adding another scale for 'y', which will
-## replace the existing scale.
-```
-
-```r
 plot_abundance 
 ```
 
@@ -533,10 +304,10 @@ The plot shows peak abundances around 30 %.
 
 ```r
 # Subset data by taking only Firmicutes
-tse_firmicutes <- tse_phylum["Firmicutes"]
+se_firmicutes <- se_phylum["Firmicutes"]
 
 # Gets the abundance table
-abundance_firmicutes <- assay(tse_firmicutes, "relabundance")
+abundance_firmicutes <- assay(se_firmicutes, "relabundance")
 
 # Creates a data frame object, where first column includes abundances
 firmicutes_abund_df <- as.data.frame(t(abundance_firmicutes))
@@ -556,69 +327,4 @@ firmicutes_abund_plot
 
 ![](05-explore_files/figure-latex/unnamed-chunk-11-1.pdf)<!-- --> 
 
-
-
-
 For more visualization options and examples, see the [miaViz vignette](https://microbiome.github.io/miaViz/articles/miaViz.html).
-
-
-
-## Exercises (optional)
-
-Explore some of the following questions on your own by following
-[online examples](https://microbiome.github.io/OMA/). Prepare a
-reproducible report (Rmarkdown), and include the code that you use to
-import the data and generate the analyses.
-
- * **Abundance table** Retrieve the taxonomic abundance table from the
-   example data set (TSE object). Tip: check "assays" in [data import
-   section](https://microbiome.github.io/OMA/data-introduction.html#loading-experimental-microbiome-data)
-   
- * How many different samples and genus-level groups this phyloseq
-   object has? Tips: see dim(), rowData()
-
- * What is the maximum abundance of Akkermansia in this data set? Tip:
-   aggregate the data to Genus level with agglomerateByRank, pick
-   abundance assay, and check a given genus (row) in the assay
-
- * Draw a histogram of library sizes (total number of reads per
-   sample). Tip: Library size section in
-   [OMA](https://microbiome.github.io/OMA/quality-control.html). You
-   can use the available function, or count the sum of reads per
-   sample by using the colSums command applied on the abundance
-   table. Check [Vandeputte et
-   al. 2017](https://www.nature.com/articles/nature24460) for further
-   discussion on the differences between absolute and relative
-   quantification of microbial abundances.
-
- * **Taxonomy table** Retrieve the taxonomy table and print out the
-   first few lines of it with the R command head(). Investigate how
-   many different phylum-level groups this phyloseq object has? Tips:
-   rowData, taxonomicRanks in
-   [OMA](https://microbiome.github.io/OMA/taxonomic-information.html#functions-to-access-taxonomic-information).
-
- * **Sample metadata** Retrieve sample metadata. How many patient
-     groups this data set has? Draw a histogram of sample
-     diversities. Tips: colData
-
- * **Subsetting** Pick a subset of the data object including only
-     ADHD individuals from Cohort 1. How many there are? Tips: subsetSamples
-
- * **Transformations** The data contains read counts. We can convert
-  these into relative abundances and other formats. Compare abundance
-  of a given taxonomic group using the example data before and after
-  the compositionality transformation (with a cross-plot, for
-  instance). You can also compare the results to CLR-transformed data
-  (see e.g. [Gloor et
-  al. 2017](https://www.frontiersin.org/articles/10.3389/fmicb.2017.02224/full))
-
- * **Visual exploration** Visualize the population distribution of
-   abundances for certain taxonomic groups. Do the same for
-   CLR-transformed abundances. Tip: assays, transformCounts
-   
- * Experiment with other data manipulation tools from
-   [OMA](https://microbiome.github.io/OMA/taxonomic-information.html#functions-to-access-taxonomic-information).
-
-
- * Example solution: [Solutions](06-3-ex-sol-ADHD.html)
- 

@@ -213,7 +213,6 @@ div.csl-indent {
 <li class="chapter" data-level="8.2" data-path="supervised-learning.html"><a href="supervised-learning.html#regression-with-random-forests"><i class="fa fa-check"></i><b>8.2</b> Regression with random forests</a></li>
 <li class="chapter" data-level="8.3" data-path="supervised-learning.html"><a href="supervised-learning.html#classification-with-random-forests"><i class="fa fa-check"></i><b>8.3</b> Classification with random forests</a></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="model-selection-and-evaluation.html"><a href="model-selection-and-evaluation.html"><i class="fa fa-check"></i><b>9</b> Model selection and evaluation</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -280,7 +279,7 @@ metabolites.</p>
 <span id="cb30-24"><a href="unsupervised-learning.html#cb30-24" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">paste0</span>(<span class="st">&quot;CV threshold (&quot;</span>, <span class="sc">-</span>cv_threshold, <span class="st">&quot;)&quot;</span>), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">angle=</span><span class="dv">90</span>))</span>
 <span id="cb30-25"><a href="unsupervised-learning.html#cb30-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-26"><a href="unsupervised-learning.html#cb30-26" aria-hidden="true" tabindex="-1"></a>plot</span></code></pre></div>
-<p><img src="06-unsupML_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="07-unsupML_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>Subsetting metabolomic data:</p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="unsupervised-learning.html#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get those metabolites that are over threshold</span></span>
 <span id="cb31-2"><a href="unsupervised-learning.html#cb31-2" aria-hidden="true" tabindex="-1"></a>metabolites_over_th <span class="ot">&lt;-</span> <span class="fu">rownames</span>(df[df<span class="sc">$</span>cv <span class="sc">&gt;</span> cv_threshold <span class="sc">|</span> </span>
@@ -342,7 +341,7 @@ concentration of metabolite high?” for instance.</p>
 <span id="cb33-24"><a href="unsupervised-learning.html#cb33-24" aria-hidden="true" tabindex="-1"></a>               <span class="at">breaks =</span> breaks,</span>
 <span id="cb33-25"><a href="unsupervised-learning.html#cb33-25" aria-hidden="true" tabindex="-1"></a>               <span class="at">color =</span> colors, </span>
 <span id="cb33-26"><a href="unsupervised-learning.html#cb33-26" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize_number =</span> <span class="dv">10</span>)</span></code></pre></div>
-<p><img src="06-unsupML_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
+<p><img src="07-unsupML_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
 <p>Finally, we can find biclusters from cross-correlation data.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="unsupervised-learning.html#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load package</span></span>
 <span id="cb34-2"><a href="unsupervised-learning.html#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biclust)</span></code></pre></div>
@@ -374,12 +373,12 @@ concentration of metabolite high?” for instance.</p>
 ##      m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
 ##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
 ## 
-## Number of Clusters found:  3 
+## Number of Clusters found:  4 
 ## 
-## First  3  Cluster sizes:
-##                    BC 1 BC 2 BC 3
-## Number of Rows:      12   13    8
-## Number of Columns:    3    5    4</code></pre>
+## First  4  Cluster sizes:
+##                    BC 1 BC 2 BC 3 BC 4
+## Number of Rows:      12   13    8    5
+## Number of Columns:    3    5    4    5</code></pre>
 <p>To get cluster information into right format, we can use functions from OMA book.
 They add cluster for those features that were not assigned to any cluster.</p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="unsupervised-learning.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Functions for obtaining biclust information</span></span>
@@ -437,13 +436,13 @@ They add cluster for those features that were not assigned to any cluster.</p>
 <span id="cb46-6"><a href="unsupervised-learning.html#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-7"><a href="unsupervised-learning.html#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
 <span id="cb46-8"><a href="unsupervised-learning.html#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
-<pre><code>##                               cluster_1 cluster_2 cluster_3 cluster_4
-## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE
-## Genus:Lactobacillus               FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE
-## Genus:Lactococcus                 FALSE     FALSE     FALSE      TRUE
-## Genus:Mucispirillum               FALSE     FALSE     FALSE      TRUE</code></pre>
+<pre><code>##                               cluster_1 cluster_2 cluster_3 cluster_4 cluster_5
+## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE     FALSE
+## Genus:Lactobacillus               FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE     FALSE
+## Genus:Lactococcus                 FALSE     FALSE     FALSE     FALSE      TRUE
+## Genus:Mucispirillum               FALSE     FALSE     FALSE     FALSE      TRUE</code></pre>
 <p>Now, we can add bicluster information into the heatmap that we already made.</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="unsupervised-learning.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into factors</span></span>
 <span id="cb48-2"><a href="unsupervised-learning.html#cb48-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">apply</span>(bicluster_columns, <span class="dv">2</span>, as.factor))</span>
@@ -481,7 +480,7 @@ They add cluster for those features that were not assigned to any cluster.</p>
 <span id="cb48-34"><a href="unsupervised-learning.html#cb48-34" aria-hidden="true" tabindex="-1"></a>               <span class="at">fontsize_number =</span> <span class="dv">6</span>, </span>
 <span id="cb48-35"><a href="unsupervised-learning.html#cb48-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>,</span>
 <span id="cb48-36"><a href="unsupervised-learning.html#cb48-36" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_legend =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
-<p><img src="06-unsupML_files/figure-html/unnamed-chunk-9-1.png" width="768" /></p>
+<p><img src="07-unsupML_files/figure-html/unnamed-chunk-9-1.png" width="768" /></p>
 
 </div>
 </div>

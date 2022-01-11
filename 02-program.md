@@ -1,0 +1,72 @@
+
+# Program
+
+The workshop takes place on the 13th and 14th of January from 9am – 5pm
+(CET). Short breaks will be scheduled between sessions.
+
+The practical sessions consists of a set of example
+multi-omics analysis workflows. It is assumed that you
+have already installed the required software. Do not hesitate to ask
+support from the course assistants.
+
+## Day 1
+
+**Lectures**
+
+ * 9:15-10:00 - Welcome and introduction - Leo Lahti, Associate professor (UTU)
+
+ * 10:00-10:15 - Break
+
+ * 10:15-11:00 - Metagenomics - Katariina Pärnänen, Postdoctoral researcher (UTU)
+ 
+ * 11:00-11:15 - Break
+ 
+ * 11:15-12:00 - Metabolomics - Pande Putu Erawijantari, Postdoctoral researcher (UTU)
+ 
+ * 12:00-12:15 - Break
+ 
+ * 12:15-13:00 - Multiomics - Leo Lahti, Associate professor (UTU)
+ 
+ * 13:00-14:15 - Lunch break
+
+**Practical**
+
+ * 14:15-17:00 - Tuomas Borman and Chouaib Benchraka, Research assistants (UTU)
+
+ * Topics:
+     
+   * Data import and data structures
+	 
+   * Microbiome data exploration 
+	 
+   * Visualization
+ 
+ ----------------------------------------------------------------
+
+## Day 2
+
+**Lectures**
+
+ * 9:15-11:00 (including a short break) - Unsupervised and supervised machine learning - Matti Ruuskanen, Postdoctoral researcher (UTU)
+ 
+ * 11:00-11:15 - Break
+ 
+ * 11:15-12:00 - Individual-based modeling - Gergely Boza, Research fellow (CER)
+ 
+ * 12:00-12:15 - Break
+ 
+ * 12:15-13:00 - Data integration - Leo Lahti, Associate professor (UTU)
+ 
+ * 13:00-14:15 - Lunch break
+
+**Practical**
+
+ * 14:15-17:00 - Tuomas Borman, Matti Ruuskanen and Chouaib Benchraka (UTU)
+
+ * Topics: 
+
+   * Unsupervised learning: Beta-diversity and biclustering
+ 
+   * Supervised learning: Regression and classification with random forests
+ 
+   * Validation and interpretation of black box models

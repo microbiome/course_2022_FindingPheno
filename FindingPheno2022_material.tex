@@ -751,7 +751,7 @@ data visualization. Let us plot the Phylum level abundances.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{04-explore_files/figure-latex/unnamed-chunk-10-1.pdf}
+\includegraphics{05-explore_files/figure-latex/unnamed-chunk-10-1.pdf}
 
 \textbf{Density plot} shows the overall abundance distribution for a given
 taxonomic group. Let us check the relative abundance of Firmicutes
@@ -785,7 +785,7 @@ The plot shows peak abundances around 30 \%.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{04-explore_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{05-explore_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 For more visualization options and examples, see the \href{https://microbiome.github.io/miaViz/articles/miaViz.html}{miaViz vignette}.
 
@@ -860,7 +860,7 @@ Let us start with PCoA based on a Bray-Curtis dissimilarity matrix.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{05-beta_files/figure-latex/pcoa_asv_bc-1.pdf}
+\includegraphics{06-beta_files/figure-latex/pcoa_asv_bc-1.pdf}
 
 \hypertarget{highlighting-external-variables}{%
 \section{Highlighting external variables}\label{highlighting-external-variables}}
@@ -887,7 +887,7 @@ The following is an example with a discrete grouping variable (Diet) shown with 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{05-beta_files/figure-latex/pcoa_genus-1.pdf}
+\includegraphics{06-beta_files/figure-latex/pcoa_genus-1.pdf}
 
 \hypertarget{estimating-associations-with-an-external-variable}{%
 \section{Estimating associations with an external variable}\label{estimating-associations-with-an-external-variable}}
@@ -954,7 +954,7 @@ coefficients of taxa:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{05-beta_files/figure-latex/permanova_coefs-1.pdf}
+\includegraphics{06-beta_files/figure-latex/permanova_coefs-1.pdf}
 
 The above plot shows taxa as code names, and it is hard to tell which
 bacterial groups they represent. However, it is easy to add human readable
@@ -972,7 +972,7 @@ names. We can fetch those from our rowData. Here we use Genus level names:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{05-beta_files/figure-latex/unnamed-chunk-2-1.pdf}
+\includegraphics{06-beta_files/figure-latex/unnamed-chunk-2-1.pdf}
 
 The same test can be conducted using the ordination from PCoA as follows:
 
@@ -999,7 +999,7 @@ The same test can be conducted using the ordination from PCoA as follows:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{05-beta_files/figure-latex/unnamed-chunk-3-1.pdf}
+\includegraphics{06-beta_files/figure-latex/unnamed-chunk-3-1.pdf}
 
 There are many alternative and complementary methods for analysing
 community composition. For more examples, see a dedicated section on
@@ -1070,7 +1070,7 @@ metabolites.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-2-1.pdf}
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-2-1.pdf}
 
 Subsetting metabolomic data:
 
@@ -1152,7 +1152,7 @@ Check OMA book's dedicated chapther on
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-5-1.pdf}
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-5-1.pdf}
 
 Finally, we can find biclusters from cross-correlation data.
 
@@ -1351,7 +1351,7 @@ Now, we can add bicluster information into the heatmap that we already made.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{06-unsupML_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-9-1.pdf}
 
 \hypertarget{supervised-learning}{%
 \chapter{Supervised learning}\label{supervised-learning}}
@@ -1524,7 +1524,7 @@ observed values, and include a line to show how a perfect model would predict.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{07-supML_files/figure-latex/unnamed-chunk-6-1.pdf}
+\includegraphics{08-supML_files/figure-latex/unnamed-chunk-6-1.pdf}
 
 All models are wrong, but some are useful. Luckily, our model seems to be somewhat useful.
 However, we are not yet done with the model. It is important to examine how our model
@@ -1543,7 +1543,7 @@ does not affect the model performance negatively, its permutation importance wil
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{07-supML_files/figure-latex/unnamed-chunk-7-1.pdf}
+\includegraphics{08-supML_files/figure-latex/unnamed-chunk-7-1.pdf}
 
 We can see that some genera are highly important for model predictions. The importance
 values can be highly useful, and these are often used e.g.~for feature selection before
@@ -1588,7 +1588,7 @@ range of an individual input feature (up to 3 features).
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{07-supML_files/figure-latex/unnamed-chunk-8-1.pdf}
+\includegraphics{08-supML_files/figure-latex/unnamed-chunk-8-1.pdf}
 
 \hypertarget{classification-with-random-forests}{%
 \section{Classification with random forests}\label{classification-with-random-forests}}
@@ -1742,7 +1742,7 @@ Here is one way to calculate both with the package precrec and plot both curves.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{07-supML_files/figure-latex/unnamed-chunk-12-1.pdf}
+\includegraphics{08-supML_files/figure-latex/unnamed-chunk-12-1.pdf}
 
 Finally, we can also extract and plot the feature importance from the binary
 classification model. It is interesting to compare this result to the importances
@@ -1754,12 +1754,7 @@ of the same features in the regression model.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{07-supML_files/figure-latex/unnamed-chunk-13-1.pdf}
-
-\hypertarget{model-selection-and-evaluation}{%
-\chapter{Model selection and evaluation}\label{model-selection-and-evaluation}}
-
-Coming up\ldots{}
+\includegraphics{08-supML_files/figure-latex/unnamed-chunk-13-1.pdf}
 
   \bibliography{packages.bib}
 

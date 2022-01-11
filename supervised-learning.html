@@ -32,7 +32,7 @@
   
   
 <link rel="prev" href="unsupervised-learning.html"/>
-<link rel="next" href="model-selection-and-evaluation.html"/>
+
 <script src="libs/header-attrs-2.11/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -213,7 +213,6 @@ div.csl-indent {
 <li class="chapter" data-level="8.2" data-path="supervised-learning.html"><a href="supervised-learning.html#regression-with-random-forests"><i class="fa fa-check"></i><b>8.2</b> Regression with random forests</a></li>
 <li class="chapter" data-level="8.3" data-path="supervised-learning.html"><a href="supervised-learning.html#classification-with-random-forests"><i class="fa fa-check"></i><b>8.3</b> Classification with random forests</a></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="model-selection-and-evaluation.html"><a href="model-selection-and-evaluation.html"><i class="fa fa-check"></i><b>9</b> Model selection and evaluation</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -349,7 +348,7 @@ observed values, and include a line to show how a perfect model would predict.</
 <span id="cb58-4"><a href="supervised-learning.html#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Predicted butyrate concentration&quot;</span>) <span class="sc">+</span> <span class="fu">ylab</span>(<span class="st">&quot;Observed butyrate concentration&quot;</span>) <span class="sc">+</span></span>
 <span id="cb58-5"><a href="supervised-learning.html#cb58-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lims</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>), <span class="at">y =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">5</span>)) <span class="sc">+</span></span>
 <span id="cb58-6"><a href="supervised-learning.html#cb58-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">linetype =</span> <span class="dv">5</span>, <span class="at">color =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="co"># Plot a perfect fit line</span></span></code></pre></div>
-<p><img src="07-supML_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="08-supML_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>All models are wrong, but some are useful. Luckily, our model seems to be somewhat useful.
 However, we are not yet done with the model. It is important to examine how our model
 actually works. Even though the random forest can look like a “black box,” we can get
@@ -360,7 +359,7 @@ values of individual feature columns. Permutation importance of a feature will b
 if such corrupted data leads to bad predictions of the model. If shuffling a feature
 does not affect the model performance negatively, its permutation importance will be low.</p>
 <div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="supervised-learning.html#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(rfFit1))</span></code></pre></div>
-<p><img src="07-supML_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><img src="08-supML_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 <p>We can see that some genera are highly important for model predictions. The importance
 values can be highly useful, and these are often used e.g. for feature selection before
 conducting statistical (or other ML) tests. However, if we only conducted this supervised
@@ -389,7 +388,7 @@ range of an individual input feature (up to 3 features).</p>
 ## [1] &quot;Partial dependence of Lachnoclostridium&quot;
 ## [1] &quot;Partial dependence of Ruminiclostridium&quot;</code></pre>
 <div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="supervised-learning.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(pd_plots)</span></code></pre></div>
-<p><img src="07-supML_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="08-supML_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 </div>
 <div id="classification-with-random-forests" class="section level2" number="8.3">
 <h2><span class="header-section-number">8.3</span> Classification with random forests</h2>
@@ -490,13 +489,18 @@ distribution is skewed. In these cases we want to use area under the precision-r
 ##      Model name Dataset ID # of negatives # of positives
 ##    1         m1          1              4              4</code></pre>
 <div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="supervised-learning.html#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(aucs)</span></code></pre></div>
-<p><img src="07-supML_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p><img src="08-supML_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Finally, we can also extract and plot the feature importance from the binary
 classification model. It is interesting to compare this result to the importances
 of the same features in the regression model.</p>
 <div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="supervised-learning.html#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(rfFit2))</span></code></pre></div>
-<p><img src="07-supML_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="08-supML_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div class="csl-entry">
+Borman, Tuomas, Henrik Eckermann, Chouaib Benchraka, and Leo Lahti. 2022. <em>Introduction to Multi-Omics Data Analysis</em>. <a href="https://microbiome.github.io/course_2022_FindingPheno/">microbiome.github.io/course_2022_FindingPheno/</a>.
+</div>
+</div>
 </div>
 </div>
             </section>
@@ -504,8 +508,8 @@ of the same features in the regression model.</p>
           </div>
         </div>
       </div>
-<a href="unsupervised-learning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="model-selection-and-evaluation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="unsupervised-learning.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
