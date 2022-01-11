@@ -61,7 +61,6 @@ visualized on a two (or three) dimensional display.
 
 Let us next look at some concrete examples.
 
-
 ### PCoA for ASV-level data with Bray-Curtis
 
 Let us start with PCoA based on a Bray-Curtis dissimilarity matrix
@@ -115,9 +114,6 @@ plot <- ggplot(data = bray_curtis_pcoa_df, aes_string(x = "pcoa1", y = "pcoa2", 
 
 plot
 ```
-
-PCoA plot in some cases could also be overlayed with a continuous variable. ([see example](https://microbiome.github.io/course_2022_miaverse/beta-diversity.html#pcoa-plot-with-continuous-variable))
-
 
 ## Estimating associations with an external variable
 
