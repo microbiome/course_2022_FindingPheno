@@ -209,7 +209,7 @@ for(pc in c("pcoa1", "pcoa2")){
 plot <- ggplot(data = bray_curtis_pcoa_df, aes_string(x = "pcoa1", y = "pcoa2", color = "Diet")) +
   geom_point(size = 3) +
   labs(title = paste0("PCoA beta diversity ordination for microbiome samples"), x = paste0("PC1 (p = ", p_values[["pcoa1"]], ")"), y = paste0("PC2 (p = ", p_values[["pcoa2"]], ")")) +
-  theme_bw(12) 
+  theme_bw() 
 
 plot
 ```
