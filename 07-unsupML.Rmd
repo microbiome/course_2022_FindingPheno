@@ -163,6 +163,19 @@ bc <- biclust(correlations$cor, method=BCPlaid(), fit.model = y ~ m,
 bc
 ```
 
+```{r}
+# Get biclusters
+bicluster_rows <- bc@RowxNumber
+bicluster_columns <- bc@NumberxCol
+
+# Adjust names of clusters
+colnames(bicluster_rows) <- paste0("cluster_", 1:ncol(bicluster_rows))
+colnames(bicluster_columns) <- paste0("cluster_", 1:ncol(bicluster_columns))
+
+# Print biclusters for rows
+head(bicluster_rows)
+```
+
 Now, we can add bicluster information into the heatmap that we already made.
 
 ```{r, message=FALSE, warning=FALSE, fig.height=10, fig.width=8}
