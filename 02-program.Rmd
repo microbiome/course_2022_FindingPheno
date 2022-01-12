@@ -40,6 +40,12 @@ support from the course assistants.
    * Microbiome data exploration 
 	 
    * Visualization
+   
+ * R Code:
+ 
+   * [Installation](install_script.R)
+   
+   * [Day 1](Day_1.R)
  
  ----------------------------------------------------------------
 
@@ -70,3 +76,9 @@ support from the course assistants.
    * Supervised learning: Regression and classification with random forests
  
    * Validation and interpretation of black box models
+   
+ * R Code:
+ 
+   * [Installation](install_script.R)
+   
+   * [Day 2](Day_2.R)
