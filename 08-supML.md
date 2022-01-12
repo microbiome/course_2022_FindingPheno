@@ -20,8 +20,8 @@ that there is no data leakage between these two sets, or otherwise the validatio
 compromised.
 
 In the workshop we use random forests and the caret package to train regression and 
-classification models. The models will predict butyrate concentration or discretized 
-class (high/low butyrate) based on the microbiome composition.
+classification models. The models will predict continuous butyrate concentration or discretized 
+class (high/low butyrate) based on the microbiome composition ([why butyrate?](https://scholar.google.com/scholar?as_sdt=0%2C5&as_ylo=2015&q=butyrate+and+gut+microbiome&btnG=)).
 
 ## Data curation
 
@@ -36,13 +36,13 @@ butyrate_df <- data.frame(cbind(y, x))
 butyrate_df <- butyrate_df[,which(colnames(butyrate_df) %in% c("Butyrate", colnames(x)))]
 ```
 
-The caret package is used to divide the data once to 80% train and 20% test (validation) 
+A function in the [caret package](https://topepo.github.io/caret/) is used to divide the data once to 80% train and 20% test (validation) 
 sets. This is to prevent data leakage and overestimation of model performance. The 
 20% test set is only used to conduct the final validation of the models. The number of 
 samples in this case is low (n = 40), but as we can see later on, even 8 samples is 
 sufficient for estimation of the performance. Note that the data is stratified to include 
 a representative distribution of butyrate concentrations on both sides of the split. 
-There is some randomness inherent in the splitting, so a seed needs to be used.
+There is some randomness inherent in the splitting, so set.seed() needs to be used.
 
 
 ```r
@@ -56,15 +56,15 @@ butyrate_df_test <- butyrate_df[-trainIndex,]
 ## Regression with random forests
 
 Random forests are a common and flexible ensemble learning method, which are a good starting
-point when choosing a machine learning model. We are using the ranger implementation 
+point when choosing a machine learning model. We are using the [ranger](https://github.com/imbs-hl/ranger) implementation 
 of random forests, which runs quite fast compared to its alternatives in R. A wrapper 
 train function from caret is used to conduct a 5-fold cross-validation, repeated 5 times 
-with random partitions inside the training data. Because of the randomness, seed needs 
-to be set. Note that the seed does not remain set if you re-run a random function 
-without it! Specific to random forests, we are also using an option to use permutation 
+with random partitions inside the training data (for further reading, [see documentation](https://topepo.github.io/caret/model-training-and-tuning.html)). 
+Because of the randomness, seed needs to be set again. **Note that the seed does *not* remain set if you re-run a function with a random component
+without calling set.seed() first!** Specific to random forests, we are also using an option to use permutation 
 importance.
 
-The train function is quite complex, and performs hyperparameter tuning while training the 
+The train function is [quite complex](https://www.rdocumentation.org/packages/caret/versions/4.47/topics/train), and performs hyperparameter tuning while training the 
 model with cross-validation. The final model included in the object is then trained on all 
 input data and optimized hyperparameters.
 
@@ -156,7 +156,9 @@ pred_obs <- data.frame(predicted = test_predictions, observed = butyrate_df_test
 ggplot(data = pred_obs, aes(x=predicted, y=observed)) + geom_point(size = 5, color = "orange") + 
   xlab("Predicted butyrate concentration") + ylab("Observed butyrate concentration") +
   lims(x = c(0,5), y = c(0,5)) +
-  geom_abline(linetype = 5, color = "blue", size = 1) # Plot a perfect fit line
+  geom_abline(linetype = 5, color = "blue", size = 1)+ # Plot a perfect fit line
+    theme(panel.border = element_rect(colour = "black", fill = NA),
+                             panel.background = element_blank())
 ```
 
 ![](08-supML_files/figure-latex/unnamed-chunk-6-1.pdf)<!-- --> 
@@ -180,7 +182,7 @@ plot(varImp(rfFit1))
 ![](08-supML_files/figure-latex/unnamed-chunk-7-1.pdf)<!-- --> 
 
 We can see that some genera are highly important for model predictions. The importance 
-values can be highly useful, and these are often used e.g. for feature selection before 
+values can be highly useful, and these are often used *e.g.,* for feature selection before 
 conducting statistical (or other ML) tests. However, if we only conducted this supervised 
 machine learning analysis, we would not know which features are positively and which 
 ones negatively associated with butyrate levels.
@@ -190,7 +192,9 @@ validation, we can again utilize the fact that ML models are great at making new
 While the inner workings of the model are highly complex, we can assume that changing 
 the values of an important feature affects the model prediction in a specific way. 
 Briefly, partial dependence plots visualize the expected output of the model over the 
-range of an individual input feature (up to 3 features).
+range of an individual input feature (up to 3 features). The [pdp package](https://bgreenwell.github.io/pdp/articles/pdp.html)
+is a versatile implementation for conducting these analyses in R and works directly on models
+fitted with caret::train().
 
 
 ```r
@@ -201,7 +205,9 @@ pd_plots <- list(NULL)
 for (feature in 1:length(top_features)) {
   pd_plots[[feature]] <- partial(rfFit1, pred.var = top_features[feature], rug = TRUE) %>% autoplot() + 
     geom_hline(yintercept = mean(butyrate_df_train$Butyrate), linetype = 2, color = "gray") + # Show the mean of the training data as a dashed line
-    scale_y_continuous(limits=c(1.5,2.3)) # Harmonize the scale of yhat on all plots
+    scale_y_continuous(limits=c(1.5,2.3)) + # Harmonize the scale of yhat on all plots
+      theme(panel.border = element_rect(colour = "black", fill = NA),
+                             panel.background = element_blank())
   print(paste0("Partial dependence of ", top_features[feature]))
 }
 ```
@@ -243,10 +249,10 @@ butyrate_df_train_2$Butyrate <- as.factor(ifelse(butyrate_df_train_2$Butyrate >=
 ```
 
 Training of the model is very similar to regression, but we want to define two options in the 
-trainControl function sent to train(). classProbs = TRUE is used to output classification 
+trainControl function sent to caret::train(). classProbs = TRUE is used to output classification 
 probabilities instead of the classes themselves. This is required for calculating 
 ROC-AUC values. Also, we are defining a summaryFunction which is used for evaluation 
-(and hyperparameter optimization).
+and hyperparameter optimization.
 
 
 ```r
@@ -329,11 +335,10 @@ print(twoClassSummary(test_predictions_2, lev = c("High", "Low")))
 ```
 
 Often just the ROC-AUC value calculated above can suffice, for example for 
-model comparisons. However, its values are not reliable in cases where the class
-distribution is skewed. In these cases we want to use area under the precision-recall curve
-(AUPRC) instead. 
+model comparisons. However, if class distribution is skewed, area under the precision-recall curve
+(AUPRC) should be used instead (see [Fu et al., 2018](https://doi.org/10.1002/bimj.201800148)). 
 
-Here is one way to calculate both with the package precrec and plot both curves.
+Here is one way to calculate both with the package precrec and plot the curves.
 
 
 ```r

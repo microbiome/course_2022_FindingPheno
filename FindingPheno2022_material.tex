@@ -267,6 +267,15 @@ support from the course assistants.
   \item
     Visualization
   \end{itemize}
+\item
+  R Code:
+
+  \begin{itemize}
+  \item
+    \href{install_script.R}{Installation}
+  \item
+    \href{Day_1.R}{Day 1}
+  \end{itemize}
 \end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
@@ -306,6 +315,15 @@ support from the course assistants.
     Supervised learning: Regression and classification with random forests
   \item
     Validation and interpretation of black box models
+  \end{itemize}
+\item
+  R Code:
+
+  \begin{itemize}
+  \item
+    \href{install_script.R}{Installation}
+  \item
+    \href{Day_2.R}{Day 2}
   \end{itemize}
 \end{itemize}
 
@@ -1384,8 +1402,8 @@ that there is no data leakage between these two sets, or otherwise the validatio
 compromised.
 
 In the workshop we use random forests and the caret package to train regression and
-classification models. The models will predict butyrate concentration or discretized
-class (high/low butyrate) based on the microbiome composition.
+classification models. The models will predict continuous butyrate concentration or discretized
+class (high/low butyrate) based on the microbiome composition (\href{https://scholar.google.com/scholar?as_sdt=0\%2C5\&as_ylo=2015\&q=butyrate+and+gut+microbiome\&btnG=}{why butyrate?}).
 
 \hypertarget{data-curation}{%
 \section{Data curation}\label{data-curation}}
@@ -1402,13 +1420,13 @@ Creating a dataframe for modeling butyrate levels:
 \end{Highlighting}
 \end{Shaded}
 
-The caret package is used to divide the data once to 80\% train and 20\% test (validation)
+A function in the \href{https://topepo.github.io/caret/}{caret package} is used to divide the data once to 80\% train and 20\% test (validation)
 sets. This is to prevent data leakage and overestimation of model performance. The
 20\% test set is only used to conduct the final validation of the models. The number of
 samples in this case is low (n = 40), but as we can see later on, even 8 samples is
 sufficient for estimation of the performance. Note that the data is stratified to include
 a representative distribution of butyrate concentrations on both sides of the split.
-There is some randomness inherent in the splitting, so a seed needs to be used.
+There is some randomness inherent in the splitting, so set.seed() needs to be used.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1424,15 +1442,15 @@ There is some randomness inherent in the splitting, so a seed needs to be used.
 \section{Regression with random forests}\label{regression-with-random-forests}}
 
 Random forests are a common and flexible ensemble learning method, which are a good starting
-point when choosing a machine learning model. We are using the ranger implementation
+point when choosing a machine learning model. We are using the \href{https://github.com/imbs-hl/ranger}{ranger} implementation
 of random forests, which runs quite fast compared to its alternatives in R. A wrapper
 train function from caret is used to conduct a 5-fold cross-validation, repeated 5 times
-with random partitions inside the training data. Because of the randomness, seed needs
-to be set. Note that the seed does not remain set if you re-run a random function
-without it! Specific to random forests, we are also using an option to use permutation
+with random partitions inside the training data (for further reading, \href{https://topepo.github.io/caret/model-training-and-tuning.html}{see documentation}).
+Because of the randomness, seed needs to be set again. \textbf{Note that the seed does \emph{not} remain set if you re-run a function with a random component
+without calling set.seed() first!} Specific to random forests, we are also using an option to use permutation
 importance.
 
-The train function is quite complex, and performs hyperparameter tuning while training the
+The train function is \href{https://www.rdocumentation.org/packages/caret/versions/4.47/topics/train}{quite complex}, and performs hyperparameter tuning while training the
 model with cross-validation. The final model included in the object is then trained on all
 input data and optimized hyperparameters.
 
@@ -1530,7 +1548,9 @@ observed values, and include a line to show how a perfect model would predict.
 \FunctionTok{ggplot}\NormalTok{(}\AttributeTok{data =}\NormalTok{ pred\_obs, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\NormalTok{predicted, }\AttributeTok{y=}\NormalTok{observed)) }\SpecialCharTok{+} \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{size =} \DecValTok{5}\NormalTok{, }\AttributeTok{color =} \StringTok{"orange"}\NormalTok{) }\SpecialCharTok{+} 
   \FunctionTok{xlab}\NormalTok{(}\StringTok{"Predicted butyrate concentration"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{ylab}\NormalTok{(}\StringTok{"Observed butyrate concentration"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{lims}\NormalTok{(}\AttributeTok{x =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{5}\NormalTok{), }\AttributeTok{y =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{5}\NormalTok{)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{linetype =} \DecValTok{5}\NormalTok{, }\AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{) }\CommentTok{\# Plot a perfect fit line}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{linetype =} \DecValTok{5}\NormalTok{, }\AttributeTok{color =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{size =} \DecValTok{1}\NormalTok{)}\SpecialCharTok{+} \CommentTok{\# Plot a perfect fit line}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{panel.border =} \FunctionTok{element\_rect}\NormalTok{(}\AttributeTok{colour =} \StringTok{"black"}\NormalTok{, }\AttributeTok{fill =} \ConstantTok{NA}\NormalTok{),}
+                             \AttributeTok{panel.background =} \FunctionTok{element\_blank}\NormalTok{())}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1556,7 +1576,7 @@ does not affect the model performance negatively, its permutation importance wil
 \includegraphics{08-supML_files/figure-latex/unnamed-chunk-7-1.pdf}
 
 We can see that some genera are highly important for model predictions. The importance
-values can be highly useful, and these are often used e.g.~for feature selection before
+values can be highly useful, and these are often used \emph{e.g.,} for feature selection before
 conducting statistical (or other ML) tests. However, if we only conducted this supervised
 machine learning analysis, we would not know which features are positively and which
 ones negatively associated with butyrate levels.
@@ -1566,7 +1586,9 @@ validation, we can again utilize the fact that ML models are great at making new
 While the inner workings of the model are highly complex, we can assume that changing
 the values of an important feature affects the model prediction in a specific way.
 Briefly, partial dependence plots visualize the expected output of the model over the
-range of an individual input feature (up to 3 features).
+range of an individual input feature (up to 3 features). The \href{https://bgreenwell.github.io/pdp/articles/pdp.html}{pdp package}
+is a versatile implementation for conducting these analyses in R and works directly on models
+fitted with caret::train().
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1577,7 +1599,9 @@ range of an individual input feature (up to 3 features).
 \ControlFlowTok{for}\NormalTok{ (feature }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(top\_features)) \{}
 \NormalTok{  pd\_plots[[feature]] }\OtherTok{\textless{}{-}} \FunctionTok{partial}\NormalTok{(rfFit1, }\AttributeTok{pred.var =}\NormalTok{ top\_features[feature], }\AttributeTok{rug =} \ConstantTok{TRUE}\NormalTok{) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{autoplot}\NormalTok{() }\SpecialCharTok{+} 
     \FunctionTok{geom\_hline}\NormalTok{(}\AttributeTok{yintercept =} \FunctionTok{mean}\NormalTok{(butyrate\_df\_train}\SpecialCharTok{$}\NormalTok{Butyrate), }\AttributeTok{linetype =} \DecValTok{2}\NormalTok{, }\AttributeTok{color =} \StringTok{"gray"}\NormalTok{) }\SpecialCharTok{+} \CommentTok{\# Show the mean of the training data as a dashed line}
-    \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits=}\FunctionTok{c}\NormalTok{(}\FloatTok{1.5}\NormalTok{,}\FloatTok{2.3}\NormalTok{)) }\CommentTok{\# Harmonize the scale of yhat on all plots}
+    \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{limits=}\FunctionTok{c}\NormalTok{(}\FloatTok{1.5}\NormalTok{,}\FloatTok{2.3}\NormalTok{)) }\SpecialCharTok{+} \CommentTok{\# Harmonize the scale of yhat on all plots}
+      \FunctionTok{theme}\NormalTok{(}\AttributeTok{panel.border =} \FunctionTok{element\_rect}\NormalTok{(}\AttributeTok{colour =} \StringTok{"black"}\NormalTok{, }\AttributeTok{fill =} \ConstantTok{NA}\NormalTok{),}
+                             \AttributeTok{panel.background =} \FunctionTok{element\_blank}\NormalTok{())}
   \FunctionTok{print}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"Partial dependence of "}\NormalTok{, top\_features[feature]))}
 \NormalTok{\}}
 \end{Highlighting}
@@ -1624,10 +1648,10 @@ and results.
 \end{Shaded}
 
 Training of the model is very similar to regression, but we want to define two options in the
-trainControl function sent to train(). classProbs = TRUE is used to output classification
+trainControl function sent to caret::train(). classProbs = TRUE is used to output classification
 probabilities instead of the classes themselves. This is required for calculating
 ROC-AUC values. Also, we are defining a summaryFunction which is used for evaluation
-(and hyperparameter optimization).
+and hyperparameter optimization.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1716,11 +1740,10 @@ specific dimensions as an input for twoClassSummary().
 \end{verbatim}
 
 Often just the ROC-AUC value calculated above can suffice, for example for
-model comparisons. However, its values are not reliable in cases where the class
-distribution is skewed. In these cases we want to use area under the precision-recall curve
-(AUPRC) instead.
+model comparisons. However, if class distribution is skewed, area under the precision-recall curve
+(AUPRC) should be used instead (see \href{https://doi.org/10.1002/bimj.201800148}{Fu et al., 2018}).
 
-Here is one way to calculate both with the package precrec and plot both curves.
+Here is one way to calculate both with the package precrec and plot the curves.
 
 \begin{Shaded}
 \begin{Highlighting}[]
