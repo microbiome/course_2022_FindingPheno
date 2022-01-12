@@ -373,12 +373,12 @@ concentration of metabolite high?” for instance.</p>
 ##      m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
 ##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
 ## 
-## Number of Clusters found:  4 
+## Number of Clusters found:  3 
 ## 
-## First  4  Cluster sizes:
-##                    BC 1 BC 2 BC 3 BC 4
-## Number of Rows:      12   13    8    5
-## Number of Columns:    3    5    4    5</code></pre>
+## First  3  Cluster sizes:
+##                    BC 1 BC 2 BC 3
+## Number of Rows:      12   13    8
+## Number of Columns:    3    5    4</code></pre>
 <p>To get cluster information into right format, we can use functions from OMA book.
 They add cluster for those features that were not assigned to any cluster.</p>
 <div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="unsupervised-learning.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Functions for obtaining biclust information</span></span>
@@ -436,13 +436,13 @@ They add cluster for those features that were not assigned to any cluster.</p>
 <span id="cb46-6"><a href="unsupervised-learning.html#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-7"><a href="unsupervised-learning.html#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
 <span id="cb46-8"><a href="unsupervised-learning.html#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
-<pre><code>##                               cluster_1 cluster_2 cluster_3 cluster_4 cluster_5
-## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE     FALSE
-## Genus:Lactobacillus               FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE     FALSE
-## Genus:Lactococcus                 FALSE     FALSE     FALSE     FALSE      TRUE
-## Genus:Mucispirillum               FALSE     FALSE     FALSE     FALSE      TRUE</code></pre>
+<pre><code>##                               cluster_1 cluster_2 cluster_3 cluster_4
+## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE
+## Genus:Lactobacillus               FALSE     FALSE     FALSE      TRUE
+## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE
+## Genus:Lactococcus                 FALSE     FALSE     FALSE      TRUE
+## Genus:Mucispirillum               FALSE     FALSE     FALSE      TRUE</code></pre>
 <p>Now, we can add bicluster information into the heatmap that we already made.</p>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="unsupervised-learning.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into factors</span></span>
 <span id="cb48-2"><a href="unsupervised-learning.html#cb48-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">apply</span>(bicluster_columns, <span class="dv">2</span>, as.factor))</span>

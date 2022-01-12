@@ -348,8 +348,12 @@ the R session. Only uninstalled packages are installed.
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\SpecialCharTok{!}\FunctionTok{requireNamespace}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{)) \{}
+  \FunctionTok{install.packages}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{)}
+\NormalTok{\}}
+
 \CommentTok{\# List of packages that we need from cran and bioc }
-\NormalTok{packages }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"BiocManager"}\NormalTok{, }\StringTok{"ggplot2"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"igraph"}\NormalTok{, }\StringTok{"ANCOMBC"}\NormalTok{,}
+\NormalTok{packages }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"ggplot2"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"igraph"}\NormalTok{, }\StringTok{"ANCOMBC"}\NormalTok{,}
              \StringTok{"microbiome"}\NormalTok{, }\StringTok{"httpuv"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{, }\StringTok{"mia"}\NormalTok{, }\StringTok{"caret"}\NormalTok{, }\StringTok{"ranger"}\NormalTok{,}
             \StringTok{"dplyr"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"biclust"}\NormalTok{,}
             \StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{, }\StringTok{"MLmetrics"}\NormalTok{, }\StringTok{"precrec"}\NormalTok{)}
@@ -360,30 +364,29 @@ The following script tries to load all required packages, and if they are not av
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{is.installed }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(pkg) \{}
-\NormalTok{  new.pkg }\OtherTok{\textless{}{-}}\NormalTok{ pkg[}\SpecialCharTok{!}\NormalTok{(pkg }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{()[, }\StringTok{"Package"}\NormalTok{])]}
-  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(new.pkg)) \{}
-\NormalTok{    BiocManager}\SpecialCharTok{::}\FunctionTok{install}\NormalTok{(new.pkg, }\AttributeTok{ask=}\NormalTok{T)}
-\NormalTok{  \}}
-  \FunctionTok{sapply}\NormalTok{(pkg, require, }\AttributeTok{character.only =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{new.pkgs }\OtherTok{\textless{}{-}}\NormalTok{ packages[}\SpecialCharTok{!}\NormalTok{(packages }\SpecialCharTok{\%in\%} \FunctionTok{installed.packages}\NormalTok{()[, }\StringTok{"Package"}\NormalTok{])]}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{length}\NormalTok{(new.pkgs)) \{}
+\NormalTok{    BiocManager}\SpecialCharTok{::}\FunctionTok{install}\NormalTok{(new.pkgs, }\AttributeTok{ask=}\NormalTok{T)}
 \NormalTok{\}}
-\FunctionTok{is.installed}\NormalTok{(packages)}
+
+\FunctionTok{sapply}\NormalTok{(packages, require, }\AttributeTok{character.only =} \ConstantTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##        BiocManager            ggplot2           pheatmap            stringr 
+##            ggplot2           pheatmap            stringr             igraph 
 ##               TRUE               TRUE               TRUE               TRUE 
-##             igraph            ANCOMBC         microbiome             httpuv 
+##            ANCOMBC         microbiome             httpuv microbiomeDataSets 
 ##               TRUE               TRUE               TRUE               TRUE 
-## microbiomeDataSets                mia              caret             ranger 
+##                mia              caret             ranger              dplyr 
 ##               TRUE               TRUE               TRUE               TRUE 
-##              dplyr             miaViz              knitr         kableExtra 
+##             miaViz              knitr         kableExtra              vegan 
 ##               TRUE               TRUE               TRUE               TRUE 
-##              vegan            ecodist            biclust          patchwork 
+##            ecodist            biclust          patchwork                pdp 
 ##               TRUE               TRUE               TRUE               TRUE 
-##                pdp          MLmetrics            precrec 
-##               TRUE               TRUE               TRUE
+##          MLmetrics            precrec 
+##               TRUE               TRUE
 \end{verbatim}
 
 \hypertarget{data}{%

@@ -263,32 +263,35 @@ packages required on this course.</p></li>
 <h2><span class="header-section-number">3.3</span> Installing and loading the required R packages</h2>
 <p>This section shows how to install and load all required packages into
 the R session. Only uninstalled packages are installed.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="getting-started.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List of packages that we need from cran and bioc </span></span>
-<span id="cb1-2"><a href="getting-started.html#cb1-2" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, <span class="st">&quot;stringr&quot;</span>, <span class="st">&quot;igraph&quot;</span>, <span class="st">&quot;ANCOMBC&quot;</span>,</span>
-<span id="cb1-3"><a href="getting-started.html#cb1-3" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;microbiome&quot;</span>, <span class="st">&quot;httpuv&quot;</span>, <span class="st">&quot;microbiomeDataSets&quot;</span>, <span class="st">&quot;mia&quot;</span>, <span class="st">&quot;caret&quot;</span>, <span class="st">&quot;ranger&quot;</span>,</span>
-<span id="cb1-4"><a href="getting-started.html#cb1-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;miaViz&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>, <span class="st">&quot;vegan&quot;</span>, <span class="st">&quot;ecodist&quot;</span>, <span class="st">&quot;biclust&quot;</span>,</span>
-<span id="cb1-5"><a href="getting-started.html#cb1-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;patchwork&quot;</span>, <span class="st">&quot;pdp&quot;</span>, <span class="st">&quot;MLmetrics&quot;</span>, <span class="st">&quot;precrec&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="getting-started.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>)) {</span>
+<span id="cb1-2"><a href="getting-started.html#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span>
+<span id="cb1-3"><a href="getting-started.html#cb1-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-4"><a href="getting-started.html#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="getting-started.html#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># List of packages that we need from cran and bioc </span></span>
+<span id="cb1-6"><a href="getting-started.html#cb1-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, <span class="st">&quot;stringr&quot;</span>, <span class="st">&quot;igraph&quot;</span>, <span class="st">&quot;ANCOMBC&quot;</span>,</span>
+<span id="cb1-7"><a href="getting-started.html#cb1-7" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;microbiome&quot;</span>, <span class="st">&quot;httpuv&quot;</span>, <span class="st">&quot;microbiomeDataSets&quot;</span>, <span class="st">&quot;mia&quot;</span>, <span class="st">&quot;caret&quot;</span>, <span class="st">&quot;ranger&quot;</span>,</span>
+<span id="cb1-8"><a href="getting-started.html#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;miaViz&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>, <span class="st">&quot;vegan&quot;</span>, <span class="st">&quot;ecodist&quot;</span>, <span class="st">&quot;biclust&quot;</span>,</span>
+<span id="cb1-9"><a href="getting-started.html#cb1-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;patchwork&quot;</span>, <span class="st">&quot;pdp&quot;</span>, <span class="st">&quot;MLmetrics&quot;</span>, <span class="st">&quot;precrec&quot;</span>)</span></code></pre></div>
 <p>The following script tries to load all required packages, and if they are not available, installs them.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="getting-started.html#cb2-1" aria-hidden="true" tabindex="-1"></a>is.installed <span class="ot">&lt;-</span> <span class="cf">function</span>(pkg) {</span>
-<span id="cb2-2"><a href="getting-started.html#cb2-2" aria-hidden="true" tabindex="-1"></a>  new.pkg <span class="ot">&lt;-</span> pkg[<span class="sc">!</span>(pkg <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">&quot;Package&quot;</span>])]</span>
-<span id="cb2-3"><a href="getting-started.html#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(new.pkg)) {</span>
-<span id="cb2-4"><a href="getting-started.html#cb2-4" aria-hidden="true" tabindex="-1"></a>    BiocManager<span class="sc">::</span><span class="fu">install</span>(new.pkg, <span class="at">ask=</span>T)</span>
-<span id="cb2-5"><a href="getting-started.html#cb2-5" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-6"><a href="getting-started.html#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(pkg, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-7"><a href="getting-started.html#cb2-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-8"><a href="getting-started.html#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">is.installed</span>(packages)</span></code></pre></div>
-<pre><code>##        BiocManager            ggplot2           pheatmap            stringr 
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="getting-started.html#cb2-1" aria-hidden="true" tabindex="-1"></a>new.pkgs <span class="ot">&lt;-</span> packages[<span class="sc">!</span>(packages <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">&quot;Package&quot;</span>])]</span>
+<span id="cb2-2"><a href="getting-started.html#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="getting-started.html#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(new.pkgs)) {</span>
+<span id="cb2-4"><a href="getting-started.html#cb2-4" aria-hidden="true" tabindex="-1"></a>    BiocManager<span class="sc">::</span><span class="fu">install</span>(new.pkgs, <span class="at">ask=</span>T)</span>
+<span id="cb2-5"><a href="getting-started.html#cb2-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-6"><a href="getting-started.html#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="getting-started.html#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(packages, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>##            ggplot2           pheatmap            stringr             igraph 
 ##               TRUE               TRUE               TRUE               TRUE 
-##             igraph            ANCOMBC         microbiome             httpuv 
+##            ANCOMBC         microbiome             httpuv microbiomeDataSets 
 ##               TRUE               TRUE               TRUE               TRUE 
-## microbiomeDataSets                mia              caret             ranger 
+##                mia              caret             ranger              dplyr 
 ##               TRUE               TRUE               TRUE               TRUE 
-##              dplyr             miaViz              knitr         kableExtra 
+##             miaViz              knitr         kableExtra              vegan 
 ##               TRUE               TRUE               TRUE               TRUE 
-##              vegan            ecodist            biclust          patchwork 
+##            ecodist            biclust          patchwork                pdp 
 ##               TRUE               TRUE               TRUE               TRUE 
-##                pdp          MLmetrics            precrec 
-##               TRUE               TRUE               TRUE</code></pre>
+##          MLmetrics            precrec 
+##               TRUE               TRUE</code></pre>
 
 </div>
 </div>

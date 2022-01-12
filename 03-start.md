@@ -39,8 +39,12 @@ the R session. Only uninstalled packages are installed.
 
 
 ```r
+if (!requireNamespace("BiocManager")) {
+  install.packages("BiocManager")
+}
+
 # List of packages that we need from cran and bioc 
-packages <- c("BiocManager", "ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
+packages <- c("ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
              "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger",
             "dplyr", "miaViz", "knitr", "kableExtra", "vegan", "ecodist", "biclust",
             "patchwork", "pdp", "MLmetrics", "precrec")
@@ -49,27 +53,26 @@ packages <- c("BiocManager", "ggplot2", "pheatmap", "stringr", "igraph", "ANCOMB
 The following script tries to load all required packages, and if they are not available, installs them.
 
 ```r
-is.installed <- function(pkg) {
-  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-  if (length(new.pkg)) {
-    BiocManager::install(new.pkg, ask=T)
-  }
-  sapply(pkg, require, character.only = TRUE)
+new.pkgs <- packages[!(packages %in% installed.packages()[, "Package"])]
+
+if (length(new.pkgs)) {
+    BiocManager::install(new.pkgs, ask=T)
 }
-is.installed(packages)
+
+sapply(packages, require, character.only = TRUE)
 ```
 
 ```
-##        BiocManager            ggplot2           pheatmap            stringr 
+##            ggplot2           pheatmap            stringr             igraph 
 ##               TRUE               TRUE               TRUE               TRUE 
-##             igraph            ANCOMBC         microbiome             httpuv 
+##            ANCOMBC         microbiome             httpuv microbiomeDataSets 
 ##               TRUE               TRUE               TRUE               TRUE 
-## microbiomeDataSets                mia              caret             ranger 
+##                mia              caret             ranger              dplyr 
 ##               TRUE               TRUE               TRUE               TRUE 
-##              dplyr             miaViz              knitr         kableExtra 
+##             miaViz              knitr         kableExtra              vegan 
 ##               TRUE               TRUE               TRUE               TRUE 
-##              vegan            ecodist            biclust          patchwork 
+##            ecodist            biclust          patchwork                pdp 
 ##               TRUE               TRUE               TRUE               TRUE 
-##                pdp          MLmetrics            precrec 
-##               TRUE               TRUE               TRUE
+##          MLmetrics            precrec 
+##               TRUE               TRUE
 ```
