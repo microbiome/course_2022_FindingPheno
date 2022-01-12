@@ -169,7 +169,9 @@ pred_obs <- data.frame(predicted = test_predictions, observed = butyrate_df_test
 ggplot(data = pred_obs, aes(x=predicted, y=observed)) + geom_point(size = 5, color = "orange") + 
   xlab("Predicted butyrate concentration") + ylab("Observed butyrate concentration") +
   lims(x = c(0,5), y = c(0,5)) +
-  geom_abline(linetype = 5, color = "blue", size = 1) # Plot a perfect fit line
+  geom_abline(linetype = 5, color = "blue", size = 1)+ # Plot a perfect fit line
+    theme(panel.border = element_rect(colour = "black", fill = NA),
+                             panel.background = element_blank())
 ```
 
 All models are wrong, but some are useful. Luckily, our model seems to be somewhat useful. 
@@ -210,7 +212,9 @@ pd_plots <- list(NULL)
 for (feature in 1:length(top_features)) {
   pd_plots[[feature]] <- partial(rfFit1, pred.var = top_features[feature], rug = TRUE) %>% autoplot() + 
     geom_hline(yintercept = mean(butyrate_df_train$Butyrate), linetype = 2, color = "gray") + # Show the mean of the training data as a dashed line
-    scale_y_continuous(limits=c(1.5,2.3)) # Harmonize the scale of yhat on all plots
+    scale_y_continuous(limits=c(1.5,2.3)) + # Harmonize the scale of yhat on all plots
+      theme(panel.border = element_rect(colour = "black", fill = NA),
+                             panel.background = element_blank())
   print(paste0("Partial dependence of ", top_features[feature]))
 }
 wrap_plots(pd_plots)
