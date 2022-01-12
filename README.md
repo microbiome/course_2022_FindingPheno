@@ -37,17 +37,23 @@ to apply the techniques to your own data.
 
 
 
-# Learning goals [TO DO]
+## Learning goals
 
-This workshop provides an overview of bioinformatics
-tools for multi-omics studies, ranging from data
-preprocessing to statistical analysis and reproducible reporting.
+This workshop provides an overview of analytical
+tools for multi-omics studies in R. A particular focus is on multi-omics tools and techniques 
+required to process microbial community data in combination with other omics. 
 
+After the workshop the participants should be able to preprocess and manipulate data,
+perform simple visualizations and statistical analyses, apply unsupervised and supervised 
+machine learning, and produce robust and reproducible results.
 
-**Target audience** Advanced students and applied researchers who wish
-  to develop their skills in microbial community analysis. [TO DO]
+**Target audience** 
+Advanced students and applied researchers who wish
+to develop their skills in multi-omics analysis.
 
-**Venue** [TO DO]
+**Venue**
+The course is organized fully remotely in [Zoom](https://utu.zoom.us/j/63432425453). 
+The meeting requires a passcode (sent by email to the participants).
 
 
 
@@ -61,11 +67,13 @@ preprocessing to statistical analysis and reproducible reporting.
 
 **License** All material is released under the open [CC BY-NC-SA 3.0 License](LICENSE).
 
-- Landing page (html): [workshop teaching material](https://microbiome.github.io/course_2022_FindingPheno/)
-- Source code (github): [workshop teaching material](https://github.com/microbiome/course_2022_FindingPheno)
+**Source code**
 
 The source code of this repository is fully reproducible and contains
 the Rmd files with executable code. All files can be rendered at one
 go by running the file [main.R](main.R). You can check the file for
 details on how to clone the repository and convert it into a gitbook,
 although this is not necessary for the training.
+
+- Landing page (html): [workshop teaching material](https://microbiome.github.io/course_2022_FindingPheno/)
+- Source code (github): [workshop teaching material](https://github.com/microbiome/course_2022_FindingPheno)
