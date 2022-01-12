@@ -1,7 +1,6 @@
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 library(mia)
 library(miaViz)
-library(dplyr)
 library(stringr)
 
 mae <- microbiomeDataSets::HintikkaXOData()
@@ -81,8 +80,7 @@ Subsetting metabolomic data:
 
 ```{r, warning=FALSE, message=FALSE}
 # Get those metabolites that are over threshold
-metabolites_over_th <- rownames(df[df$cv > cv_threshold | 
-                                     df$cv < -cv_threshold, , drop = FALSE])
+metabolites_over_th <- rownames(df[abs(df$cv) > cv_threshold, , drop = FALSE])
 # Ignore those metabolites that do not have name / are NA
 metabolites_over_th <- metabolites_over_th[!str_detect(metabolites_over_th, "NA")]
 ```
@@ -165,71 +163,6 @@ bc <- biclust(correlations$cor, method=BCPlaid(), fit.model = y ~ m,
 bc
 ```
 
-To get cluster information into right format, we can use functions from OMA book.
-They add cluster for those features that were not assigned to any cluster.
-
-```{r}
-# Functions for obtaining biclust information
-
-# Get clusters for rows and columns
-.get_biclusters_from_biclust <- function(bc, assay){
-  # Get cluster information for columns and rows
-  bc_columns <- t(bc@NumberxCol)
-  bc_columns <- data.frame(bc_columns)
-  bc_rows <- bc@RowxNumber
-  bc_rows <- data.frame(bc_rows)
-  
-  # Get data into right format
-  bc_columns <- .manipulate_bc_data(bc_columns, assay, "col")
-  bc_rows <- .manipulate_bc_data(bc_rows, assay, "row")
-  
-  return(list(bc_columns = bc_columns, bc_rows = bc_rows))
-}
-
-# Input clusters, and how many observations there should be, i.e., the number of samples or features
-.manipulate_bc_data <- function(bc_clusters, assay, row_col){
-  # Get right dimension
-  dim <- ifelse(row_col == "col", ncol(assay), nrow(assay))
-  # Get column/row names
-  if( row_col == "col" ){
-    names <- colnames(assay)
-  } else{
-    names <- rownames(assay)
-  }
-  
-  # If no clusters were found, create one. Otherwise create additional cluster which
-  # contain those samples that are not included in clusters that were found.
-  if( nrow(bc_clusters) != dim ){
-      bc_clusters <- data.frame(cluster = rep(TRUE, dim))
-  } else {
-      # Create additional cluster that includes those samples/features that
-      # are not included in other clusters.
-      vec <- ifelse(rowSums(bc_clusters) > 0, FALSE, TRUE)
-      # If additional cluster contains samples, then add it
-      if ( any(vec) ){
-          bc_clusters <- cbind(bc_clusters, vec)
-      }
-  }
-  # Adjust row and column names
-  rownames(bc_clusters) <- names
-  colnames(bc_clusters) <- paste0("cluster_", 1:ncol(bc_clusters))
-  return(bc_clusters)
-}
-```
-
-Then we can use the functions.
-
-```{r}
-# Get biclusters
-bcs <- .get_biclusters_from_biclust(bc, correlations$cor)
-
-bicluster_rows <- bcs$bc_rows
-bicluster_columns <- bcs$bc_columns
-
-# Print biclusters for rows
-head(bicluster_rows)
-```
-
 Now, we can add bicluster information into the heatmap that we already made.
 
 ```{r, message=FALSE, warning=FALSE, fig.height=10, fig.width=8}
@@ -270,4 +203,3 @@ pheatmap(correlations$cor,
          number_color = "yellow",
          annotation_legend = FALSE)
 ```
-
