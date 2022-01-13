@@ -2,6 +2,7 @@
 library(mia)
 library(miaViz)
 library(stringr)
+library(pheatmap)
 ```
 
 # Cross-correlation & Unsupervised learning
