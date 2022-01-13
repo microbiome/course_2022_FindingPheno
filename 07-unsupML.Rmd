@@ -1,4 +1,4 @@
-```{r, message=FALSE, warning=FALSE, echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(mia)
 library(miaViz)
 library(stringr)
@@ -22,15 +22,89 @@ colData(mae)$Diet <- ifelse(colData(mae)$Diet == "High-fat" |
 mae[[1]] <- transformCounts(mae[[1]], method = "relabundance")
 ```
 
-# Unsupervised learning
+# Cross-correlation & Unsupervised learning
 
+## Cross-correlation
+
+With cross-correlation analysis, we can analyze how strongly and how differently variables 
+are associated between each other. For instance, we can analyze if higher presence of a 
+specific taxon equals to higher levels of a biomolecule.
+
+**TASK**
+1. Run installation script to load packages into the session
+2. Import HintikkaXO data
+3. Subset _microbiota_ data (rank = "Phylum", prevalence = 0.2, detection = 0.001) ([subsetByPrevalentTaxa](https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering))
+4. Apply clr-transform to _microbiota_ data and log10-tranform to _metabolites_ data ([transformSamples](https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation))
+5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: mae[[1]] <- mae[[1]][-grep("uncultured|Ambiguous_taxa", names(mae[[1]])),] )
+5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) ([testExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
+6. Create a heatmap from cross-correlation matrix [pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap)
+
+
+```{r include=FALSE}
+mae <- microbiomeDataSets::HintikkaXOData()
+mae
+```
+
+```{r include=FALSE}
+mae[[1]] <- as(mae[[1]], "TreeSummarizedExperiment")
+altExp(mae[[1]], "Family") <- subsetByPrevalentTaxa(mae[[1]], rank = "Family", prevalence = 0.2, detection = 0.001)
+altExp(mae[[1]], "Family")
+```
+
+```{r include=FALSE}
+altExp(mae[[1]], "Family") <- transformSamples(altExp(mae[[1]], "Family"), method = "clr", pseudocount = 1)
+mae[[2]] <- transformSamples(mae[[2]], abund_values = "nmr", method = "log10")
+```
+
+```{r include=FALSE}
+altExp(mae[[1]], "Family") <-altExp(mae[[1]], "Family")[-grep("uncultured|Ambiguous_taxa", 
+                                                              names(altExp(mae[[1]], "Family"))),]
+```
+
+
+```{r include=FALSE}
+corr <- testExperimentCrossCorrelation(altExp(mae[[1]], "Family"), 
+                                       mae[[2]], 
+                                       "clr", 
+                                       "log10", 
+                                       show_warnings = FALSE,
+                                       mode = "matrix")
+head(corr$cor,2)
+```
+
+```{r fig.height=6, fig.width=10, message=FALSE, warning=FALSE, include=FALSE}
+pheatmap(corr$cor)
+```
+
+```{r fig.height=6, fig.width=10, message=FALSE, warning=FALSE, include=FALSE}
+mat <- corr$cor
+# Determines the scaling of colors
+# Scale colors
+breaks <- seq(-ceiling(max(abs(mat))), ceiling(max(abs(mat))), 
+              length.out = ifelse( max(abs(mat))>5, 2*ceiling(max(abs(mat))), 10 ) )
+colors <- colorRampPalette(c("darkblue", "blue", "white", "red", "darkred"))(length(breaks)-1)
+
+# For plotting purpose, convert p-values, under 0.05 are marked with "X"
+p_threshold <- 0.01
+p_values <- ifelse(corr$p_adj<p_threshold, "X", "")
+
+pheatmap(mat,
+         breaks = breaks,
+         color = colors,
+         display_numbers = p_values,
+               main = paste0("Correlations between bacteria and metabolites 
+              (statistically significant associations (p < 0.05) marked with X)"),
+            number_color = "yellow")
+```
+
+## Unsupervised learning
 Unsupervised learning is a part of machine learning where we try to find information
 from unknown data. It is also called data mining. Usually this means finding of
 clusters, for instance. Cluster refers to group of samples/features that are similar
 between each other. For example, based on clinical data we can try to find patient 
 groups that have similar response to used drug.
 
-## Biclustering
+### Biclustering
 
 Biclustering is a clustering method, which simultaneously clusters rows and columns.
 In this example, the aim is to find clusters where subset of taxa share similar
@@ -40,123 +114,13 @@ taxa and metabolites correlate similarly.
 Check more from OMA which has dedicated chapter on 
 [biclustering](https://microbiome.github.io/OMA/biclustering.html). 
 
-First, we subset metabolite data so that it includes fewer metabolites. We use 
-coefficient of variation as a subset criteria. Meaning of this is that, if concentration
-of metabolite does not vary, concentration does not differ between samples. 
-
-By doing that, we avoid unnecessary multiple testing, and we focus only on interesting
-metabolites. 
-
-```{r, warning=FALSE, message=FALSE}
-library(ggplot2)
-# Threshold: metabolites whose (cv > +threshold or cv < -threshold), will be included
-cv_threshold <- 0.5
-metabolite_trans <- "nmr"
-
-# Get the data
-metabolite_tse <- mae[[2]]
-
-# Calculate coefficient of variation of individual metabolites
-df <- data.frame(cv = apply(assay(metabolite_tse, metabolite_trans), 1, 
-                            function(x){sd(x)/mean(x)}))
-
-# Plot them as a histogram, and show a line that is used as a threshold
-plot <- ggplot(df, aes(x = cv)) +
-  geom_histogram(bins = 50, color="darkred", fill="lightblue") +
-  labs(x = "CV", y = "metabolite frequency", 
-       title = "Distribution of coefficient of 
-       variation of log10 concentration of metabolites") +
-  geom_vline(xintercept = cv_threshold, color = "red") +
-  geom_text(aes(cv_threshold, 6, label = 
-                  paste0("CV threshold (", cv_threshold, ")"), vjust = 2, angle=90)) +
-  geom_vline(xintercept = -cv_threshold, color = "red") +
-  geom_text(aes(-cv_threshold, 6, label = 
-                  paste0("CV threshold (", -cv_threshold, ")"), vjust = -1, angle=90))
-
-plot
-```
-
-Subsetting metabolomic data:
-
-```{r, warning=FALSE, message=FALSE}
-# Get those metabolites that are over threshold
-metabolites_over_th <- rownames(df[abs(df$cv) > cv_threshold, , drop = FALSE])
-# Ignore those metabolites that do not have name / are NA
-metabolites_over_th <- metabolites_over_th[!str_detect(metabolites_over_th, "NA")]
-```
-
-After that, we subset microbiome data by filtering rarest taxa off-
-
-```{r, warning=FALSE, message=FALSE}
-rank <- "Genus"
-prevalence <- 0.2
-detection <- 0.001
-taxa_trans <-  "clr"
-
-# Get bacterial data
-taxa_tse <- mae[[1]]
-# Agglomerate at Genus level
-taxa_tse <- agglomerateByRank(taxa_tse, rank = rank)
-# Do CLR transformation
-taxa_tse <- transformSamples(taxa_tse, method = "clr", pseudocount = 1)
-
-# Subset metabolite data
-metabolite_tse <- metabolite_tse[metabolites_over_th, ]
-
-# Subset bacterial data by its prevalence. Bacteria whose prevalences are over 
-# threshold are included
-taxa_tse <- subsetByPrevalentTaxa(taxa_tse, 
-                                  prevalence = prevalence, 
-                                  detection = detection)
-
-# Remove uncultured and ambiguous(as it's hard to interpret their results)
-taxa_tse <- taxa_tse[-grep("uncultured|Ambiguous_taxa", names(taxa_tse)),]
-```
-
-After subsetting, we can perform cross-correlation analysis. With cross-correlation
-analysis we can answer the question "If the abundance of this taxon is high, is the 
-concentration of metabolite high?", for instance.
-
-Check OMA book's dedicated chapther on 
-[multi-assay analyses](https://microbiome.github.io/OMA/multi-assay_analyses.html).  
-
-```{r, message=FALSE, warning=FALSE, fig.height=10, fig.width=8}
-library(pheatmap)
-
-# Cross correlate data sets
-correlations <- testExperimentCrossCorrelation(taxa_tse, metabolite_tse, 
-                                               abund_values1 = "clr", abund_values2 = "nmr",
-                                               method = "spearman", mode = "matrix")
-
-# For plotting purpose, convert p-values, under 0.05 are marked with "X"
-p_threshold <- 0.01
-p_values <- ifelse(correlations$p_adj<p_threshold, "X", "")
-
-# Scale colors
-breaks <- seq(-ceiling(max(abs(correlations$cor))), ceiling(max(abs(correlations$cor))), 
-              length.out = ifelse( max(abs(correlations$cor))>5, 
-                                   2*ceiling(max(abs(correlations$cor))), 10 ) )
-colors <- colorRampPalette(c("darkblue", "blue", "white", 
-                             "red", "darkred"))(length(breaks)-1)
-
-# Create a heatmap
-pheatmap(correlations$cor, display_numbers = p_values,
-               main = paste0("Correlations between bacteria and metabolites 
-              (statistically significant associations (p < 0.05) marked with X)"),
-               fontsize = 10,
-               breaks = breaks,
-               color = colors, 
-               fontsize_number = 10)
-```
-
-Finally, we can find biclusters from cross-correlation data.
 
 ```{r}
 # Load package
 library(biclust)
 
 # Find biclusters
-bc <- biclust(correlations$cor, method=BCPlaid(), fit.model = y ~ m,
+bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m,
               background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10,
               iter.startup = 10, iter.layer = 100, verbose = FALSE)
 
@@ -168,6 +132,10 @@ bc
 bicluster_rows <- bc@RowxNumber
 bicluster_columns <- bc@NumberxCol
 
+# Convert them into data.frames
+bicluster_rows <- data.frame(bicluster_rows)
+bicluster_columns <- data.frame(t(bc@NumberxCol))
+
 # Adjust names of clusters
 colnames(bicluster_rows) <- paste0("cluster_", 1:ncol(bicluster_rows))
 colnames(bicluster_columns) <- paste0("cluster_", 1:ncol(bicluster_columns))
@@ -178,41 +146,32 @@ head(bicluster_rows)
 
 Now, we can add bicluster information into the heatmap that we already made.
 
-```{r, message=FALSE, warning=FALSE, fig.height=10, fig.width=8}
+```{r, message=FALSE, warning=FALSE, fig.height=8, fig.width=10}
 # Convert boolean values into factors
-bicluster_columns <- data.frame(apply(bicluster_columns, 2, as.factor))
-bicluster_rows <- data.frame(apply(bicluster_rows, 2, as.factor))
+bicluster_columns[ , 1] <- as.factor(bicluster_columns[, 1] )
+bicluster_rows[ , 1] <- as.factor(bicluster_rows[ , 1])
 
-# Adjust colors for all clusters
-if( ncol(bicluster_rows) > ncol(bicluster_columns) ){
-  cluster_names <- colnames(bicluster_rows)
-} else {
-  cluster_names <- colnames(bicluster_columns)
-}
-annotation_colors <- list()
-for(name in cluster_names){
-  annotation_colors[[name]] <- c("TRUE" = "red", "FALSE" = "white")
-}
+# Adjust their rownames
+rownames(bicluster_columns) <- colnames(corr$cor)
+rownames(bicluster_rows) <- rownames(corr$cor)
 
 # Get correlation values that are over thresholds
 p_threshold <- 0.01
-corr_threshold <- 0.6
-corr_values <- ifelse(correlations$p_adj<p_threshold & 
-                          abs(correlations$cor)>corr_threshold , round(correlations$cor,1), "")
+corr_values <- ifelse(corr$p_adj<p_threshold, round(corr$cor,1), "")
 
 # Create a heatmap
-pheatmap(correlations$cor,
+pheatmap(corr$cor,
          annotation_col = bicluster_columns, 
          annotation_row = bicluster_rows,
-         annotation_colors = annotation_colors,
+         
          display_numbers = corr_values,
-               main = paste0("Correlations between bacteria and metabolites 
-              (correlation over threshold (corr > ", corr_threshold,
-              ", p < ", p_threshold,") marked)"),
-               fontsize = 10,
-               breaks = breaks,
-               color = colors, 
-               fontsize_number = 6, 
-         number_color = "yellow",
-         annotation_legend = FALSE)
+   
+         main = paste0("Correlations between bacteria and metabolites 
+                       (correlation over threshold (p < ", p_threshold,") marked)"),
+         
+         breaks = breaks,
+         color = colors, 
+   
+         fontsize_number = 6, 
+         number_color = "yellow")
 ```
