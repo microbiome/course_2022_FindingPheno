@@ -111,9 +111,7 @@ Check more from OMA which has dedicated chapter on
 library(biclust)
 
 # Find biclusters
-bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m,
-              background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10,
-              iter.startup = 10, iter.layer = 100, verbose = FALSE)
+bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m)
 
 bc
 ```
