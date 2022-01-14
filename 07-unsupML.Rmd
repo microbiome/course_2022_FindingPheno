@@ -238,3 +238,5 @@ plot_top_weights(model.trained,
   nfeatures = 10
 )
 ```
+
+More tutorials and examples of using the package are found at: [link](https://biofam.github.io/MOFA2/tutorials.html)
