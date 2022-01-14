@@ -25,8 +25,8 @@ specific taxon equals to higher levels of a biomolecule.
 
 5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: _mae[[1]] <- mae[[1]][-grep("uncultured|Ambiguous_taxa", names(mae[[1]])),]_ )
 
-5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_ as an argument)
-([testExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
+5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_, _test_significance = TRUE_, and _mode = "matrix"_ as an arguments)
+([getExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
 
 6. Create a heatmap from cross-correlation matrix [pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap)
 
@@ -54,12 +54,13 @@ altExp(mae[[1]], "Family") <-altExp(mae[[1]], "Family")[-grep("uncultured|Ambigu
 
 
 ```{r include=FALSE}
-corr <- testExperimentCrossCorrelation(altExp(mae[[1]], "Family"), 
-                                       mae[[2]], 
-                                       "clr", 
-                                       "log10", 
-                                       show_warnings = FALSE,
-                                       mode = "matrix")
+corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Family"), 
+                                      mae[[2]], 
+                                      "clr", 
+                                      "log10", 
+                                      show_warnings = FALSE,
+                                      test_significance = TRUE,
+                                      mode = "matrix")
 head(corr$cor,2)
 ```
 
@@ -111,7 +112,9 @@ Check more from OMA which has dedicated chapter on
 library(biclust)
 
 # Find biclusters
-bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m)
+bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m, 
+              background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+              iter.startup = 10, iter.layer = 100, verbose = FALSE)
 
 bc
 ```
@@ -120,10 +123,6 @@ bc
 # Get biclusters
 bicluster_rows <- bc@RowxNumber
 bicluster_columns <- bc@NumberxCol
-
-# Convert them into data.frames
-bicluster_rows <- data.frame(bicluster_rows)
-bicluster_columns <- data.frame(t(bc@NumberxCol))
 
 # Adjust names of clusters
 colnames(bicluster_rows) <- paste0("cluster_", 1:ncol(bicluster_rows))
@@ -137,7 +136,7 @@ Now, we can add bicluster information into the heatmap that we already made.
 
 ```{r, message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
 # Convert boolean values into numeric
-bicluster_columns[ , 1] <- as.numeric(bicluster_columns[, 1] )
+bicluster_cluster[ , 1] <- as.numeric(bicluster_cluster[ , 1])
 bicluster_rows[ , 1] <- as.numeric(bicluster_rows[ , 1])
 
 # Adjust their rownames
