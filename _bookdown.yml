@@ -15,3 +15,4 @@ rmd_files:
   - 06-beta.Rmd
   - 07-unsupML.Rmd
   - 08-supML.Rmd
+  - 09-mofa.Rmd

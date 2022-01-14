@@ -1,0 +1,67 @@
+```{r, message=FALSE, warning=FALSE}
+library(mia)
+library(miaViz)
+library(dplyr)
+library(stringr)
+
+mae <- microbiomeDataSets::HintikkaXOData()
+
+# Drop off those bacteria that do not include information in Phylum or lower levels
+mae[[1]] <- mae[[1]][!is.na(rowData(mae[[1]])$Phylum), ]
+
+# Clean taxonomy data, so that names do not include addtional characters
+rowData(mae[[1]]) <- DataFrame(apply(rowData(mae[[1]]), 2, 
+                                     str_remove, pattern = "._[0-9]__"))
+
+# For simplicity, classify all high-fat diets as high-fat, and all the low-fat 
+# diets as low-fat diets
+colData(mae)$Diet <- ifelse(colData(mae)$Diet == "High-fat" | 
+                              colData(mae)$Diet == "High-fat + XOS", 
+                            "High-fat", "Low-fat")
+mae
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(MOFA2)
+model <- create_mofa_from_MultiAssayExperiment(mae,
+                                               groups = "Diet", 
+                                               extract_metadata = TRUE)
+model
+```
+
+```{r, message=FALSE, warning=FALSE}
+model_opts <- get_default_model_options(model)
+model_opts$num_factors <- 15
+head(model_opts)
+```
+
+```{r, message=FALSE, warning=FALSE}
+train_opts <- get_default_training_options(model)
+head(train_opts)
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(reticulate)
+use_condaenv(condaenv = "base")
+model.prepared <- prepare_mofa(
+  object = model,
+  model_options = model_opts
+)
+model.trained <- run_mofa(model.prepared) 
+```
+
+```{r, message=FALSE, warning=FALSE}
+plot_variance_explained(model.trained, x="view", y="factor")
+```
+
+```{r, message=FALSE, warning=FALSE}
+plot_variance_explained(model.trained, x="view", y="factor", plot_total = T)[[2]]
+```
+
+```{r, warning=FALSE, message=FALSE, fig.height=15. fig.width=10}
+plot_top_weights(model.trained,
+  view = "metabolites",
+  factors = 1:3,
+  nfeatures = 10
+)
+```
