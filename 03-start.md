@@ -47,7 +47,7 @@ if (!requireNamespace("BiocManager")) {
 packages <- c("ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
              "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger",
             "dplyr", "miaViz", "knitr", "kableExtra", "vegan", "ecodist", "biclust",
-            "patchwork", "pdp", "MLmetrics", "precrec")
+            "patchwork", "pdp", "MLmetrics", "precrec","reticulate", "MOFA2")
 ```
  
 The following script tries to load all required packages, and if they are not available, installs them.
@@ -73,6 +73,6 @@ sapply(packages, require, character.only = TRUE)
 ##               TRUE               TRUE               TRUE               TRUE 
 ##            ecodist            biclust          patchwork                pdp 
 ##               TRUE               TRUE               TRUE               TRUE 
-##          MLmetrics            precrec 
-##               TRUE               TRUE
+##          MLmetrics            precrec         reticulate              MOFA2 
+##               TRUE               TRUE               TRUE               TRUE
 ```

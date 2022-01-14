@@ -383,7 +383,7 @@ the R session. Only uninstalled packages are installed.
 \NormalTok{packages }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"ggplot2"}\NormalTok{, }\StringTok{"pheatmap"}\NormalTok{, }\StringTok{"stringr"}\NormalTok{, }\StringTok{"igraph"}\NormalTok{, }\StringTok{"ANCOMBC"}\NormalTok{,}
              \StringTok{"microbiome"}\NormalTok{, }\StringTok{"httpuv"}\NormalTok{, }\StringTok{"microbiomeDataSets"}\NormalTok{, }\StringTok{"mia"}\NormalTok{, }\StringTok{"caret"}\NormalTok{, }\StringTok{"ranger"}\NormalTok{,}
             \StringTok{"dplyr"}\NormalTok{, }\StringTok{"miaViz"}\NormalTok{, }\StringTok{"knitr"}\NormalTok{, }\StringTok{"kableExtra"}\NormalTok{, }\StringTok{"vegan"}\NormalTok{, }\StringTok{"ecodist"}\NormalTok{, }\StringTok{"biclust"}\NormalTok{,}
-            \StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{, }\StringTok{"MLmetrics"}\NormalTok{, }\StringTok{"precrec"}\NormalTok{)}
+            \StringTok{"patchwork"}\NormalTok{, }\StringTok{"pdp"}\NormalTok{, }\StringTok{"MLmetrics"}\NormalTok{, }\StringTok{"precrec"}\NormalTok{,}\StringTok{"reticulate"}\NormalTok{, }\StringTok{"MOFA2"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -412,8 +412,8 @@ The following script tries to load all required packages, and if they are not av
 ##               TRUE               TRUE               TRUE               TRUE 
 ##            ecodist            biclust          patchwork                pdp 
 ##               TRUE               TRUE               TRUE               TRUE 
-##          MLmetrics            precrec 
-##               TRUE               TRUE
+##          MLmetrics            precrec         reticulate              MOFA2 
+##               TRUE               TRUE               TRUE               TRUE
 \end{verbatim}
 
 \hypertarget{data}{%
@@ -1042,8 +1042,8 @@ book}.
 A dedicated section presenting examples on community typing is in the
 \href{https://microbiome.github.io/OMA/microbiome-community.html\#community-typing}{online book}.
 
-\hypertarget{cross-correlation-unsupervised-learning}{%
-\chapter{Cross-correlation \& Unsupervised learning}\label{cross-correlation-unsupervised-learning}}
+\hypertarget{multi-omics-unsupervised-learning}{%
+\chapter{Multi-Omics \& Unsupervised learning}\label{multi-omics-unsupervised-learning}}
 
 \hypertarget{cross-correlation}{%
 \section{Cross-correlation}\label{cross-correlation}}
@@ -1129,6 +1129,8 @@ Check more from OMA which has dedicated chapter on
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{19574}\NormalTok{)}
+
 \CommentTok{\# Find biclusters}
 \NormalTok{bc }\OtherTok{\textless{}{-}} \FunctionTok{biclust}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor, }\AttributeTok{method=}\FunctionTok{BCPlaid}\NormalTok{(), }\AttributeTok{fit.model =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ m, }
               \AttributeTok{background =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{shuffle =} \DecValTok{100}\NormalTok{, }\AttributeTok{back.fit =} \DecValTok{0}\NormalTok{, }\AttributeTok{max.layers =} \DecValTok{10}\NormalTok{, }
@@ -1215,6 +1217,175 @@ Now, we can add bicluster information into the heatmap that we already made.
 \end{Shaded}
 
 \includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\hypertarget{multi-omics-factor-analysis}{%
+\subsection{Multi-Omics Factor Analysis}\label{multi-omics-factor-analysis}}
+
+We use the R \href{https://biofam.github.io/MOFA2/installation.html}{MOFA2} package
+for the analysis, and install corresponding dependencies:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reticulate}\SpecialCharTok{::}\FunctionTok{install\_miniconda}\NormalTok{(}\AttributeTok{force =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "/github/home/.local/share/r-miniconda"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reticulate}\SpecialCharTok{::}\FunctionTok{use\_miniconda}\NormalTok{()}
+\NormalTok{reticulate}\SpecialCharTok{::}\FunctionTok{py\_install}\NormalTok{(}\AttributeTok{packages =} \FunctionTok{c}\NormalTok{(}\StringTok{"mofapy2"}\NormalTok{), }\AttributeTok{pip =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{mae} object could be used straight to create the MOFA model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(MOFA2)}
+
+\CommentTok{\# For simplicity, classify all high{-}fat diets as high{-}fat, and all the low{-}fat }
+\CommentTok{\# diets as low{-}fat diets}
+\FunctionTok{colData}\NormalTok{(mae)}\SpecialCharTok{$}\NormalTok{Diet }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{colData}\NormalTok{(mae)}\SpecialCharTok{$}\NormalTok{Diet }\SpecialCharTok{==} \StringTok{"High{-}fat"} \SpecialCharTok{|} 
+                              \FunctionTok{colData}\NormalTok{(mae)}\SpecialCharTok{$}\NormalTok{Diet }\SpecialCharTok{==} \StringTok{"High{-}fat + XOS"}\NormalTok{, }
+                            \StringTok{"High{-}fat"}\NormalTok{, }\StringTok{"Low{-}fat"}\NormalTok{)}
+
+\NormalTok{mae[[}\DecValTok{1}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{transformCounts}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\AttributeTok{method =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
+\FunctionTok{assay}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"counts"}\NormalTok{) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\FunctionTok{assay}\NormalTok{(mae[[}\DecValTok{2}\NormalTok{]], }\StringTok{"nmr"}\NormalTok{) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{create\_mofa\_from\_MultiAssayExperiment}\NormalTok{(mae,}
+                                               \AttributeTok{groups =} \StringTok{"Diet"}\NormalTok{, }
+                                               \AttributeTok{extract\_metadata =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{model}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Untrained MOFA model with the following characteristics: 
+##  Number of views: 3 
+##  Views names: microbiota metabolites biomarkers 
+##  Number of features (per view): 12706 38 39 
+##  Number of groups: 2 
+##  Groups names: High-fat Low-fat 
+##  Number of samples (per group): 20 20 
+## 
+\end{verbatim}
+
+Model options could be defined as follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model\_opts }\OtherTok{\textless{}{-}} \FunctionTok{get\_default\_model\_options}\NormalTok{(model)}
+\NormalTok{model\_opts}\SpecialCharTok{$}\NormalTok{num\_factors }\OtherTok{\textless{}{-}} \DecValTok{15}
+\FunctionTok{head}\NormalTok{(model\_opts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $likelihoods
+##  microbiota metabolites  biomarkers 
+##  "gaussian"  "gaussian"  "gaussian" 
+## 
+## $num_factors
+## [1] 15
+## 
+## $spikeslab_factors
+## [1] FALSE
+## 
+## $spikeslab_weights
+## [1] TRUE
+## 
+## $ard_factors
+## [1] TRUE
+## 
+## $ard_weights
+## [1] TRUE
+\end{verbatim}
+
+Model's training options are defined with the following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{train\_opts }\OtherTok{\textless{}{-}} \FunctionTok{get\_default\_training\_options}\NormalTok{(model)}
+\FunctionTok{head}\NormalTok{(train\_opts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $maxiter
+## [1] 1000
+## 
+## $convergence_mode
+## [1] "fast"
+## 
+## $drop_factor_threshold
+## [1] -1
+## 
+## $verbose
+## [1] FALSE
+## 
+## $startELBO
+## [1] 1
+## 
+## $freqELBO
+## [1] 5
+\end{verbatim}
+
+Preparing and training the model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model.prepared }\OtherTok{\textless{}{-}} \FunctionTok{prepare\_mofa}\NormalTok{(}
+  \AttributeTok{object =}\NormalTok{ model,}
+  \AttributeTok{model\_options =}\NormalTok{ model\_opts}
+\NormalTok{)}
+\NormalTok{model.trained }\OtherTok{\textless{}{-}} \FunctionTok{run\_mofa}\NormalTok{(model.prepared)}
+\end{Highlighting}
+\end{Shaded}
+
+Visualizing the variance explained:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(patchwork)}
+\FunctionTok{wrap\_plots}\NormalTok{(}
+    \FunctionTok{plot\_variance\_explained}\NormalTok{(model.trained, }\AttributeTok{x=}\StringTok{"view"}\NormalTok{, }\AttributeTok{y=}\StringTok{"factor"}\NormalTok{, }\AttributeTok{plot\_total =}\NormalTok{ T),}
+    \AttributeTok{nrow =} \DecValTok{2}
+\NormalTok{) }\SpecialCharTok{+} \FunctionTok{plot\_annotation}\NormalTok{(}\AttributeTok{title =} \StringTok{"Varience Explained per factor and assay"}\NormalTok{,}
+                    \AttributeTok{theme =} \FunctionTok{theme}\NormalTok{(}\AttributeTok{plot.title =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{hjust =} \FloatTok{0.5}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+The top weights for metabolites using the three first factors:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p1 }\OtherTok{\textless{}{-}} \FunctionTok{plot\_top\_weights}\NormalTok{(model.trained,}
+  \AttributeTok{view =} \StringTok{"metabolites"}\NormalTok{,}
+  \AttributeTok{factors =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{,}
+  \AttributeTok{nfeatures =} \DecValTok{10}
+\NormalTok{) }\SpecialCharTok{+} \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Top weights of the metabolomic assay"}\NormalTok{)}
+
+\NormalTok{p2 }\OtherTok{\textless{}{-}} \FunctionTok{plot\_top\_weights}\NormalTok{(model.trained,}
+  \AttributeTok{view =} \StringTok{"microbiota"}\NormalTok{,}
+  \AttributeTok{factors =} \DecValTok{1}\SpecialCharTok{:}\DecValTok{3}\NormalTok{,}
+  \AttributeTok{nfeatures =} \DecValTok{10}
+\NormalTok{) }\SpecialCharTok{+} \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Top weights of the microbiota assay"}\NormalTok{)}\SpecialCharTok{+}
+    \FunctionTok{theme}\NormalTok{(}\AttributeTok{text =} \FunctionTok{element\_text}\NormalTok{(}\AttributeTok{size =} \DecValTok{8}\NormalTok{))}
+
+\NormalTok{p1}\SpecialCharTok{/}\NormalTok{p2}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+More tutorials and examples of using the package are found at: \href{https://biofam.github.io/MOFA2/tutorials.html}{link}
 
 \hypertarget{supervised-learning}{%
 \chapter{Supervised learning}\label{supervised-learning}}

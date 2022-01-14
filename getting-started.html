@@ -203,12 +203,13 @@ div.csl-indent {
 <li class="chapter" data-level="6.3" data-path="beta-diversity.html"><a href="beta-diversity.html#estimating-associations-with-an-external-variable"><i class="fa fa-check"></i><b>6.3</b> Estimating associations with an external variable</a></li>
 <li class="chapter" data-level="6.4" data-path="beta-diversity.html"><a href="beta-diversity.html#community-typing"><i class="fa fa-check"></i><b>6.4</b> Community typing</a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html"><i class="fa fa-check"></i><b>7</b> Cross-correlation &amp; Unsupervised learning</a>
+<li class="chapter" data-level="7" data-path="multi-omics-unsupervised-learning.html"><a href="multi-omics-unsupervised-learning.html"><i class="fa fa-check"></i><b>7</b> Multi-Omics &amp; Unsupervised learning</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#cross-correlation"><i class="fa fa-check"></i><b>7.1</b> Cross-correlation</a></li>
-<li class="chapter" data-level="7.2" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#unsupervised-learning"><i class="fa fa-check"></i><b>7.2</b> Unsupervised learning</a>
+<li class="chapter" data-level="7.1" data-path="multi-omics-unsupervised-learning.html"><a href="multi-omics-unsupervised-learning.html#cross-correlation"><i class="fa fa-check"></i><b>7.1</b> Cross-correlation</a></li>
+<li class="chapter" data-level="7.2" data-path="multi-omics-unsupervised-learning.html"><a href="multi-omics-unsupervised-learning.html#unsupervised-learning"><i class="fa fa-check"></i><b>7.2</b> Unsupervised learning</a>
 <ul>
-<li class="chapter" data-level="7.2.1" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#biclustering"><i class="fa fa-check"></i><b>7.2.1</b> Biclustering</a></li>
+<li class="chapter" data-level="7.2.1" data-path="multi-omics-unsupervised-learning.html"><a href="multi-omics-unsupervised-learning.html#biclustering"><i class="fa fa-check"></i><b>7.2.1</b> Biclustering</a></li>
+<li class="chapter" data-level="7.2.2" data-path="multi-omics-unsupervised-learning.html"><a href="multi-omics-unsupervised-learning.html#multi-omics-factor-analysis"><i class="fa fa-check"></i><b>7.2.2</b> Multi-Omics Factor Analysis</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="supervised-learning.html"><a href="supervised-learning.html"><i class="fa fa-check"></i><b>8</b> Supervised learning</a>
@@ -275,7 +276,7 @@ the R session. Only uninstalled packages are installed.</p>
 <span id="cb1-6"><a href="getting-started.html#cb1-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, <span class="st">&quot;stringr&quot;</span>, <span class="st">&quot;igraph&quot;</span>, <span class="st">&quot;ANCOMBC&quot;</span>,</span>
 <span id="cb1-7"><a href="getting-started.html#cb1-7" aria-hidden="true" tabindex="-1"></a>             <span class="st">&quot;microbiome&quot;</span>, <span class="st">&quot;httpuv&quot;</span>, <span class="st">&quot;microbiomeDataSets&quot;</span>, <span class="st">&quot;mia&quot;</span>, <span class="st">&quot;caret&quot;</span>, <span class="st">&quot;ranger&quot;</span>,</span>
 <span id="cb1-8"><a href="getting-started.html#cb1-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;miaViz&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>, <span class="st">&quot;vegan&quot;</span>, <span class="st">&quot;ecodist&quot;</span>, <span class="st">&quot;biclust&quot;</span>,</span>
-<span id="cb1-9"><a href="getting-started.html#cb1-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;patchwork&quot;</span>, <span class="st">&quot;pdp&quot;</span>, <span class="st">&quot;MLmetrics&quot;</span>, <span class="st">&quot;precrec&quot;</span>)</span></code></pre></div>
+<span id="cb1-9"><a href="getting-started.html#cb1-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;patchwork&quot;</span>, <span class="st">&quot;pdp&quot;</span>, <span class="st">&quot;MLmetrics&quot;</span>, <span class="st">&quot;precrec&quot;</span>,<span class="st">&quot;reticulate&quot;</span>, <span class="st">&quot;MOFA2&quot;</span>)</span></code></pre></div>
 <p>The following script tries to load all required packages, and if they are not available, installs them.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="getting-started.html#cb2-1" aria-hidden="true" tabindex="-1"></a>new.pkgs <span class="ot">&lt;-</span> packages[<span class="sc">!</span>(packages <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">&quot;Package&quot;</span>])]</span>
 <span id="cb2-2"><a href="getting-started.html#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -294,8 +295,8 @@ the R session. Only uninstalled packages are installed.</p>
 ##               TRUE               TRUE               TRUE               TRUE 
 ##            ecodist            biclust          patchwork                pdp 
 ##               TRUE               TRUE               TRUE               TRUE 
-##          MLmetrics            precrec 
-##               TRUE               TRUE</code></pre>
+##          MLmetrics            precrec         reticulate              MOFA2 
+##               TRUE               TRUE               TRUE               TRUE</code></pre>
 
 </div>
 </div>
