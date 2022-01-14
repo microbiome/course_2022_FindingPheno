@@ -58,7 +58,7 @@ plot_variance_explained(model.trained, x="view", y="factor")
 plot_variance_explained(model.trained, x="view", y="factor", plot_total = T)[[2]]
 ```
 
-```{r, warning=FALSE, message=FALSE, fig.height=15. fig.width=10}
+```{r, warning=FALSE, message=FALSE, fig.height=15, fig.width=10}
 plot_top_weights(model.trained,
   view = "metabolites",
   factors = 1:3,
