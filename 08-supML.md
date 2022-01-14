@@ -241,7 +241,7 @@ and results.
 
 
 ```r
-butyrate_cutoff <- median(butyrate_df_test$Butyrate)
+butyrate_cutoff <- median(butyrate_df_train$Butyrate)
 butyrate_df_test_2 <- butyrate_df_test
 butyrate_df_train_2 <- butyrate_df_train
 butyrate_df_test_2$Butyrate <- as.factor(ifelse(butyrate_df_test_2$Butyrate >= butyrate_cutoff, "High", "Low"))
@@ -286,16 +286,16 @@ print(rfFit2)
 ## 
 ## No pre-processing
 ## Resampling: Cross-Validated (5 fold, repeated 10 times) 
-## Summary of sample sizes: 25, 25, 26, 26, 26, 26, ... 
+## Summary of sample sizes: 26, 25, 26, 26, 25, 26, ... 
 ## Resampling results across tuning parameters:
 ## 
 ##   mtry  splitrule   ROC        Sens       Spec     
-##    2    gini        0.8622222  0.7733333  0.8433333
-##    2    extratrees  0.8877778  0.8133333  0.8450000
-##   15    gini        0.8261111  0.7866667  0.7950000
-##   15    extratrees  0.8561111  0.8266667  0.8116667
-##   28    gini        0.8150000  0.7733333  0.7950000
-##   28    extratrees  0.8488889  0.8200000  0.8016667
+##    2    gini        0.8661111  0.7733333  0.8450000
+##    2    extratrees  0.8840278  0.8166667  0.8516667
+##   15    gini        0.8345833  0.7683333  0.7883333
+##   15    extratrees  0.8718056  0.8650000  0.8533333
+##   28    gini        0.8194444  0.7800000  0.7116667
+##   28    extratrees  0.8729167  0.8516667  0.8516667
 ## 
 ## Tuning parameter 'min.node.size' was held constant at a value of 1
 ## ROC was used to select the optimal model using the largest value.
@@ -322,7 +322,7 @@ print(rfFit2$finalModel)
 ## Variable importance mode:         permutation 
 ## Splitrule:                        extratrees 
 ## Number of random splits:          1 
-## OOB prediction error (Brier s.):  0.163163
+## OOB prediction error (Brier s.):  0.1536114
 ```
 
 ```r

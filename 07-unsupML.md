@@ -23,23 +23,208 @@ specific taxon equals to higher levels of a biomolecule.
 5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_, _test_significance = TRUE_, and _mode = "matrix"_ as an arguments)
 ([getExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
 
-6. Create a heatmap from cross-correlation matrix [pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap)
+6. Create a heatmap from cross-correlation matrix ([pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap))
+
+
+**Example solution for the task**
+
+
+```r
+mae <- microbiomeDataSets::HintikkaXOData()
+```
+
+```
+## snapshotDate(): 2022-01-04
+```
+
+```
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+```
+
+```
+## loading from cache
+```
+
+```
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+```
+
+```
+## loading from cache
+```
+
+```
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+```
+
+```
+## loading from cache
+```
+
+```
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+```
+
+```
+## loading from cache
+```
+
+```
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+```
+
+```
+## loading from cache
+```
+
+```r
+mae
+```
+
+```
+## A MultiAssayExperiment object of 3 listed
+##  experiments with user-defined names and respective classes.
+##  Containing an ExperimentList class object of length 3:
+##  [1] microbiota: SummarizedExperiment with 12706 rows and 40 columns
+##  [2] metabolites: SummarizedExperiment with 38 rows and 40 columns
+##  [3] biomarkers: SummarizedExperiment with 39 rows and 40 columns
+## Functionality:
+##  experiments() - obtain the ExperimentList instance
+##  colData() - the primary/phenotype DataFrame
+##  sampleMap() - the sample coordination DataFrame
+##  `$`, `[`, `[[` - extract colData columns, subset, or experiment
+##  *Format() - convert into a long or wide DataFrame
+##  assays() - convert ExperimentList to a SimpleList of matrices
+##  exportClass() - save data to flat files
+```
+
+
+```r
+mae[[1]] <- as(mae[[1]], "TreeSummarizedExperiment")
+altExp(mae[[1]], "Genus") <- subsetByPrevalentTaxa(mae[[1]], rank = "Genus", prevalence = 0.2, detection = 0.001)
+altExp(mae[[1]], "Genus")
+```
+
+```
+## class: TreeSummarizedExperiment 
+## dim: 57 40 
+## metadata(0):
+## assays(1): counts
+## rownames(57): D_5__Escherichia-Shigella D_5__Ruminiclostridium 5 ...
+##   D_5__[Ruminococcus] gauvreauii group D_5__Defluviitaleaceae UCG-011
+## rowData names(7): Phylum Class ... Species OTU
+## colnames(40): C1 C2 ... C39 C40
+## colData names(0):
+## reducedDimNames(0):
+## mainExpName: NULL
+## altExpNames(0):
+## rowLinks: NULL
+## rowTree: NULL
+## colLinks: NULL
+## colTree: NULL
+```
+
+
+```r
+altExp(mae[[1]], "Genus") <- transformSamples(altExp(mae[[1]], "Genus"), method = "clr", pseudocount = 1)
+mae[[2]] <- transformSamples(mae[[2]], abund_values = "nmr", method = "log10")
+```
+
+
+```r
+altExp(mae[[1]], "Genus") <-altExp(mae[[1]], "Genus")[-grep("uncultured|Ambiguous_taxa", 
+                                                              names(altExp(mae[[1]], "Genus"))),]
+```
 
 
 
+```r
+corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Genus"), 
+                                      mae[[2]], 
+                                      "clr", 
+                                      "log10", 
+                                      show_warnings = FALSE,
+                                      test_significance = TRUE,
+                                      mode = "matrix")
+```
+
+```
+## Calculating correlations...
+## method: spearman, test_significance: TRUE, p_adj_method: fdr
+```
+
+```
+## 
+## Converting table into matrices...
+```
+
+```r
+head(corr$cor,2)
+```
+
+```
+##                              Butyrate    Acetate Propionate   Valerate
+## D_5__Escherichia-Shigella -0.06622889 -0.1390244 -0.2099437 -0.3477649
+## D_5__Ruminiclostridium 5   0.67560976  0.3814259  0.4881801 -0.1973826
+##                           Isovalerate Isobutyrate    Formate    Glucose
+## D_5__Escherichia-Shigella  -0.1908068  -0.1609585 0.07814625 -0.1677298
+## D_5__Ruminiclostridium 5   -0.3050657  -0.4113141 0.35236174  0.6491557
+##                              Glycerol   Threonine    Leucine Methionine
+## D_5__Escherichia-Shigella -0.09118199  0.03771107 -0.1303644 -0.1570356
+## D_5__Ruminiclostridium 5  -0.35028143 -0.31951220  0.3406883  0.4741088
+##                                Valine   Proline     Lactate  Glutamate
+## D_5__Escherichia-Shigella -0.16547842 0.0021577  0.07129456 -0.1260788
+## D_5__Ruminiclostridium 5   0.07054409 0.2359398 -0.06454034  0.3442777
+##                              Ethanol    Tryptophan   Aspartate     Alanine
+## D_5__Escherichia-Shigella 0.03752345 -0.0004032258  0.10956848 -0.07017215
+## D_5__Ruminiclostridium 5  0.15497186 -0.3887096774 -0.05741088  0.17036446
+##                           Phenylalanine Isoleucine   Tyrosine    Glycine
+## D_5__Escherichia-Shigella    -0.1607880 -0.1382739 -0.1452158  0.3093809
+## D_5__Ruminiclostridium 5      0.3652908  0.3810507  0.3384615 -0.2947467
+##                            Nicotinate      Uracil  Urocanate Hypoxanthine
+## D_5__Escherichia-Shigella -0.09438034 -0.07899428 -0.2950200  -0.07701712
+## D_5__Ruminiclostridium 5   0.67088845  0.63533165  0.4642432   0.36644255
+##                               Choline    Methanol  Succinate 2-oxoglutarate
+## D_5__Escherichia-Shigella  0.04822442  0.04504733  0.1389371     -0.4192383
+## D_5__Ruminiclostridium 5  -0.11146034 -0.01538695 -0.2616445      0.5039396
+##                              Fumarate   Pyruvate Methylamine Trimethylamine
+## D_5__Escherichia-Shigella  0.06923726 -0.1629609  -0.3784418     -0.1032735
+## D_5__Ruminiclostridium 5  -0.03987241  0.4943240   0.2805010      0.1143721
+##                             Malonate 1,3-dihydroxyacetone
+## D_5__Escherichia-Shigella -0.1579107           -0.1216788
+## D_5__Ruminiclostridium 5  -0.1021358            0.4057836
+```
 
 
+```r
+pheatmap(corr$cor)
+```
+
+![](07-unsupML_files/figure-latex/unnamed-chunk-7-1.pdf)<!-- --> 
 
 
+```r
+mat <- corr$cor
+# Determines the scaling of colors
+# Scale colors
+breaks <- seq(-ceiling(max(abs(mat))), ceiling(max(abs(mat))), 
+              length.out = ifelse( max(abs(mat))>5, 2*ceiling(max(abs(mat))), 10 ) )
+colors <- colorRampPalette(c("darkblue", "blue", "white", "red", "darkred"))(length(breaks)-1)
 
+# For plotting purpose, convert p-values, under 0.05 are marked with "X"
+p_threshold <- 0.01
+p_values <- ifelse(corr$p_adj<p_threshold, "X", "")
 
+pheatmap(mat,
+         breaks = breaks,
+         color = colors,
+         display_numbers = p_values,
+               main = paste0("Correlations between bacteria and metabolites 
+              (statistically significant associations (p < 0.05) marked with X)"),
+            number_color = "yellow")
+```
 
-
-
-
-
-
-
+![](07-unsupML_files/figure-latex/unnamed-chunk-8-1.pdf)<!-- --> 
 
 ## Unsupervised learning
 Unsupervised learning is a part of machine learning where we try to find information

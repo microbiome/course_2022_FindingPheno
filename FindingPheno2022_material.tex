@@ -1070,8 +1070,218 @@ specific taxon equals to higher levels of a biomolecule.
   Calculate cross-correlation between \emph{microbiota} (clr) and \emph{metabolites} (log10) (Use \emph{show\_warnings = FALSE}, \emph{test\_significance = TRUE}, and \emph{mode = ``matrix''} as an arguments)
   (\href{https://microbiome.github.io/OMA/multi-assay_analyses.html\#multi-assay_analyses}{getExperimentCrossCorrelation})
 \item
-  Create a heatmap from cross-correlation matrix \href{https://microbiome.github.io/OMA/microbiome-community.html\#composition-heatmap}{pheatmap}
+  Create a heatmap from cross-correlation matrix (\href{https://microbiome.github.io/OMA/microbiome-community.html\#composition-heatmap}{pheatmap})
 \end{enumerate}
+
+\textbf{Example solution for the task}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mae }\OtherTok{\textless{}{-}}\NormalTok{ microbiomeDataSets}\SpecialCharTok{::}\FunctionTok{HintikkaXOData}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## snapshotDate(): 2022-01-04
+\end{verbatim}
+
+\begin{verbatim}
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+\end{verbatim}
+
+\begin{verbatim}
+## loading from cache
+\end{verbatim}
+
+\begin{verbatim}
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+\end{verbatim}
+
+\begin{verbatim}
+## loading from cache
+\end{verbatim}
+
+\begin{verbatim}
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+\end{verbatim}
+
+\begin{verbatim}
+## loading from cache
+\end{verbatim}
+
+\begin{verbatim}
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+\end{verbatim}
+
+\begin{verbatim}
+## loading from cache
+\end{verbatim}
+
+\begin{verbatim}
+## see ?microbiomeDataSets and browseVignettes('microbiomeDataSets') for documentation
+\end{verbatim}
+
+\begin{verbatim}
+## loading from cache
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mae}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## A MultiAssayExperiment object of 3 listed
+##  experiments with user-defined names and respective classes.
+##  Containing an ExperimentList class object of length 3:
+##  [1] microbiota: SummarizedExperiment with 12706 rows and 40 columns
+##  [2] metabolites: SummarizedExperiment with 38 rows and 40 columns
+##  [3] biomarkers: SummarizedExperiment with 39 rows and 40 columns
+## Functionality:
+##  experiments() - obtain the ExperimentList instance
+##  colData() - the primary/phenotype DataFrame
+##  sampleMap() - the sample coordination DataFrame
+##  `$`, `[`, `[[` - extract colData columns, subset, or experiment
+##  *Format() - convert into a long or wide DataFrame
+##  assays() - convert ExperimentList to a SimpleList of matrices
+##  exportClass() - save data to flat files
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mae[[}\DecValTok{1}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{as}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"TreeSummarizedExperiment"}\NormalTok{)}
+\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{) }\OtherTok{\textless{}{-}} \FunctionTok{subsetByPrevalentTaxa}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\AttributeTok{rank =} \StringTok{"Genus"}\NormalTok{, }\AttributeTok{prevalence =} \FloatTok{0.2}\NormalTok{, }\AttributeTok{detection =} \FloatTok{0.001}\NormalTok{)}
+\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## class: TreeSummarizedExperiment 
+## dim: 57 40 
+## metadata(0):
+## assays(1): counts
+## rownames(57): D_5__Escherichia-Shigella D_5__Ruminiclostridium 5 ...
+##   D_5__[Ruminococcus] gauvreauii group D_5__Defluviitaleaceae UCG-011
+## rowData names(7): Phylum Class ... Species OTU
+## colnames(40): C1 C2 ... C39 C40
+## colData names(0):
+## reducedDimNames(0):
+## mainExpName: NULL
+## altExpNames(0):
+## rowLinks: NULL
+## rowTree: NULL
+## colLinks: NULL
+## colTree: NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{) }\OtherTok{\textless{}{-}} \FunctionTok{transformSamples}\NormalTok{(}\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{), }\AttributeTok{method =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
+\NormalTok{mae[[}\DecValTok{2}\NormalTok{]] }\OtherTok{\textless{}{-}} \FunctionTok{transformSamples}\NormalTok{(mae[[}\DecValTok{2}\NormalTok{]], }\AttributeTok{abund\_values =} \StringTok{"nmr"}\NormalTok{, }\AttributeTok{method =} \StringTok{"log10"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{) }\OtherTok{\textless{}{-}}\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{)[}\SpecialCharTok{{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"uncultured|Ambiguous\_taxa"}\NormalTok{, }
+                                                              \FunctionTok{names}\NormalTok{(}\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{))),]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{corr }\OtherTok{\textless{}{-}} \FunctionTok{getExperimentCrossCorrelation}\NormalTok{(}\FunctionTok{altExp}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]], }\StringTok{"Genus"}\NormalTok{), }
+\NormalTok{                                      mae[[}\DecValTok{2}\NormalTok{]], }
+                                      \StringTok{"clr"}\NormalTok{, }
+                                      \StringTok{"log10"}\NormalTok{, }
+                                      \AttributeTok{show\_warnings =} \ConstantTok{FALSE}\NormalTok{,}
+                                      \AttributeTok{test\_significance =} \ConstantTok{TRUE}\NormalTok{,}
+                                      \AttributeTok{mode =} \StringTok{"matrix"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Calculating correlations...
+## method: spearman, test_significance: TRUE, p_adj_method: fdr
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Converting table into matrices...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor,}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                              Butyrate    Acetate Propionate   Valerate
+## D_5__Escherichia-Shigella -0.06622889 -0.1390244 -0.2099437 -0.3477649
+## D_5__Ruminiclostridium 5   0.67560976  0.3814259  0.4881801 -0.1973826
+##                           Isovalerate Isobutyrate    Formate    Glucose
+## D_5__Escherichia-Shigella  -0.1908068  -0.1609585 0.07814625 -0.1677298
+## D_5__Ruminiclostridium 5   -0.3050657  -0.4113141 0.35236174  0.6491557
+##                              Glycerol   Threonine    Leucine Methionine
+## D_5__Escherichia-Shigella -0.09118199  0.03771107 -0.1303644 -0.1570356
+## D_5__Ruminiclostridium 5  -0.35028143 -0.31951220  0.3406883  0.4741088
+##                                Valine   Proline     Lactate  Glutamate
+## D_5__Escherichia-Shigella -0.16547842 0.0021577  0.07129456 -0.1260788
+## D_5__Ruminiclostridium 5   0.07054409 0.2359398 -0.06454034  0.3442777
+##                              Ethanol    Tryptophan   Aspartate     Alanine
+## D_5__Escherichia-Shigella 0.03752345 -0.0004032258  0.10956848 -0.07017215
+## D_5__Ruminiclostridium 5  0.15497186 -0.3887096774 -0.05741088  0.17036446
+##                           Phenylalanine Isoleucine   Tyrosine    Glycine
+## D_5__Escherichia-Shigella    -0.1607880 -0.1382739 -0.1452158  0.3093809
+## D_5__Ruminiclostridium 5      0.3652908  0.3810507  0.3384615 -0.2947467
+##                            Nicotinate      Uracil  Urocanate Hypoxanthine
+## D_5__Escherichia-Shigella -0.09438034 -0.07899428 -0.2950200  -0.07701712
+## D_5__Ruminiclostridium 5   0.67088845  0.63533165  0.4642432   0.36644255
+##                               Choline    Methanol  Succinate 2-oxoglutarate
+## D_5__Escherichia-Shigella  0.04822442  0.04504733  0.1389371     -0.4192383
+## D_5__Ruminiclostridium 5  -0.11146034 -0.01538695 -0.2616445      0.5039396
+##                              Fumarate   Pyruvate Methylamine Trimethylamine
+## D_5__Escherichia-Shigella  0.06923726 -0.1629609  -0.3784418     -0.1032735
+## D_5__Ruminiclostridium 5  -0.03987241  0.4943240   0.2805010      0.1143721
+##                             Malonate 1,3-dihydroxyacetone
+## D_5__Escherichia-Shigella -0.1579107           -0.1216788
+## D_5__Ruminiclostridium 5  -0.1021358            0.4057836
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{pheatmap}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mat }\OtherTok{\textless{}{-}}\NormalTok{ corr}\SpecialCharTok{$}\NormalTok{cor}
+\CommentTok{\# Determines the scaling of colors}
+\CommentTok{\# Scale colors}
+\NormalTok{breaks }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(mat))), }\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(mat))), }
+              \AttributeTok{length.out =} \FunctionTok{ifelse}\NormalTok{( }\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(mat))}\SpecialCharTok{\textgreater{}}\DecValTok{5}\NormalTok{, }\DecValTok{2}\SpecialCharTok{*}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(mat))), }\DecValTok{10}\NormalTok{ ) )}
+\NormalTok{colors }\OtherTok{\textless{}{-}} \FunctionTok{colorRampPalette}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"darkblue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"white"}\NormalTok{, }\StringTok{"red"}\NormalTok{, }\StringTok{"darkred"}\NormalTok{))(}\FunctionTok{length}\NormalTok{(breaks)}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{)}
+
+\CommentTok{\# For plotting purpose, convert p{-}values, under 0.05 are marked with "X"}
+\NormalTok{p\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.01}
+\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{p\_adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold, }\StringTok{"X"}\NormalTok{, }\StringTok{""}\NormalTok{)}
+
+\FunctionTok{pheatmap}\NormalTok{(mat,}
+         \AttributeTok{breaks =}\NormalTok{ breaks,}
+         \AttributeTok{color =}\NormalTok{ colors,}
+         \AttributeTok{display\_numbers =}\NormalTok{ p\_values,}
+               \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Correlations between bacteria and metabolites }
+\StringTok{              (statistically significant associations (p \textless{} 0.05) marked with X)"}\NormalTok{),}
+            \AttributeTok{number\_color =} \StringTok{"yellow"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-8-1.pdf}
 
 \hypertarget{unsupervised-learning}{%
 \section{Unsupervised learning}\label{unsupervised-learning}}
@@ -1645,7 +1855,7 @@ and results.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{butyrate\_cutoff }\OtherTok{\textless{}{-}} \FunctionTok{median}\NormalTok{(butyrate\_df\_test}\SpecialCharTok{$}\NormalTok{Butyrate)}
+\NormalTok{butyrate\_cutoff }\OtherTok{\textless{}{-}} \FunctionTok{median}\NormalTok{(butyrate\_df\_train}\SpecialCharTok{$}\NormalTok{Butyrate)}
 \NormalTok{butyrate\_df\_test\_2 }\OtherTok{\textless{}{-}}\NormalTok{ butyrate\_df\_test}
 \NormalTok{butyrate\_df\_train\_2 }\OtherTok{\textless{}{-}}\NormalTok{ butyrate\_df\_train}
 \NormalTok{butyrate\_df\_test\_2}\SpecialCharTok{$}\NormalTok{Butyrate }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(}\FunctionTok{ifelse}\NormalTok{(butyrate\_df\_test\_2}\SpecialCharTok{$}\NormalTok{Butyrate }\SpecialCharTok{\textgreater{}=}\NormalTok{ butyrate\_cutoff, }\StringTok{"High"}\NormalTok{, }\StringTok{"Low"}\NormalTok{))}
@@ -1693,16 +1903,16 @@ specific dimensions as an input for twoClassSummary().
 ## 
 ## No pre-processing
 ## Resampling: Cross-Validated (5 fold, repeated 10 times) 
-## Summary of sample sizes: 25, 25, 26, 26, 26, 26, ... 
+## Summary of sample sizes: 26, 25, 26, 26, 25, 26, ... 
 ## Resampling results across tuning parameters:
 ## 
 ##   mtry  splitrule   ROC        Sens       Spec     
-##    2    gini        0.8622222  0.7733333  0.8433333
-##    2    extratrees  0.8877778  0.8133333  0.8450000
-##   15    gini        0.8261111  0.7866667  0.7950000
-##   15    extratrees  0.8561111  0.8266667  0.8116667
-##   28    gini        0.8150000  0.7733333  0.7950000
-##   28    extratrees  0.8488889  0.8200000  0.8016667
+##    2    gini        0.8661111  0.7733333  0.8450000
+##    2    extratrees  0.8840278  0.8166667  0.8516667
+##   15    gini        0.8345833  0.7683333  0.7883333
+##   15    extratrees  0.8718056  0.8650000  0.8533333
+##   28    gini        0.8194444  0.7800000  0.7116667
+##   28    extratrees  0.8729167  0.8516667  0.8516667
 ## 
 ## Tuning parameter 'min.node.size' was held constant at a value of 1
 ## ROC was used to select the optimal model using the largest value.
@@ -1731,7 +1941,7 @@ specific dimensions as an input for twoClassSummary().
 ## Variable importance mode:         permutation 
 ## Splitrule:                        extratrees 
 ## Number of random splits:          1 
-## OOB prediction error (Brier s.):  0.163163
+## OOB prediction error (Brier s.):  0.1536114
 \end{verbatim}
 
 \begin{Shaded}

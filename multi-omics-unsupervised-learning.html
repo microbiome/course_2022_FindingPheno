@@ -254,8 +254,122 @@ specific taxon equals to higher levels of a biomolecule.</p>
 <li><p>Remove uncultured and ambiguous taxa (as it’s hard to interpret their results) ( USE THIS: <em>mae[[1]] &lt;- mae[[1]][-grep(“uncultured|Ambiguous_taxa,” names(mae[[1]])),]</em> )</p></li>
 <li><p>Calculate cross-correlation between <em>microbiota</em> (clr) and <em>metabolites</em> (log10) (Use <em>show_warnings = FALSE</em>, <em>test_significance = TRUE</em>, and <em>mode = “matrix”</em> as an arguments)
 (<a href="https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses">getExperimentCrossCorrelation</a>)</p></li>
-<li><p>Create a heatmap from cross-correlation matrix <a href="https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap">pheatmap</a></p></li>
+<li><p>Create a heatmap from cross-correlation matrix (<a href="https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap">pheatmap</a>)</p></li>
 </ol>
+<p><strong>Example solution for the task</strong></p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="multi-omics-unsupervised-learning.html#cb30-1" aria-hidden="true" tabindex="-1"></a>mae <span class="ot">&lt;-</span> microbiomeDataSets<span class="sc">::</span><span class="fu">HintikkaXOData</span>()</span></code></pre></div>
+<pre><code>## snapshotDate(): 2022-01-04</code></pre>
+<pre><code>## see ?microbiomeDataSets and browseVignettes(&#39;microbiomeDataSets&#39;) for documentation</code></pre>
+<pre><code>## loading from cache</code></pre>
+<pre><code>## see ?microbiomeDataSets and browseVignettes(&#39;microbiomeDataSets&#39;) for documentation</code></pre>
+<pre><code>## loading from cache</code></pre>
+<pre><code>## see ?microbiomeDataSets and browseVignettes(&#39;microbiomeDataSets&#39;) for documentation</code></pre>
+<pre><code>## loading from cache</code></pre>
+<pre><code>## see ?microbiomeDataSets and browseVignettes(&#39;microbiomeDataSets&#39;) for documentation</code></pre>
+<pre><code>## loading from cache</code></pre>
+<pre><code>## see ?microbiomeDataSets and browseVignettes(&#39;microbiomeDataSets&#39;) for documentation</code></pre>
+<pre><code>## loading from cache</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="multi-omics-unsupervised-learning.html#cb42-1" aria-hidden="true" tabindex="-1"></a>mae</span></code></pre></div>
+<pre><code>## A MultiAssayExperiment object of 3 listed
+##  experiments with user-defined names and respective classes.
+##  Containing an ExperimentList class object of length 3:
+##  [1] microbiota: SummarizedExperiment with 12706 rows and 40 columns
+##  [2] metabolites: SummarizedExperiment with 38 rows and 40 columns
+##  [3] biomarkers: SummarizedExperiment with 39 rows and 40 columns
+## Functionality:
+##  experiments() - obtain the ExperimentList instance
+##  colData() - the primary/phenotype DataFrame
+##  sampleMap() - the sample coordination DataFrame
+##  `$`, `[`, `[[` - extract colData columns, subset, or experiment
+##  *Format() - convert into a long or wide DataFrame
+##  assays() - convert ExperimentList to a SimpleList of matrices
+##  exportClass() - save data to flat files</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="multi-omics-unsupervised-learning.html#cb44-1" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">as</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;TreeSummarizedExperiment&quot;</span>)</span>
+<span id="cb44-2"><a href="multi-omics-unsupervised-learning.html#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">subsetByPrevalentTaxa</span>(mae[[<span class="dv">1</span>]], <span class="at">rank =</span> <span class="st">&quot;Genus&quot;</span>, <span class="at">prevalence =</span> <span class="fl">0.2</span>, <span class="at">detection =</span> <span class="fl">0.001</span>)</span>
+<span id="cb44-3"><a href="multi-omics-unsupervised-learning.html#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>)</span></code></pre></div>
+<pre><code>## class: TreeSummarizedExperiment 
+## dim: 57 40 
+## metadata(0):
+## assays(1): counts
+## rownames(57): D_5__Escherichia-Shigella D_5__Ruminiclostridium 5 ...
+##   D_5__[Ruminococcus] gauvreauii group D_5__Defluviitaleaceae UCG-011
+## rowData names(7): Phylum Class ... Species OTU
+## colnames(40): C1 C2 ... C39 C40
+## colData names(0):
+## reducedDimNames(0):
+## mainExpName: NULL
+## altExpNames(0):
+## rowLinks: NULL
+## rowTree: NULL
+## colLinks: NULL
+## colTree: NULL</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="multi-omics-unsupervised-learning.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">transformSamples</span>(<span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>), <span class="at">method =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
+<span id="cb46-2"><a href="multi-omics-unsupervised-learning.html#cb46-2" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="fu">transformSamples</span>(mae[[<span class="dv">2</span>]], <span class="at">abund_values =</span> <span class="st">&quot;nmr&quot;</span>, <span class="at">method =</span> <span class="st">&quot;log10&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="multi-omics-unsupervised-learning.html#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>) <span class="ot">&lt;-</span><span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>)[<span class="sc">-</span><span class="fu">grep</span>(<span class="st">&quot;uncultured|Ambiguous_taxa&quot;</span>, </span>
+<span id="cb47-2"><a href="multi-omics-unsupervised-learning.html#cb47-2" aria-hidden="true" tabindex="-1"></a>                                                              <span class="fu">names</span>(<span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>))),]</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="multi-omics-unsupervised-learning.html#cb48-1" aria-hidden="true" tabindex="-1"></a>corr <span class="ot">&lt;-</span> <span class="fu">getExperimentCrossCorrelation</span>(<span class="fu">altExp</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;Genus&quot;</span>), </span>
+<span id="cb48-2"><a href="multi-omics-unsupervised-learning.html#cb48-2" aria-hidden="true" tabindex="-1"></a>                                      mae[[<span class="dv">2</span>]], </span>
+<span id="cb48-3"><a href="multi-omics-unsupervised-learning.html#cb48-3" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">&quot;clr&quot;</span>, </span>
+<span id="cb48-4"><a href="multi-omics-unsupervised-learning.html#cb48-4" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">&quot;log10&quot;</span>, </span>
+<span id="cb48-5"><a href="multi-omics-unsupervised-learning.html#cb48-5" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">show_warnings =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb48-6"><a href="multi-omics-unsupervised-learning.html#cb48-6" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">test_significance =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb48-7"><a href="multi-omics-unsupervised-learning.html#cb48-7" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">mode =</span> <span class="st">&quot;matrix&quot;</span>)</span></code></pre></div>
+<pre><code>## Calculating correlations...
+## method: spearman, test_significance: TRUE, p_adj_method: fdr</code></pre>
+<pre><code>## 
+## Converting table into matrices...</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="multi-omics-unsupervised-learning.html#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(corr<span class="sc">$</span>cor,<span class="dv">2</span>)</span></code></pre></div>
+<pre><code>##                              Butyrate    Acetate Propionate   Valerate
+## D_5__Escherichia-Shigella -0.06622889 -0.1390244 -0.2099437 -0.3477649
+## D_5__Ruminiclostridium 5   0.67560976  0.3814259  0.4881801 -0.1973826
+##                           Isovalerate Isobutyrate    Formate    Glucose
+## D_5__Escherichia-Shigella  -0.1908068  -0.1609585 0.07814625 -0.1677298
+## D_5__Ruminiclostridium 5   -0.3050657  -0.4113141 0.35236174  0.6491557
+##                              Glycerol   Threonine    Leucine Methionine
+## D_5__Escherichia-Shigella -0.09118199  0.03771107 -0.1303644 -0.1570356
+## D_5__Ruminiclostridium 5  -0.35028143 -0.31951220  0.3406883  0.4741088
+##                                Valine   Proline     Lactate  Glutamate
+## D_5__Escherichia-Shigella -0.16547842 0.0021577  0.07129456 -0.1260788
+## D_5__Ruminiclostridium 5   0.07054409 0.2359398 -0.06454034  0.3442777
+##                              Ethanol    Tryptophan   Aspartate     Alanine
+## D_5__Escherichia-Shigella 0.03752345 -0.0004032258  0.10956848 -0.07017215
+## D_5__Ruminiclostridium 5  0.15497186 -0.3887096774 -0.05741088  0.17036446
+##                           Phenylalanine Isoleucine   Tyrosine    Glycine
+## D_5__Escherichia-Shigella    -0.1607880 -0.1382739 -0.1452158  0.3093809
+## D_5__Ruminiclostridium 5      0.3652908  0.3810507  0.3384615 -0.2947467
+##                            Nicotinate      Uracil  Urocanate Hypoxanthine
+## D_5__Escherichia-Shigella -0.09438034 -0.07899428 -0.2950200  -0.07701712
+## D_5__Ruminiclostridium 5   0.67088845  0.63533165  0.4642432   0.36644255
+##                               Choline    Methanol  Succinate 2-oxoglutarate
+## D_5__Escherichia-Shigella  0.04822442  0.04504733  0.1389371     -0.4192383
+## D_5__Ruminiclostridium 5  -0.11146034 -0.01538695 -0.2616445      0.5039396
+##                              Fumarate   Pyruvate Methylamine Trimethylamine
+## D_5__Escherichia-Shigella  0.06923726 -0.1629609  -0.3784418     -0.1032735
+## D_5__Ruminiclostridium 5  -0.03987241  0.4943240   0.2805010      0.1143721
+##                             Malonate 1,3-dihydroxyacetone
+## D_5__Escherichia-Shigella -0.1579107           -0.1216788
+## D_5__Ruminiclostridium 5  -0.1021358            0.4057836</code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="multi-omics-unsupervised-learning.html#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(corr<span class="sc">$</span>cor)</span></code></pre></div>
+<p><img src="07-unsupML_files/figure-html/unnamed-chunk-7-1.png" width="1536" /></p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="multi-omics-unsupervised-learning.html#cb54-1" aria-hidden="true" tabindex="-1"></a>mat <span class="ot">&lt;-</span> corr<span class="sc">$</span>cor</span>
+<span id="cb54-2"><a href="multi-omics-unsupervised-learning.html#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Determines the scaling of colors</span></span>
+<span id="cb54-3"><a href="multi-omics-unsupervised-learning.html#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Scale colors</span></span>
+<span id="cb54-4"><a href="multi-omics-unsupervised-learning.html#cb54-4" aria-hidden="true" tabindex="-1"></a>breaks <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(mat))), <span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(mat))), </span>
+<span id="cb54-5"><a href="multi-omics-unsupervised-learning.html#cb54-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">length.out =</span> <span class="fu">ifelse</span>( <span class="fu">max</span>(<span class="fu">abs</span>(mat))<span class="sc">&gt;</span><span class="dv">5</span>, <span class="dv">2</span><span class="sc">*</span><span class="fu">ceiling</span>(<span class="fu">max</span>(<span class="fu">abs</span>(mat))), <span class="dv">10</span> ) )</span>
+<span id="cb54-6"><a href="multi-omics-unsupervised-learning.html#cb54-6" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">&quot;darkblue&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;white&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;darkred&quot;</span>))(<span class="fu">length</span>(breaks)<span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb54-7"><a href="multi-omics-unsupervised-learning.html#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="multi-omics-unsupervised-learning.html#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="co"># For plotting purpose, convert p-values, under 0.05 are marked with &quot;X&quot;</span></span>
+<span id="cb54-9"><a href="multi-omics-unsupervised-learning.html#cb54-9" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb54-10"><a href="multi-omics-unsupervised-learning.html#cb54-10" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(corr<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="st">&quot;X&quot;</span>, <span class="st">&quot;&quot;</span>)</span>
+<span id="cb54-11"><a href="multi-omics-unsupervised-learning.html#cb54-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-12"><a href="multi-omics-unsupervised-learning.html#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(mat,</span>
+<span id="cb54-13"><a href="multi-omics-unsupervised-learning.html#cb54-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> breaks,</span>
+<span id="cb54-14"><a href="multi-omics-unsupervised-learning.html#cb54-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> colors,</span>
+<span id="cb54-15"><a href="multi-omics-unsupervised-learning.html#cb54-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> p_values,</span>
+<span id="cb54-16"><a href="multi-omics-unsupervised-learning.html#cb54-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
+<span id="cb54-17"><a href="multi-omics-unsupervised-learning.html#cb54-17" aria-hidden="true" tabindex="-1"></a><span class="st">              (statistically significant associations (p &lt; 0.05) marked with X)&quot;</span>),</span>
+<span id="cb54-18"><a href="multi-omics-unsupervised-learning.html#cb54-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
+<p><img src="07-unsupML_files/figure-html/unnamed-chunk-8-1.png" width="1344" /></p>
 </div>
 <div id="unsupervised-learning" class="section level2" number="7.2">
 <h2><span class="header-section-number">7.2</span> Unsupervised learning</h2>
@@ -272,8 +386,8 @@ pattern over subset of metabolites. In our case, we try to find clusters where
 taxa and metabolites correlate similarly.</p>
 <p>Check more from OMA which has dedicated chapter on
 <a href="https://microbiome.github.io/OMA/biclustering.html">biclustering</a>.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="multi-omics-unsupervised-learning.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load package</span></span>
-<span id="cb30-2"><a href="multi-omics-unsupervised-learning.html#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biclust)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="multi-omics-unsupervised-learning.html#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load package</span></span>
+<span id="cb55-2"><a href="multi-omics-unsupervised-learning.html#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biclust)</span></code></pre></div>
 <pre><code>## Loading required package: MASS</code></pre>
 <pre><code>## Loading required package: grid</code></pre>
 <pre><code>## 
@@ -283,14 +397,14 @@ taxa and metabolites correlate similarly.</p>
 ##     pattern</code></pre>
 <pre><code>## Loading required package: colorspace</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="multi-omics-unsupervised-learning.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19574</span>)</span>
-<span id="cb37-2"><a href="multi-omics-unsupervised-learning.html#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-3"><a href="multi-omics-unsupervised-learning.html#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Find biclusters</span></span>
-<span id="cb37-4"><a href="multi-omics-unsupervised-learning.html#cb37-4" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">biclust</span>(corr<span class="sc">$</span>cor, <span class="at">method=</span><span class="fu">BCPlaid</span>(), <span class="at">fit.model =</span> y <span class="sc">~</span> m, </span>
-<span id="cb37-5"><a href="multi-omics-unsupervised-learning.html#cb37-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">background =</span> <span class="cn">TRUE</span>, <span class="at">shuffle =</span> <span class="dv">100</span>, <span class="at">back.fit =</span> <span class="dv">0</span>, <span class="at">max.layers =</span> <span class="dv">10</span>, </span>
-<span id="cb37-6"><a href="multi-omics-unsupervised-learning.html#cb37-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">iter.startup =</span> <span class="dv">10</span>, <span class="at">iter.layer =</span> <span class="dv">100</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb37-7"><a href="multi-omics-unsupervised-learning.html#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="multi-omics-unsupervised-learning.html#cb37-8" aria-hidden="true" tabindex="-1"></a>bc</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="multi-omics-unsupervised-learning.html#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">19574</span>)</span>
+<span id="cb62-2"><a href="multi-omics-unsupervised-learning.html#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="multi-omics-unsupervised-learning.html#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Find biclusters</span></span>
+<span id="cb62-4"><a href="multi-omics-unsupervised-learning.html#cb62-4" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">biclust</span>(corr<span class="sc">$</span>cor, <span class="at">method=</span><span class="fu">BCPlaid</span>(), <span class="at">fit.model =</span> y <span class="sc">~</span> m, </span>
+<span id="cb62-5"><a href="multi-omics-unsupervised-learning.html#cb62-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">background =</span> <span class="cn">TRUE</span>, <span class="at">shuffle =</span> <span class="dv">100</span>, <span class="at">back.fit =</span> <span class="dv">0</span>, <span class="at">max.layers =</span> <span class="dv">10</span>, </span>
+<span id="cb62-6"><a href="multi-omics-unsupervised-learning.html#cb62-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">iter.startup =</span> <span class="dv">10</span>, <span class="at">iter.layer =</span> <span class="dv">100</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb62-7"><a href="multi-omics-unsupervised-learning.html#cb62-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-8"><a href="multi-omics-unsupervised-learning.html#cb62-8" aria-hidden="true" tabindex="-1"></a>bc</span></code></pre></div>
 <pre><code>## 
 ## An object of class Biclust 
 ## 
@@ -301,20 +415,20 @@ taxa and metabolites correlate similarly.</p>
 ## 
 ## There was one cluster found with
 ##   6 Rows and  7 columns</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="multi-omics-unsupervised-learning.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get biclusters</span></span>
-<span id="cb39-2"><a href="multi-omics-unsupervised-learning.html#cb39-2" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> bc<span class="sc">@</span>RowxNumber</span>
-<span id="cb39-3"><a href="multi-omics-unsupervised-learning.html#cb39-3" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> bc<span class="sc">@</span>NumberxCol</span>
-<span id="cb39-4"><a href="multi-omics-unsupervised-learning.html#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-5"><a href="multi-omics-unsupervised-learning.html#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert into data.frames</span></span>
-<span id="cb39-6"><a href="multi-omics-unsupervised-learning.html#cb39-6" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(bicluster_rows)</span>
-<span id="cb39-7"><a href="multi-omics-unsupervised-learning.html#cb39-7" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(bicluster_columns))</span>
-<span id="cb39-8"><a href="multi-omics-unsupervised-learning.html#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-9"><a href="multi-omics-unsupervised-learning.html#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust names of clusters</span></span>
-<span id="cb39-10"><a href="multi-omics-unsupervised-learning.html#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_rows))</span>
-<span id="cb39-11"><a href="multi-omics-unsupervised-learning.html#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_columns))</span>
-<span id="cb39-12"><a href="multi-omics-unsupervised-learning.html#cb39-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-13"><a href="multi-omics-unsupervised-learning.html#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
-<span id="cb39-14"><a href="multi-omics-unsupervised-learning.html#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="multi-omics-unsupervised-learning.html#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get biclusters</span></span>
+<span id="cb64-2"><a href="multi-omics-unsupervised-learning.html#cb64-2" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> bc<span class="sc">@</span>RowxNumber</span>
+<span id="cb64-3"><a href="multi-omics-unsupervised-learning.html#cb64-3" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> bc<span class="sc">@</span>NumberxCol</span>
+<span id="cb64-4"><a href="multi-omics-unsupervised-learning.html#cb64-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-5"><a href="multi-omics-unsupervised-learning.html#cb64-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert into data.frames</span></span>
+<span id="cb64-6"><a href="multi-omics-unsupervised-learning.html#cb64-6" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(bicluster_rows)</span>
+<span id="cb64-7"><a href="multi-omics-unsupervised-learning.html#cb64-7" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">t</span>(bicluster_columns))</span>
+<span id="cb64-8"><a href="multi-omics-unsupervised-learning.html#cb64-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-9"><a href="multi-omics-unsupervised-learning.html#cb64-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust names of clusters</span></span>
+<span id="cb64-10"><a href="multi-omics-unsupervised-learning.html#cb64-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_rows))</span>
+<span id="cb64-11"><a href="multi-omics-unsupervised-learning.html#cb64-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_columns))</span>
+<span id="cb64-12"><a href="multi-omics-unsupervised-learning.html#cb64-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-13"><a href="multi-omics-unsupervised-learning.html#cb64-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
+<span id="cb64-14"><a href="multi-omics-unsupervised-learning.html#cb64-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
 <pre><code>##   cluster_1
 ## 1     FALSE
 ## 2      TRUE
@@ -323,60 +437,60 @@ taxa and metabolites correlate similarly.</p>
 ## 5     FALSE
 ## 6     FALSE</code></pre>
 <p>Now, we can add bicluster information into the heatmap that we already made.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="multi-omics-unsupervised-learning.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into numeric</span></span>
-<span id="cb41-2"><a href="multi-omics-unsupervised-learning.html#cb41-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_columns[ , <span class="dv">1</span>])</span>
-<span id="cb41-3"><a href="multi-omics-unsupervised-learning.html#cb41-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
-<span id="cb41-4"><a href="multi-omics-unsupervised-learning.html#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-5"><a href="multi-omics-unsupervised-learning.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust their rownames</span></span>
-<span id="cb41-6"><a href="multi-omics-unsupervised-learning.html#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(corr<span class="sc">$</span>cor)</span>
-<span id="cb41-7"><a href="multi-omics-unsupervised-learning.html#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(corr<span class="sc">$</span>cor)</span>
-<span id="cb41-8"><a href="multi-omics-unsupervised-learning.html#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-9"><a href="multi-omics-unsupervised-learning.html#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation values that are over thresholds</span></span>
-<span id="cb41-10"><a href="multi-omics-unsupervised-learning.html#cb41-10" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb41-11"><a href="multi-omics-unsupervised-learning.html#cb41-11" aria-hidden="true" tabindex="-1"></a>corr_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(corr<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="fu">round</span>(corr<span class="sc">$</span>cor,<span class="dv">1</span>), <span class="st">&quot;&quot;</span>)</span>
-<span id="cb41-12"><a href="multi-omics-unsupervised-learning.html#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-13"><a href="multi-omics-unsupervised-learning.html#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
-<span id="cb41-14"><a href="multi-omics-unsupervised-learning.html#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(corr<span class="sc">$</span>cor,</span>
-<span id="cb41-15"><a href="multi-omics-unsupervised-learning.html#cb41-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col =</span> bicluster_columns, </span>
-<span id="cb41-16"><a href="multi-omics-unsupervised-learning.html#cb41-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_row =</span> bicluster_rows,</span>
-<span id="cb41-17"><a href="multi-omics-unsupervised-learning.html#cb41-17" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb41-18"><a href="multi-omics-unsupervised-learning.html#cb41-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> corr_values,</span>
-<span id="cb41-19"><a href="multi-omics-unsupervised-learning.html#cb41-19" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb41-20"><a href="multi-omics-unsupervised-learning.html#cb41-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
-<span id="cb41-21"><a href="multi-omics-unsupervised-learning.html#cb41-21" aria-hidden="true" tabindex="-1"></a><span class="st">                       (correlation over threshold (p &lt; &quot;</span>, p_threshold,<span class="st">&quot;) marked)&quot;</span>),</span>
-<span id="cb41-22"><a href="multi-omics-unsupervised-learning.html#cb41-22" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb41-23"><a href="multi-omics-unsupervised-learning.html#cb41-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> breaks,</span>
-<span id="cb41-24"><a href="multi-omics-unsupervised-learning.html#cb41-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> colors, </span>
-<span id="cb41-25"><a href="multi-omics-unsupervised-learning.html#cb41-25" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb41-26"><a href="multi-omics-unsupervised-learning.html#cb41-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">fontsize_number =</span> <span class="dv">8</span>, </span>
-<span id="cb41-27"><a href="multi-omics-unsupervised-learning.html#cb41-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="multi-omics-unsupervised-learning.html#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into numeric</span></span>
+<span id="cb66-2"><a href="multi-omics-unsupervised-learning.html#cb66-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_columns[ , <span class="dv">1</span>])</span>
+<span id="cb66-3"><a href="multi-omics-unsupervised-learning.html#cb66-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
+<span id="cb66-4"><a href="multi-omics-unsupervised-learning.html#cb66-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-5"><a href="multi-omics-unsupervised-learning.html#cb66-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust their rownames</span></span>
+<span id="cb66-6"><a href="multi-omics-unsupervised-learning.html#cb66-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(corr<span class="sc">$</span>cor)</span>
+<span id="cb66-7"><a href="multi-omics-unsupervised-learning.html#cb66-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(corr<span class="sc">$</span>cor)</span>
+<span id="cb66-8"><a href="multi-omics-unsupervised-learning.html#cb66-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-9"><a href="multi-omics-unsupervised-learning.html#cb66-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation values that are over thresholds</span></span>
+<span id="cb66-10"><a href="multi-omics-unsupervised-learning.html#cb66-10" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb66-11"><a href="multi-omics-unsupervised-learning.html#cb66-11" aria-hidden="true" tabindex="-1"></a>corr_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(corr<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="fu">round</span>(corr<span class="sc">$</span>cor,<span class="dv">1</span>), <span class="st">&quot;&quot;</span>)</span>
+<span id="cb66-12"><a href="multi-omics-unsupervised-learning.html#cb66-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-13"><a href="multi-omics-unsupervised-learning.html#cb66-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
+<span id="cb66-14"><a href="multi-omics-unsupervised-learning.html#cb66-14" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(corr<span class="sc">$</span>cor,</span>
+<span id="cb66-15"><a href="multi-omics-unsupervised-learning.html#cb66-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col =</span> bicluster_columns, </span>
+<span id="cb66-16"><a href="multi-omics-unsupervised-learning.html#cb66-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_row =</span> bicluster_rows,</span>
+<span id="cb66-17"><a href="multi-omics-unsupervised-learning.html#cb66-17" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb66-18"><a href="multi-omics-unsupervised-learning.html#cb66-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> corr_values,</span>
+<span id="cb66-19"><a href="multi-omics-unsupervised-learning.html#cb66-19" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb66-20"><a href="multi-omics-unsupervised-learning.html#cb66-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
+<span id="cb66-21"><a href="multi-omics-unsupervised-learning.html#cb66-21" aria-hidden="true" tabindex="-1"></a><span class="st">                       (correlation over threshold (p &lt; &quot;</span>, p_threshold,<span class="st">&quot;) marked)&quot;</span>),</span>
+<span id="cb66-22"><a href="multi-omics-unsupervised-learning.html#cb66-22" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb66-23"><a href="multi-omics-unsupervised-learning.html#cb66-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> breaks,</span>
+<span id="cb66-24"><a href="multi-omics-unsupervised-learning.html#cb66-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> colors, </span>
+<span id="cb66-25"><a href="multi-omics-unsupervised-learning.html#cb66-25" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb66-26"><a href="multi-omics-unsupervised-learning.html#cb66-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">fontsize_number =</span> <span class="dv">8</span>, </span>
+<span id="cb66-27"><a href="multi-omics-unsupervised-learning.html#cb66-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
 <p><img src="07-unsupML_files/figure-html/unnamed-chunk-11-1.png" width="1536" /></p>
 </div>
 <div id="multi-omics-factor-analysis" class="section level3" number="7.2.2">
 <h3><span class="header-section-number">7.2.2</span> Multi-Omics Factor Analysis</h3>
 <p>We use the R <a href="https://biofam.github.io/MOFA2/installation.html">MOFA2</a> package
 for the analysis, and install corresponding dependencies:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="multi-omics-unsupervised-learning.html#cb42-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">install_miniconda</span>(<span class="at">force =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="multi-omics-unsupervised-learning.html#cb67-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">install_miniconda</span>(<span class="at">force =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <pre><code>## [1] &quot;/github/home/.local/share/r-miniconda&quot;</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="multi-omics-unsupervised-learning.html#cb44-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_miniconda</span>()</span>
-<span id="cb44-2"><a href="multi-omics-unsupervised-learning.html#cb44-2" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">py_install</span>(<span class="at">packages =</span> <span class="fu">c</span>(<span class="st">&quot;mofapy2&quot;</span>), <span class="at">pip =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="multi-omics-unsupervised-learning.html#cb69-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_miniconda</span>()</span>
+<span id="cb69-2"><a href="multi-omics-unsupervised-learning.html#cb69-2" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">py_install</span>(<span class="at">packages =</span> <span class="fu">c</span>(<span class="st">&quot;mofapy2&quot;</span>), <span class="at">pip =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>The <code>mae</code> object could be used straight to create the MOFA model:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="multi-omics-unsupervised-learning.html#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MOFA2)</span>
-<span id="cb45-2"><a href="multi-omics-unsupervised-learning.html#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-3"><a href="multi-omics-unsupervised-learning.html#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="co"># For simplicity, classify all high-fat diets as high-fat, and all the low-fat </span></span>
-<span id="cb45-4"><a href="multi-omics-unsupervised-learning.html#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co"># diets as low-fat diets</span></span>
-<span id="cb45-5"><a href="multi-omics-unsupervised-learning.html#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(mae)<span class="sc">$</span>Diet <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">colData</span>(mae)<span class="sc">$</span>Diet <span class="sc">==</span> <span class="st">&quot;High-fat&quot;</span> <span class="sc">|</span> </span>
-<span id="cb45-6"><a href="multi-omics-unsupervised-learning.html#cb45-6" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet <span class="sc">==</span> <span class="st">&quot;High-fat + XOS&quot;</span>, </span>
-<span id="cb45-7"><a href="multi-omics-unsupervised-learning.html#cb45-7" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;High-fat&quot;</span>, <span class="st">&quot;Low-fat&quot;</span>)</span>
-<span id="cb45-8"><a href="multi-omics-unsupervised-learning.html#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-9"><a href="multi-omics-unsupervised-learning.html#cb45-9" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">transformCounts</span>(mae[[<span class="dv">1</span>]], <span class="at">method =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
-<span id="cb45-10"><a href="multi-omics-unsupervised-learning.html#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="fu">assay</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;counts&quot;</span>) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb45-11"><a href="multi-omics-unsupervised-learning.html#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="fu">assay</span>(mae[[<span class="dv">2</span>]], <span class="st">&quot;nmr&quot;</span>) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb45-12"><a href="multi-omics-unsupervised-learning.html#cb45-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-13"><a href="multi-omics-unsupervised-learning.html#cb45-13" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">create_mofa_from_MultiAssayExperiment</span>(mae,</span>
-<span id="cb45-14"><a href="multi-omics-unsupervised-learning.html#cb45-14" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">groups =</span> <span class="st">&quot;Diet&quot;</span>, </span>
-<span id="cb45-15"><a href="multi-omics-unsupervised-learning.html#cb45-15" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">extract_metadata =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb45-16"><a href="multi-omics-unsupervised-learning.html#cb45-16" aria-hidden="true" tabindex="-1"></a>model</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="multi-omics-unsupervised-learning.html#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MOFA2)</span>
+<span id="cb70-2"><a href="multi-omics-unsupervised-learning.html#cb70-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-3"><a href="multi-omics-unsupervised-learning.html#cb70-3" aria-hidden="true" tabindex="-1"></a><span class="co"># For simplicity, classify all high-fat diets as high-fat, and all the low-fat </span></span>
+<span id="cb70-4"><a href="multi-omics-unsupervised-learning.html#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="co"># diets as low-fat diets</span></span>
+<span id="cb70-5"><a href="multi-omics-unsupervised-learning.html#cb70-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(mae)<span class="sc">$</span>Diet <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">colData</span>(mae)<span class="sc">$</span>Diet <span class="sc">==</span> <span class="st">&quot;High-fat&quot;</span> <span class="sc">|</span> </span>
+<span id="cb70-6"><a href="multi-omics-unsupervised-learning.html#cb70-6" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">colData</span>(mae)<span class="sc">$</span>Diet <span class="sc">==</span> <span class="st">&quot;High-fat + XOS&quot;</span>, </span>
+<span id="cb70-7"><a href="multi-omics-unsupervised-learning.html#cb70-7" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;High-fat&quot;</span>, <span class="st">&quot;Low-fat&quot;</span>)</span>
+<span id="cb70-8"><a href="multi-omics-unsupervised-learning.html#cb70-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-9"><a href="multi-omics-unsupervised-learning.html#cb70-9" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">transformCounts</span>(mae[[<span class="dv">1</span>]], <span class="at">method =</span> <span class="st">&quot;clr&quot;</span>, <span class="at">pseudocount =</span> <span class="dv">1</span>)</span>
+<span id="cb70-10"><a href="multi-omics-unsupervised-learning.html#cb70-10" aria-hidden="true" tabindex="-1"></a><span class="fu">assay</span>(mae[[<span class="dv">1</span>]], <span class="st">&quot;counts&quot;</span>) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb70-11"><a href="multi-omics-unsupervised-learning.html#cb70-11" aria-hidden="true" tabindex="-1"></a><span class="fu">assay</span>(mae[[<span class="dv">2</span>]], <span class="st">&quot;nmr&quot;</span>) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb70-12"><a href="multi-omics-unsupervised-learning.html#cb70-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-13"><a href="multi-omics-unsupervised-learning.html#cb70-13" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">create_mofa_from_MultiAssayExperiment</span>(mae,</span>
+<span id="cb70-14"><a href="multi-omics-unsupervised-learning.html#cb70-14" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">groups =</span> <span class="st">&quot;Diet&quot;</span>, </span>
+<span id="cb70-15"><a href="multi-omics-unsupervised-learning.html#cb70-15" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">extract_metadata =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb70-16"><a href="multi-omics-unsupervised-learning.html#cb70-16" aria-hidden="true" tabindex="-1"></a>model</span></code></pre></div>
 <pre><code>## Untrained MOFA model with the following characteristics: 
 ##  Number of views: 3 
 ##  Views names: microbiota metabolites biomarkers 
@@ -386,9 +500,9 @@ for the analysis, and install corresponding dependencies:</p>
 ##  Number of samples (per group): 20 20 
 ## </code></pre>
 <p>Model options could be defined as follows:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="multi-omics-unsupervised-learning.html#cb47-1" aria-hidden="true" tabindex="-1"></a>model_opts <span class="ot">&lt;-</span> <span class="fu">get_default_model_options</span>(model)</span>
-<span id="cb47-2"><a href="multi-omics-unsupervised-learning.html#cb47-2" aria-hidden="true" tabindex="-1"></a>model_opts<span class="sc">$</span>num_factors <span class="ot">&lt;-</span> <span class="dv">15</span></span>
-<span id="cb47-3"><a href="multi-omics-unsupervised-learning.html#cb47-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(model_opts)</span></code></pre></div>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="multi-omics-unsupervised-learning.html#cb72-1" aria-hidden="true" tabindex="-1"></a>model_opts <span class="ot">&lt;-</span> <span class="fu">get_default_model_options</span>(model)</span>
+<span id="cb72-2"><a href="multi-omics-unsupervised-learning.html#cb72-2" aria-hidden="true" tabindex="-1"></a>model_opts<span class="sc">$</span>num_factors <span class="ot">&lt;-</span> <span class="dv">15</span></span>
+<span id="cb72-3"><a href="multi-omics-unsupervised-learning.html#cb72-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(model_opts)</span></code></pre></div>
 <pre><code>## $likelihoods
 ##  microbiota metabolites  biomarkers 
 ##  &quot;gaussian&quot;  &quot;gaussian&quot;  &quot;gaussian&quot; 
@@ -408,8 +522,8 @@ for the analysis, and install corresponding dependencies:</p>
 ## $ard_weights
 ## [1] TRUE</code></pre>
 <p>Model’s training options are defined with the following:</p>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="multi-omics-unsupervised-learning.html#cb49-1" aria-hidden="true" tabindex="-1"></a>train_opts <span class="ot">&lt;-</span> <span class="fu">get_default_training_options</span>(model)</span>
-<span id="cb49-2"><a href="multi-omics-unsupervised-learning.html#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(train_opts)</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="multi-omics-unsupervised-learning.html#cb74-1" aria-hidden="true" tabindex="-1"></a>train_opts <span class="ot">&lt;-</span> <span class="fu">get_default_training_options</span>(model)</span>
+<span id="cb74-2"><a href="multi-omics-unsupervised-learning.html#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(train_opts)</span></code></pre></div>
 <pre><code>## $maxiter
 ## [1] 1000
 ## 
@@ -428,34 +542,34 @@ for the analysis, and install corresponding dependencies:</p>
 ## $freqELBO
 ## [1] 5</code></pre>
 <p>Preparing and training the model:</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="multi-omics-unsupervised-learning.html#cb51-1" aria-hidden="true" tabindex="-1"></a>model.prepared <span class="ot">&lt;-</span> <span class="fu">prepare_mofa</span>(</span>
-<span id="cb51-2"><a href="multi-omics-unsupervised-learning.html#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> model,</span>
-<span id="cb51-3"><a href="multi-omics-unsupervised-learning.html#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_options =</span> model_opts</span>
-<span id="cb51-4"><a href="multi-omics-unsupervised-learning.html#cb51-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb51-5"><a href="multi-omics-unsupervised-learning.html#cb51-5" aria-hidden="true" tabindex="-1"></a>model.trained <span class="ot">&lt;-</span> <span class="fu">run_mofa</span>(model.prepared)</span></code></pre></div>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="multi-omics-unsupervised-learning.html#cb76-1" aria-hidden="true" tabindex="-1"></a>model.prepared <span class="ot">&lt;-</span> <span class="fu">prepare_mofa</span>(</span>
+<span id="cb76-2"><a href="multi-omics-unsupervised-learning.html#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">object =</span> model,</span>
+<span id="cb76-3"><a href="multi-omics-unsupervised-learning.html#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_options =</span> model_opts</span>
+<span id="cb76-4"><a href="multi-omics-unsupervised-learning.html#cb76-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb76-5"><a href="multi-omics-unsupervised-learning.html#cb76-5" aria-hidden="true" tabindex="-1"></a>model.trained <span class="ot">&lt;-</span> <span class="fu">run_mofa</span>(model.prepared)</span></code></pre></div>
 <p>Visualizing the variance explained:</p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="multi-omics-unsupervised-learning.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
-<span id="cb52-2"><a href="multi-omics-unsupervised-learning.html#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(</span>
-<span id="cb52-3"><a href="multi-omics-unsupervised-learning.html#cb52-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_variance_explained</span>(model.trained, <span class="at">x=</span><span class="st">&quot;view&quot;</span>, <span class="at">y=</span><span class="st">&quot;factor&quot;</span>, <span class="at">plot_total =</span> T),</span>
-<span id="cb52-4"><a href="multi-omics-unsupervised-learning.html#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrow =</span> <span class="dv">2</span></span>
-<span id="cb52-5"><a href="multi-omics-unsupervised-learning.html#cb52-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">&quot;Varience Explained per factor and assay&quot;</span>,</span>
-<span id="cb52-6"><a href="multi-omics-unsupervised-learning.html#cb52-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">theme =</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb77-1"><a href="multi-omics-unsupervised-learning.html#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb77-2"><a href="multi-omics-unsupervised-learning.html#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wrap_plots</span>(</span>
+<span id="cb77-3"><a href="multi-omics-unsupervised-learning.html#cb77-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_variance_explained</span>(model.trained, <span class="at">x=</span><span class="st">&quot;view&quot;</span>, <span class="at">y=</span><span class="st">&quot;factor&quot;</span>, <span class="at">plot_total =</span> T),</span>
+<span id="cb77-4"><a href="multi-omics-unsupervised-learning.html#cb77-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">nrow =</span> <span class="dv">2</span></span>
+<span id="cb77-5"><a href="multi-omics-unsupervised-learning.html#cb77-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">plot_annotation</span>(<span class="at">title =</span> <span class="st">&quot;Varience Explained per factor and assay&quot;</span>,</span>
+<span id="cb77-6"><a href="multi-omics-unsupervised-learning.html#cb77-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">theme =</span> <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)))</span></code></pre></div>
 <p><img src="07-unsupML_files/figure-html/unnamed-chunk-17-1.png" width="960" /></p>
 <p>The top weights for metabolites using the three first factors:</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="multi-omics-unsupervised-learning.html#cb53-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">plot_top_weights</span>(model.trained,</span>
-<span id="cb53-2"><a href="multi-omics-unsupervised-learning.html#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">view =</span> <span class="st">&quot;metabolites&quot;</span>,</span>
-<span id="cb53-3"><a href="multi-omics-unsupervised-learning.html#cb53-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">factors =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
-<span id="cb53-4"><a href="multi-omics-unsupervised-learning.html#cb53-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfeatures =</span> <span class="dv">10</span></span>
-<span id="cb53-5"><a href="multi-omics-unsupervised-learning.html#cb53-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Top weights of the metabolomic assay&quot;</span>)</span>
-<span id="cb53-6"><a href="multi-omics-unsupervised-learning.html#cb53-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-7"><a href="multi-omics-unsupervised-learning.html#cb53-7" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">plot_top_weights</span>(model.trained,</span>
-<span id="cb53-8"><a href="multi-omics-unsupervised-learning.html#cb53-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">view =</span> <span class="st">&quot;microbiota&quot;</span>,</span>
-<span id="cb53-9"><a href="multi-omics-unsupervised-learning.html#cb53-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">factors =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
-<span id="cb53-10"><a href="multi-omics-unsupervised-learning.html#cb53-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfeatures =</span> <span class="dv">10</span></span>
-<span id="cb53-11"><a href="multi-omics-unsupervised-learning.html#cb53-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Top weights of the microbiota assay&quot;</span>)<span class="sc">+</span></span>
-<span id="cb53-12"><a href="multi-omics-unsupervised-learning.html#cb53-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>))</span>
-<span id="cb53-13"><a href="multi-omics-unsupervised-learning.html#cb53-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb53-14"><a href="multi-omics-unsupervised-learning.html#cb53-14" aria-hidden="true" tabindex="-1"></a>p1<span class="sc">/</span>p2</span></code></pre></div>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="multi-omics-unsupervised-learning.html#cb78-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">plot_top_weights</span>(model.trained,</span>
+<span id="cb78-2"><a href="multi-omics-unsupervised-learning.html#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">view =</span> <span class="st">&quot;metabolites&quot;</span>,</span>
+<span id="cb78-3"><a href="multi-omics-unsupervised-learning.html#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">factors =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb78-4"><a href="multi-omics-unsupervised-learning.html#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfeatures =</span> <span class="dv">10</span></span>
+<span id="cb78-5"><a href="multi-omics-unsupervised-learning.html#cb78-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Top weights of the metabolomic assay&quot;</span>)</span>
+<span id="cb78-6"><a href="multi-omics-unsupervised-learning.html#cb78-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-7"><a href="multi-omics-unsupervised-learning.html#cb78-7" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">plot_top_weights</span>(model.trained,</span>
+<span id="cb78-8"><a href="multi-omics-unsupervised-learning.html#cb78-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">view =</span> <span class="st">&quot;microbiota&quot;</span>,</span>
+<span id="cb78-9"><a href="multi-omics-unsupervised-learning.html#cb78-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">factors =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb78-10"><a href="multi-omics-unsupervised-learning.html#cb78-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">nfeatures =</span> <span class="dv">10</span></span>
+<span id="cb78-11"><a href="multi-omics-unsupervised-learning.html#cb78-11" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Top weights of the microbiota assay&quot;</span>)<span class="sc">+</span></span>
+<span id="cb78-12"><a href="multi-omics-unsupervised-learning.html#cb78-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">8</span>))</span>
+<span id="cb78-13"><a href="multi-omics-unsupervised-learning.html#cb78-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb78-14"><a href="multi-omics-unsupervised-learning.html#cb78-14" aria-hidden="true" tabindex="-1"></a>p1<span class="sc">/</span>p2</span></code></pre></div>
 <p><img src="07-unsupML_files/figure-html/unnamed-chunk-18-1.png" width="960" /></p>
 <p>More tutorials and examples of using the package are found at: <a href="https://biofam.github.io/MOFA2/tutorials.html">link</a></p>
 

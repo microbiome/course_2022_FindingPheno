@@ -8,328 +8,208 @@
 # Loading data and pre-processing
 ################################################################################
 
+
+################################################################################
+# Chapter 7 Multi-Omics 6 Unsupervised learning
+################################################################################
+
+
+## ----echo=FALSE, message=FALSE, warning=FALSE-----------------------------------------------------------------------------------
 library(mia)
 library(miaViz)
-library(dplyr)
 library(stringr)
+library(pheatmap)
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
 mae <- microbiomeDataSets::HintikkaXOData()
-# Drop off those bacteria that do not include information in Phylum or lower levels
-mae[[1]] <- mae[[1]][!is.na(rowData(mae[[1]])$Phylum), ]
-# Clean taxonomy data, so that names do not include addtional characters
-rowData(mae[[1]]) <- DataFrame(apply(rowData(mae[[1]]), 2, 
-                                     str_remove, pattern = "._[0-9]__"))
+mae
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
+mae[[1]] <- as(mae[[1]], "TreeSummarizedExperiment")
+altExp(mae[[1]], "Genus") <- subsetByPrevalentTaxa(mae[[1]], rank = "Genus", prevalence = 0.2, detection = 0.001)
+altExp(mae[[1]], "Genus")
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
+altExp(mae[[1]], "Genus") <- transformSamples(altExp(mae[[1]], "Genus"), method = "clr", pseudocount = 1)
+mae[[2]] <- transformSamples(mae[[2]], abund_values = "nmr", method = "log10")
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
+altExp(mae[[1]], "Genus") <-altExp(mae[[1]], "Genus")[-grep("uncultured|Ambiguous_taxa", 
+                                                            names(altExp(mae[[1]], "Genus"))),]
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
+corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Genus"), 
+                                      mae[[2]], 
+                                      "clr", 
+                                      "log10", 
+                                      show_warnings = FALSE,
+                                      test_significance = TRUE,
+                                      mode = "matrix")
+head(corr$cor,2)
+
+
+## ----fig.height=10, fig.width=16, message=FALSE, warning=FALSE------------------------------------------------------------------
+pheatmap(corr$cor)
+
+
+## ----fig.height=10, fig.width=14, message=FALSE, warning=FALSE------------------------------------------------------------------
+mat <- corr$cor
+# Determines the scaling of colors
+# Scale colors
+breaks <- seq(-ceiling(max(abs(mat))), ceiling(max(abs(mat))), 
+              length.out = ifelse( max(abs(mat))>5, 2*ceiling(max(abs(mat))), 10 ) )
+colors <- colorRampPalette(c("darkblue", "blue", "white", "red", "darkred"))(length(breaks)-1)
+
+# For plotting purpose, convert p-values, under 0.05 are marked with "X"
+p_threshold <- 0.01
+p_values <- ifelse(corr$p_adj<p_threshold, "X", "")
+
+pheatmap(mat,
+         breaks = breaks,
+         color = colors,
+         display_numbers = p_values,
+         main = paste0("Correlations between bacteria and metabolites 
+              (statistically significant associations (p < 0.05) marked with X)"),
+         number_color = "yellow")
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
+# Load package
+library(biclust)
+
+set.seed(19574)
+
+# Find biclusters
+bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m, 
+              background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+              iter.startup = 10, iter.layer = 100, verbose = FALSE)
+
+bc
+
+
+## -------------------------------------------------------------------------------------------------------------------------------
+# Get biclusters
+bicluster_rows <- bc@RowxNumber
+bicluster_columns <- bc@NumberxCol
+
+# Convert into data.frames
+bicluster_rows <- as.data.frame(bicluster_rows)
+bicluster_columns <- as.data.frame(t(bicluster_columns))
+
+# Adjust names of clusters
+colnames(bicluster_rows) <- paste0("cluster_", 1:ncol(bicluster_rows))
+colnames(bicluster_columns) <- paste0("cluster_", 1:ncol(bicluster_columns))
+
+# Print biclusters for rows
+head(bicluster_rows)
+
+
+## ---- message=FALSE, warning=FALSE, fig.height=10, fig.width=16-----------------------------------------------------------------
+# Convert boolean values into numeric
+bicluster_columns[ , 1] <- as.numeric(bicluster_columns[ , 1])
+bicluster_rows[ , 1] <- as.numeric(bicluster_rows[ , 1])
+
+# Adjust their rownames
+rownames(bicluster_columns) <- colnames(corr$cor)
+rownames(bicluster_rows) <- rownames(corr$cor)
+
+# Get correlation values that are over thresholds
+p_threshold <- 0.01
+corr_values <- ifelse(corr$p_adj<p_threshold, round(corr$cor,1), "")
+
+# Create a heatmap
+pheatmap(corr$cor,
+         annotation_col = bicluster_columns, 
+         annotation_row = bicluster_rows,
+         
+         display_numbers = corr_values,
+         
+         main = paste0("Correlations between bacteria and metabolites 
+                       (correlation over threshold (p < ", p_threshold,") marked)"),
+         
+         breaks = breaks,
+         color = colors, 
+         
+         fontsize_number = 8, 
+         number_color = "yellow")
+
+
+## ---- message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------
+reticulate::install_miniconda(force = TRUE)
+reticulate::use_miniconda()
+reticulate::py_install(packages = c("mofapy2"), pip = TRUE)
+
+
+## ---- message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------
+library(MOFA2)
+
 # For simplicity, classify all high-fat diets as high-fat, and all the low-fat 
 # diets as low-fat diets
 colData(mae)$Diet <- ifelse(colData(mae)$Diet == "High-fat" | 
                                 colData(mae)$Diet == "High-fat + XOS", 
                             "High-fat", "Low-fat")
-# Calculates relative abundances, and stores the table to assays
-mae[[1]] <- transformCounts(mae[[1]], method = "relabundance")
-# agglomerate the microbiota experiment to Phylum
-se_phylum <- agglomerateByRank(mae[[1]], rank = "Phylum")
+
+mae[[1]] <- transformCounts(mae[[1]], method = "clr", pseudocount = 1)
+assay(mae[[1]], "counts") <- NULL
+assay(mae[[2]], "nmr") <- NULL
+
+model <- create_mofa_from_MultiAssayExperiment(mae,
+                                               groups = "Diet", 
+                                               extract_metadata = TRUE)
+model
 
 
-################################################################################
-# Chapter 6 Beta diversity
-################################################################################
+## ---- message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------
+model_opts <- get_default_model_options(model)
+model_opts$num_factors <- 15
+head(model_opts)
 
-### 6.1.1 PCoA for ASV-level data with Bray-Curtis
-# Pick the relative abundance table
-rel_abund_assay <- assays(mae[[1]])$relabundance
 
-# Calculates Bray-Curtis distances between samples. Because taxa is in
-# columns, it is used to compare different samples. We transpose the
-# assay to get taxa to columns
-bray_curtis_dist <- vegan::vegdist(t(rel_abund_assay), method = "bray")
+## ---- message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------
+train_opts <- get_default_training_options(model)
+head(train_opts)
 
-# PCoA
-bray_curtis_pcoa <- ecodist::pco(bray_curtis_dist)
 
-# All components could be found here: 
-# bray_curtis_pcoa$vectors
-# But we only need the first two to demonstrate what we can do:
-bray_curtis_pcoa_df <- data.frame(pcoa1 = bray_curtis_pcoa$vectors[,1], 
-                                  pcoa2 = bray_curtis_pcoa$vectors[,2])
+## ---- message=FALSE, warning=FALSE----------------------------------------------------------------------------------------------
+model.prepared <- prepare_mofa(
+    object = model,
+    model_options = model_opts
+)
+model.trained <- run_mofa(model.prepared)
 
-# Create a plot
-bray_curtis_plot <- ggplot(data = bray_curtis_pcoa_df, aes(x=pcoa1, y=pcoa2)) +
-    geom_point() +
-    labs(x = "PC1",
-         y = "PC2", 
-         title = "Bray-Curtis PCoA") +
-    theme_bw(12) # makes titles smaller
 
-bray_curtis_plot
+## ---- message=FALSE, warning=FALSE, fig.height=8, fig.width=10------------------------------------------------------------------
+library(patchwork)
+wrap_plots(
+    plot_variance_explained(model.trained, x="view", y="factor", plot_total = T),
+    nrow = 2
+) + plot_annotation(title = "Varience Explained per factor and assay",
+                    theme = theme(plot.title = element_text(hjust = 0.5)))
 
-## 6.2 Highlighting external variables
 
-# Add diet information to data.frame
-bray_curtis_pcoa_df$Diet <- colData(mae)$Diet
 
-# Creates a plot
-plot <- ggplot(data = bray_curtis_pcoa_df, aes_string(x = "pcoa1", y = "pcoa2", color = "Diet")) +
-    geom_point() +
-    labs(x = "PC1",
-         y = "PC2", 
-         title = "Bray-Curtis PCoA") +
-    theme_bw(12) 
+## ---- warning=FALSE, message=FALSE, fig.height=8, fig.width=10------------------------------------------------------------------
+p1 <- plot_top_weights(model.trained,
+                       view = "metabolites",
+                       factors = 1:3,
+                       nfeatures = 10
+) + labs(title = "Top weights of the metabolomic assay")
 
-plot
+p2 <- plot_top_weights(model.trained,
+                       view = "microbiota",
+                       factors = 1:3,
+                       nfeatures = 10
+) + labs(title = "Top weights of the microbiota assay")+
+    theme(text = element_text(size = 8))
 
-## 6.3 Estimating associations with an external variable
+p1/p2
 
-# First we get the relative abundance table
-rel_abund_assay <- assays(mae[[1]])$relabundance
 
-# again transpose it to get taxa to columns
-rel_abund_assay <- t(rel_abund_assay)
-
-# then we can perform the method
-permanova_diet <- vegan::adonis(rel_abund_assay ~ Diet,
-                                data = colData(mae),
-                                permutations = 99)
-
-# we can obtain a the p value for our predictor:
-print(paste0("The test result p-value: ", 
-             as.data.frame(permanova_diet$aov.tab)["Diet", "Pr(>F)"]))
-
-# Gets the coefficients
-coef <- coefficients(permanova_diet)["Diet1",]
-
-# Gets the highest coefficients
-top.coef <- sort(head(coef[rev(order(abs(coef)))],20))
-
-# Plots the coefficients
-top_taxa_coeffient_plot <- ggplot(data.frame(x = top.coef,
-                                             y = factor(names(top.coef),
-                                                        unique(names(top.coef)))),
-                                  aes(x = x, y = y)) +
-    geom_bar(stat="identity") +
-    labs(x="", y="", title="Top Taxa") +
-    theme_bw()
-
-top_taxa_coeffient_plot
-
-# Gets corresponding Genus level names and stores them to top.coef
-names <- rowData(mae[[1]])[names(top.coef), ][,"Genus"]
-
-# Adds new labels to the plot
-top_taxa_coeffient_plot <- top_taxa_coeffient_plot +
-    scale_y_discrete(labels = names) # Adds new labels
-top_taxa_coeffient_plot
-
-bray_curtis_pcoa_df$Diet <- colData(mae)$Diet
-p_values <- list()
-for(pc in c("pcoa1", "pcoa2")){
-    # Creates a formula from objects
-    formula <- as.formula(paste0(pc, " ~ ", "Diet"))
-    # Does the permanova analysis
-    p_values[[pc]] <- vegan::adonis(formula, data = bray_curtis_pcoa_df,
-                                    permutations = 9999, method = "euclidean"
-    )$aov.tab["Diet", "Pr(>F)"]
-}
-
-# Creates a plot
-plot <- ggplot(data = bray_curtis_pcoa_df, aes_string(x = "pcoa1", y = "pcoa2", color = "Diet")) +
-    geom_point(size = 3) +
-    labs(title = paste0("PCoA beta diversity ordination for microbiome samples"),
-         x = paste0("PC1 (p = ", p_values[["pcoa1"]], ")"), y = paste0("PC2 (p = ", p_values[["pcoa2"]], ")")) +
-    theme_bw() 
-
-plot
-
-################################################################################
-# Chapter 7 Unsupervised learning
-################################################################################
-
-## 7.1 Biclustering
-
-library(ggplot2)
-# Threshold: metabolites whose (cv > +threshold or cv < -threshold), will be included
-cv_threshold <- 0.5
-metabolite_trans <- "nmr"
-
-# Get the data
-metabolite_tse <- mae[[2]]
-
-# Calculate coefficient of variation of individual metabolites
-df <- data.frame(cv = apply(assay(metabolite_tse, metabolite_trans), 1, 
-                            function(x){sd(x)/mean(x)}))
-
-# Plot them as a histogram, and show a line that is used as a threshold
-plot <- ggplot(df, aes(x = cv)) +
-    geom_histogram(bins = 50, color="darkred", fill="lightblue") +
-    labs(x = "CV", y = "metabolite frequency", 
-         title = "Distribution of coefficient of 
-       variation of log10 concentration of metabolites") +
-    geom_vline(xintercept = cv_threshold, color = "red") +
-    geom_text(aes(cv_threshold, 6, label = 
-                      paste0("CV threshold (", cv_threshold, ")"), vjust = 2, angle=90)) +
-    geom_vline(xintercept = -cv_threshold, color = "red") +
-    geom_text(aes(-cv_threshold, 6, label = 
-                      paste0("CV threshold (", -cv_threshold, ")"), vjust = -1, angle=90))
-
-plot
-
-# Get those metabolites that are over threshold
-metabolites_over_th <- rownames(df[df$cv > cv_threshold | 
-                                       df$cv < -cv_threshold, , drop = FALSE])
-# Ignore those metabolites that do not have name / are NA
-metabolites_over_th <- metabolites_over_th[!str_detect(metabolites_over_th, "NA")]
-
-rank <- "Genus"
-prevalence <- 0.2
-detection <- 0.001
-taxa_trans <-  "clr"
-
-# Get bacterial data
-taxa_tse <- mae[[1]]
-# Agglomerate at Genus level
-taxa_tse <- agglomerateByRank(taxa_tse, rank = rank)
-# Do CLR transformation
-taxa_tse <- transformSamples(taxa_tse, method = "clr", pseudocount = 1)
-
-# Subset metabolite data
-metabolite_tse <- metabolite_tse[metabolites_over_th, ]
-
-# Subset bacterial data by its prevalence. Bacteria whose prevalences are over 
-# threshold are included
-taxa_tse <- subsetByPrevalentTaxa(taxa_tse, 
-                                  prevalence = prevalence, 
-                                  detection = detection)
-
-# Remove uncultured and ambiguous(as it's hard to interpret their results)
-taxa_tse <- taxa_tse[-grep("uncultured|Ambiguous_taxa", names(taxa_tse)),]
-
-library(pheatmap)
-
-# Cross correlate data sets
-correlations <- testExperimentCrossCorrelation(taxa_tse, metabolite_tse, 
-                                               abund_values1 = "clr", abund_values2 = "nmr",
-                                               method = "spearman", mode = "matrix")
-
-# For plotting purpose, convert p-values, under 0.05 are marked with "X"
-p_threshold <- 0.01
-p_values <- ifelse(correlations$p_adj<p_threshold, "X", "")
-
-# Scale colors
-breaks <- seq(-ceiling(max(abs(correlations$cor))), ceiling(max(abs(correlations$cor))), 
-              length.out = ifelse( max(abs(correlations$cor))>5, 
-                                   2*ceiling(max(abs(correlations$cor))), 10 ) )
-colors <- colorRampPalette(c("darkblue", "blue", "white", 
-                             "red", "darkred"))(length(breaks)-1)
-
-# Create a heatmap
-pheatmap(correlations$cor, display_numbers = p_values,
-         main = paste0("Correlations between bacteria and metabolites 
-              (statistically significant associations (p < 0.05) marked with X)"),
-         fontsize = 10,
-         breaks = breaks,
-         color = colors, 
-         fontsize_number = 10)
-
-# Load package
-library(biclust)
-
-# Find biclusters
-bc <- biclust(correlations$cor, method=BCPlaid(), fit.model = y ~ m,
-              background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10,
-              iter.startup = 10, iter.layer = 100, verbose = FALSE)
-
-bc
-
-# Functions for obtaining biclust information
-
-# Get clusters for rows and columns
-.get_biclusters_from_biclust <- function(bc, assay){
-    # Get cluster information for columns and rows
-    bc_columns <- t(bc@NumberxCol)
-    bc_columns <- data.frame(bc_columns)
-    bc_rows <- bc@RowxNumber
-    bc_rows <- data.frame(bc_rows)
-    
-    # Get data into right format
-    bc_columns <- .manipulate_bc_data(bc_columns, assay, "col")
-    bc_rows <- .manipulate_bc_data(bc_rows, assay, "row")
-    
-    return(list(bc_columns = bc_columns, bc_rows = bc_rows))
-}
-
-# Input clusters, and how many observations there should be, i.e., the number of samples or features
-.manipulate_bc_data <- function(bc_clusters, assay, row_col){
-    # Get right dimension
-    dim <- ifelse(row_col == "col", ncol(assay), nrow(assay))
-    # Get column/row names
-    if( row_col == "col" ){
-        names <- colnames(assay)
-    } else{
-        names <- rownames(assay)
-    }
-    
-    # If no clusters were found, create one. Otherwise create additional cluster which
-    # contain those samples that are not included in clusters that were found.
-    if( nrow(bc_clusters) != dim ){
-        bc_clusters <- data.frame(cluster = rep(TRUE, dim))
-    } else {
-        # Create additional cluster that includes those samples/features that
-        # are not included in other clusters.
-        vec <- ifelse(rowSums(bc_clusters) > 0, FALSE, TRUE)
-        # If additional cluster contains samples, then add it
-        if ( any(vec) ){
-            bc_clusters <- cbind(bc_clusters, vec)
-        }
-    }
-    # Adjust row and column names
-    rownames(bc_clusters) <- names
-    colnames(bc_clusters) <- paste0("cluster_", 1:ncol(bc_clusters))
-    return(bc_clusters)
-}
-
-# Get biclusters
-bcs <- .get_biclusters_from_biclust(bc, correlations$cor)
-
-bicluster_rows <- bcs$bc_rows
-bicluster_columns <- bcs$bc_columns
-
-# Print biclusters for rows
-head(bicluster_rows)
-
-# Convert boolean values into factors
-bicluster_columns <- data.frame(apply(bicluster_columns, 2, as.factor))
-bicluster_rows <- data.frame(apply(bicluster_rows, 2, as.factor))
-
-# Adjust colors for all clusters
-if( ncol(bicluster_rows) > ncol(bicluster_columns) ){
-    cluster_names <- colnames(bicluster_rows)
-} else {
-    cluster_names <- colnames(bicluster_columns)
-}
-annotation_colors <- list()
-for(name in cluster_names){
-    annotation_colors[[name]] <- c("TRUE" = "red", "FALSE" = "white")
-}
-
-# Get correlation values that are over thresholds
-p_threshold <- 0.01
-corr_threshold <- 0.6
-corr_values <- ifelse(correlations$p_adj<p_threshold & 
-                          abs(correlations$cor)>corr_threshold , round(correlations$cor,1), "")
-
-# Create a heatmap
-pheatmap(correlations$cor,
-         annotation_col = bicluster_columns, 
-         annotation_row = bicluster_rows,
-         annotation_colors = annotation_colors,
-         display_numbers = corr_values,
-         main = paste0("Correlations between bacteria and metabolites 
-              (correlation over threshold (corr > ", corr_threshold,
-                       ", p < ", p_threshold,") marked)"),
-         fontsize = 10,
-         breaks = breaks,
-         color = colors, 
-         fontsize_number = 6, 
-         number_color = "yellow",
-         annotation_legend = FALSE)
 
 ################################################################################
 # Chapter 8 Supervised learning
@@ -459,7 +339,7 @@ wrap_plots(pd_plots)
 
 ## 8.3 Classification with random forests
 
-butyrate_cutoff <- median(butyrate_df_test$Butyrate)
+butyrate_cutoff <- median(butyrate_df_train$Butyrate)
 butyrate_df_test_2 <- butyrate_df_test
 butyrate_df_train_2 <- butyrate_df_train
 butyrate_df_test_2$Butyrate <- as.factor(ifelse(butyrate_df_test_2$Butyrate >= butyrate_cutoff, "High", "Low"))
