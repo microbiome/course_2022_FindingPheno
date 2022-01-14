@@ -102,7 +102,9 @@ firmicutes_abund_plot <- ggplot(firmicutes_abund_df, aes(x = abund)) +
 firmicutes_abund_plot
 
 
-# Beta diversity
+################################################################################
+# Chapter 8 Beta diversity
+################################################################################
 
 # Beta diversity is another name for sample dissimilarity. It quantifies
 # differences in the overall taxonomic composition between two samples.

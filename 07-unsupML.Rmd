@@ -28,32 +28,34 @@ specific taxon equals to higher levels of a biomolecule.
 5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_, _test_significance = TRUE_, and _mode = "matrix"_ as an arguments)
 ([getExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
 
-6. Create a heatmap from cross-correlation matrix [pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap)
+6. Create a heatmap from cross-correlation matrix ([pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap))
 
 
-```{r include=FALSE}
+**Example solution for the task**
+
+```{r}
 mae <- microbiomeDataSets::HintikkaXOData()
 mae
 ```
 
-```{r include=FALSE}
+```{r }
 mae[[1]] <- as(mae[[1]], "TreeSummarizedExperiment")
 altExp(mae[[1]], "Genus") <- subsetByPrevalentTaxa(mae[[1]], rank = "Genus", prevalence = 0.2, detection = 0.001)
 altExp(mae[[1]], "Genus")
 ```
 
-```{r include=FALSE}
+```{r }
 altExp(mae[[1]], "Genus") <- transformSamples(altExp(mae[[1]], "Genus"), method = "clr", pseudocount = 1)
 mae[[2]] <- transformSamples(mae[[2]], abund_values = "nmr", method = "log10")
 ```
 
-```{r include=FALSE}
+```{r }
 altExp(mae[[1]], "Genus") <-altExp(mae[[1]], "Genus")[-grep("uncultured|Ambiguous_taxa", 
                                                               names(altExp(mae[[1]], "Genus"))),]
 ```
 
 
-```{r include=FALSE}
+```{r }
 corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Genus"), 
                                       mae[[2]], 
                                       "clr", 
@@ -64,11 +66,11 @@ corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Genus"),
 head(corr$cor,2)
 ```
 
-```{r fig.height=10, fig.width=16, message=FALSE, warning=FALSE, include=FALSE}
+```{r fig.height=10, fig.width=16, message=FALSE, warning=FALSE, }
 pheatmap(corr$cor)
 ```
 
-```{r fig.height=10, fig.width=14, message=FALSE, warning=FALSE, include=FALSE}
+```{r fig.height=10, fig.width=14, message=FALSE, warning=FALSE, }
 mat <- corr$cor
 # Determines the scaling of colors
 # Scale colors

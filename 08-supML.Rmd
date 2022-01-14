@@ -233,7 +233,7 @@ justified than just the mean or median. These are usually informed by previous s
 and results.
 
 ```{r, warning=FALSE, message=FALSE}
-butyrate_cutoff <- median(butyrate_df_test$Butyrate)
+butyrate_cutoff <- median(butyrate_df_train$Butyrate)
 butyrate_df_test_2 <- butyrate_df_test
 butyrate_df_train_2 <- butyrate_df_train
 butyrate_df_test_2$Butyrate <- as.factor(ifelse(butyrate_df_test_2$Butyrate >= butyrate_cutoff, "High", "Low"))
