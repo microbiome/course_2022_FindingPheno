@@ -24,7 +24,7 @@
 <meta name="author" content="University of Turku" />
 
 
-<meta name="date" content="2022-01-12" />
+<meta name="date" content="2022-01-14" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -203,9 +203,13 @@ div.csl-indent {
 <li class="chapter" data-level="6.3" data-path="beta-diversity.html"><a href="beta-diversity.html#estimating-associations-with-an-external-variable"><i class="fa fa-check"></i><b>6.3</b> Estimating associations with an external variable</a></li>
 <li class="chapter" data-level="6.4" data-path="beta-diversity.html"><a href="beta-diversity.html#community-typing"><i class="fa fa-check"></i><b>6.4</b> Community typing</a></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="unsupervised-learning.html"><a href="unsupervised-learning.html"><i class="fa fa-check"></i><b>7</b> Unsupervised learning</a>
+<li class="chapter" data-level="7" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html"><i class="fa fa-check"></i><b>7</b> Cross-correlation &amp; Unsupervised learning</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="unsupervised-learning.html"><a href="unsupervised-learning.html#biclustering"><i class="fa fa-check"></i><b>7.1</b> Biclustering</a></li>
+<li class="chapter" data-level="7.1" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#cross-correlation"><i class="fa fa-check"></i><b>7.1</b> Cross-correlation</a></li>
+<li class="chapter" data-level="7.2" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#unsupervised-learning"><i class="fa fa-check"></i><b>7.2</b> Unsupervised learning</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#biclustering"><i class="fa fa-check"></i><b>7.2.1</b> Biclustering</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="supervised-learning.html"><a href="supervised-learning.html"><i class="fa fa-check"></i><b>8</b> Supervised learning</a>
 <ul>
@@ -259,7 +263,7 @@ slot of TreeSE or <a href="https://microbiome.github.io/OMA/containers.html#mult
 <span id="cb4-6"><a href="data.html#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop off those bacteria that do not include information in Phylum or lower levels</span></span>
 <span id="cb4-7"><a href="data.html#cb4-7" aria-hidden="true" tabindex="-1"></a>mae[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> mae[[<span class="dv">1</span>]][<span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">rowData</span>(mae[[<span class="dv">1</span>]])<span class="sc">$</span>Phylum), ]</span>
 <span id="cb4-8"><a href="data.html#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="data.html#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean taxonomy data, so that names do not include addtional characters</span></span>
+<span id="cb4-9"><a href="data.html#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean taxonomy data, so that names do not include additional characters</span></span>
 <span id="cb4-10"><a href="data.html#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">rowData</span>(mae[[<span class="dv">1</span>]]) <span class="ot">&lt;-</span> <span class="fu">DataFrame</span>(<span class="fu">apply</span>(<span class="fu">rowData</span>(mae[[<span class="dv">1</span>]]), <span class="dv">2</span>, </span>
 <span id="cb4-11"><a href="data.html#cb4-11" aria-hidden="true" tabindex="-1"></a>                                     str_remove, <span class="at">pattern =</span> <span class="st">&quot;._[0-9]__&quot;</span>))</span>
 <span id="cb4-12"><a href="data.html#cb4-12" aria-hidden="true" tabindex="-1"></a></span>

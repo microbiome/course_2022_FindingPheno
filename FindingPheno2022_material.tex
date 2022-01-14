@@ -6,7 +6,7 @@
   oneside]{book}
 \title{Introduction to multi-omics data analysis}
 \author{University of Turku}
-\date{2022-01-12}
+\date{2022-01-14}
 
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
@@ -450,7 +450,7 @@ This example data can be loaded from \href{https://bioconductor.org/packages/rel
 \CommentTok{\# Drop off those bacteria that do not include information in Phylum or lower levels}
 \NormalTok{mae[[}\DecValTok{1}\NormalTok{]] }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{1}\NormalTok{]][}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(}\FunctionTok{rowData}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]])}\SpecialCharTok{$}\NormalTok{Phylum), ]}
 
-\CommentTok{\# Clean taxonomy data, so that names do not include addtional characters}
+\CommentTok{\# Clean taxonomy data, so that names do not include additional characters}
 \FunctionTok{rowData}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]]) }\OtherTok{\textless{}{-}} \FunctionTok{DataFrame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(}\FunctionTok{rowData}\NormalTok{(mae[[}\DecValTok{1}\NormalTok{]]), }\DecValTok{2}\NormalTok{, }
 \NormalTok{                                     str\_remove, }\AttributeTok{pattern =} \StringTok{".\_[0{-}9]\_\_"}\NormalTok{))}
 
@@ -1040,8 +1040,27 @@ book}.
 A dedicated section presenting examples on community typing is in the
 \href{https://microbiome.github.io/OMA/microbiome-community.html\#community-typing}{online book}.
 
+\hypertarget{cross-correlation-unsupervised-learning}{%
+\chapter{Cross-correlation \& Unsupervised learning}\label{cross-correlation-unsupervised-learning}}
+
+\hypertarget{cross-correlation}{%
+\section{Cross-correlation}\label{cross-correlation}}
+
+With cross-correlation analysis, we can analyze how strongly and how differently variables
+are associated between each other. For instance, we can analyze if higher presence of a
+specific taxon equals to higher levels of a biomolecule.
+
+\textbf{TASK}
+1. Run installation script to load packages into the session
+2. Import HintikkaXO data
+3. Subset \emph{microbiota} data (rank = ``Phylum'', prevalence = 0.2, detection = 0.001) (\href{https://microbiome.github.io/OMA/differential-abundance.html\#prevalence-filtering}{subsetByPrevalentTaxa})
+4. Apply clr-transform to \emph{microbiota} data and log10-tranform to \emph{metabolites} data (\href{https://microbiome.github.io/OMA/taxonomic-information.html\#data-transformation}{transformSamples})
+5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: mae{[}{[}1{]}{]} \textless- mae{[}{[}1{]}{]}{[}-grep(``uncultured\textbar Ambiguous\_taxa'', names(mae{[}{[}1{]}{]})),{]} )
+5. Calculate cross-correlation between \emph{microbiota} (clr) and \emph{metabolites} (log10) (\href{https://microbiome.github.io/OMA/multi-assay_analyses.html\#multi-assay_analyses}{testExperimentCrossCorrelation})
+6. Create a heatmap from cross-correlation matrix \href{https://microbiome.github.io/OMA/microbiome-community.html\#composition-heatmap}{pheatmap}
+
 \hypertarget{unsupervised-learning}{%
-\chapter{Unsupervised learning}\label{unsupervised-learning}}
+\section{Unsupervised learning}\label{unsupervised-learning}}
 
 Unsupervised learning is a part of machine learning where we try to find information
 from unknown data. It is also called data mining. Usually this means finding of
@@ -1050,7 +1069,7 @@ between each other. For example, based on clinical data we can try to find patie
 groups that have similar response to used drug.
 
 \hypertarget{biclustering}{%
-\section{Biclustering}\label{biclustering}}
+\subsection{Biclustering}\label{biclustering}}
 
 Biclustering is a clustering method, which simultaneously clusters rows and columns.
 In this example, the aim is to find clusters where subset of taxa share similar
@@ -1059,130 +1078,6 @@ taxa and metabolites correlate similarly.
 
 Check more from OMA which has dedicated chapter on
 \href{https://microbiome.github.io/OMA/biclustering.html}{biclustering}.
-
-First, we subset metabolite data so that it includes fewer metabolites. We use
-coefficient of variation as a subset criteria. Meaning of this is that, if concentration
-of metabolite does not vary, concentration does not differ between samples.
-
-By doing that, we avoid unnecessary multiple testing, and we focus only on interesting
-metabolites.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(ggplot2)}
-\CommentTok{\# Threshold: metabolites whose (cv \textgreater{} +threshold or cv \textless{} {-}threshold), will be included}
-\NormalTok{cv\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.5}
-\NormalTok{metabolite\_trans }\OtherTok{\textless{}{-}} \StringTok{"nmr"}
-
-\CommentTok{\# Get the data}
-\NormalTok{metabolite\_tse }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{2}\NormalTok{]]}
-
-\CommentTok{\# Calculate coefficient of variation of individual metabolites}
-\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{cv =} \FunctionTok{apply}\NormalTok{(}\FunctionTok{assay}\NormalTok{(metabolite\_tse, metabolite\_trans), }\DecValTok{1}\NormalTok{, }
-                            \ControlFlowTok{function}\NormalTok{(x)\{}\FunctionTok{sd}\NormalTok{(x)}\SpecialCharTok{/}\FunctionTok{mean}\NormalTok{(x)\}))}
-
-\CommentTok{\# Plot them as a histogram, and show a line that is used as a threshold}
-\NormalTok{plot }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ cv)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins =} \DecValTok{50}\NormalTok{, }\AttributeTok{color=}\StringTok{"darkred"}\NormalTok{, }\AttributeTok{fill=}\StringTok{"lightblue"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{x =} \StringTok{"CV"}\NormalTok{, }\AttributeTok{y =} \StringTok{"metabolite frequency"}\NormalTok{, }
-       \AttributeTok{title =} \StringTok{"Distribution of coefficient of }
-\StringTok{       variation of log10 concentration of metabolites"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =}\NormalTok{ cv\_threshold, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(cv\_threshold, }\DecValTok{6}\NormalTok{, }\AttributeTok{label =} 
-                  \FunctionTok{paste0}\NormalTok{(}\StringTok{"CV threshold ("}\NormalTok{, cv\_threshold, }\StringTok{")"}\NormalTok{), }\AttributeTok{vjust =} \DecValTok{2}\NormalTok{, }\AttributeTok{angle=}\DecValTok{90}\NormalTok{)) }\SpecialCharTok{+}
-  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \SpecialCharTok{{-}}\NormalTok{cv\_threshold, }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{geom\_text}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{cv\_threshold, }\DecValTok{6}\NormalTok{, }\AttributeTok{label =} 
-                  \FunctionTok{paste0}\NormalTok{(}\StringTok{"CV threshold ("}\NormalTok{, }\SpecialCharTok{{-}}\NormalTok{cv\_threshold, }\StringTok{")"}\NormalTok{), }\AttributeTok{vjust =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{, }\AttributeTok{angle=}\DecValTok{90}\NormalTok{))}
-
-\NormalTok{plot}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-2-1.pdf}
-
-Subsetting metabolomic data:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Get those metabolites that are over threshold}
-\NormalTok{metabolites\_over\_th }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(df[df}\SpecialCharTok{$}\NormalTok{cv }\SpecialCharTok{\textgreater{}}\NormalTok{ cv\_threshold }\SpecialCharTok{|} 
-\NormalTok{                                     df}\SpecialCharTok{$}\NormalTok{cv }\SpecialCharTok{\textless{}} \SpecialCharTok{{-}}\NormalTok{cv\_threshold, , }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{])}
-\CommentTok{\# Ignore those metabolites that do not have name / are NA}
-\NormalTok{metabolites\_over\_th }\OtherTok{\textless{}{-}}\NormalTok{ metabolites\_over\_th[}\SpecialCharTok{!}\FunctionTok{str\_detect}\NormalTok{(metabolites\_over\_th, }\StringTok{"NA"}\NormalTok{)]}
-\end{Highlighting}
-\end{Shaded}
-
-After that, we subset microbiome data by filtering rarest taxa off-
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{rank }\OtherTok{\textless{}{-}} \StringTok{"Genus"}
-\NormalTok{prevalence }\OtherTok{\textless{}{-}} \FloatTok{0.2}
-\NormalTok{detection }\OtherTok{\textless{}{-}} \FloatTok{0.001}
-\NormalTok{taxa\_trans }\OtherTok{\textless{}{-}}  \StringTok{"clr"}
-
-\CommentTok{\# Get bacterial data}
-\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}}\NormalTok{ mae[[}\DecValTok{1}\NormalTok{]]}
-\CommentTok{\# Agglomerate at Genus level}
-\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{agglomerateByRank}\NormalTok{(taxa\_tse, }\AttributeTok{rank =}\NormalTok{ rank)}
-\CommentTok{\# Do CLR transformation}
-\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{transformSamples}\NormalTok{(taxa\_tse, }\AttributeTok{method =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{pseudocount =} \DecValTok{1}\NormalTok{)}
-
-\CommentTok{\# Subset metabolite data}
-\NormalTok{metabolite\_tse }\OtherTok{\textless{}{-}}\NormalTok{ metabolite\_tse[metabolites\_over\_th, ]}
-
-\CommentTok{\# Subset bacterial data by its prevalence. Bacteria whose prevalences are over }
-\CommentTok{\# threshold are included}
-\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}} \FunctionTok{subsetByPrevalentTaxa}\NormalTok{(taxa\_tse, }
-                                  \AttributeTok{prevalence =}\NormalTok{ prevalence, }
-                                  \AttributeTok{detection =}\NormalTok{ detection)}
-
-\CommentTok{\# Remove uncultured and ambiguous(as it\textquotesingle{}s hard to interpret their results)}
-\NormalTok{taxa\_tse }\OtherTok{\textless{}{-}}\NormalTok{ taxa\_tse[}\SpecialCharTok{{-}}\FunctionTok{grep}\NormalTok{(}\StringTok{"uncultured|Ambiguous\_taxa"}\NormalTok{, }\FunctionTok{names}\NormalTok{(taxa\_tse)),]}
-\end{Highlighting}
-\end{Shaded}
-
-After subsetting, we can perform cross-correlation analysis. With cross-correlation
-analysis we can answer the question ``If the abundance of this taxon is high, is the
-concentration of metabolite high?'', for instance.
-
-Check OMA book's dedicated chapther on
-\href{https://microbiome.github.io/OMA/multi-assay_analyses.html}{multi-assay analyses}.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{library}\NormalTok{(pheatmap)}
-
-\CommentTok{\# Cross correlate data sets}
-\NormalTok{correlations }\OtherTok{\textless{}{-}} \FunctionTok{testExperimentCrossCorrelation}\NormalTok{(taxa\_tse, metabolite\_tse, }
-                                               \AttributeTok{abund\_values1 =} \StringTok{"clr"}\NormalTok{, }\AttributeTok{abund\_values2 =} \StringTok{"nmr"}\NormalTok{,}
-                                               \AttributeTok{method =} \StringTok{"spearman"}\NormalTok{, }\AttributeTok{mode =} \StringTok{"matrix"}\NormalTok{)}
-
-\CommentTok{\# For plotting purpose, convert p{-}values, under 0.05 are marked with "X"}
-\NormalTok{p\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.01}
-\NormalTok{p\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{p\_adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold, }\StringTok{"X"}\NormalTok{, }\StringTok{""}\NormalTok{)}
-
-\CommentTok{\# Scale colors}
-\NormalTok{breaks }\OtherTok{\textless{}{-}} \FunctionTok{seq}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }
-              \AttributeTok{length.out =} \FunctionTok{ifelse}\NormalTok{( }\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))}\SpecialCharTok{\textgreater{}}\DecValTok{5}\NormalTok{, }
-                                   \DecValTok{2}\SpecialCharTok{*}\FunctionTok{ceiling}\NormalTok{(}\FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor))), }\DecValTok{10}\NormalTok{ ) )}
-\NormalTok{colors }\OtherTok{\textless{}{-}} \FunctionTok{colorRampPalette}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"darkblue"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"white"}\NormalTok{, }
-                             \StringTok{"red"}\NormalTok{, }\StringTok{"darkred"}\NormalTok{))(}\FunctionTok{length}\NormalTok{(breaks)}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{)}
-
-\CommentTok{\# Create a heatmap}
-\FunctionTok{pheatmap}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor, }\AttributeTok{display\_numbers =}\NormalTok{ p\_values,}
-               \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Correlations between bacteria and metabolites }
-\StringTok{              (statistically significant associations (p \textless{} 0.05) marked with X)"}\NormalTok{),}
-               \AttributeTok{fontsize =} \DecValTok{10}\NormalTok{,}
-               \AttributeTok{breaks =}\NormalTok{ breaks,}
-               \AttributeTok{color =}\NormalTok{ colors, }
-               \AttributeTok{fontsize\_number =} \DecValTok{10}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-5-1.pdf}
-
-Finally, we can find biclusters from cross-correlation data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1193,17 +1088,6 @@ Finally, we can find biclusters from cross-correlation data.
 
 \begin{verbatim}
 ## Loading required package: MASS
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'MASS'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:dplyr':
-## 
-##     select
 \end{verbatim}
 
 \begin{verbatim}
@@ -1232,7 +1116,7 @@ Finally, we can find biclusters from cross-correlation data.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Find biclusters}
-\NormalTok{bc }\OtherTok{\textless{}{-}} \FunctionTok{biclust}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor, }\AttributeTok{method=}\FunctionTok{BCPlaid}\NormalTok{(), }\AttributeTok{fit.model =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ m,}
+\NormalTok{bc }\OtherTok{\textless{}{-}} \FunctionTok{biclust}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor, }\AttributeTok{method=}\FunctionTok{BCPlaid}\NormalTok{(), }\AttributeTok{fit.model =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ m,}
               \AttributeTok{background =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{shuffle =} \DecValTok{100}\NormalTok{, }\AttributeTok{back.fit =} \DecValTok{0}\NormalTok{, }\AttributeTok{max.layers =} \DecValTok{10}\NormalTok{,}
               \AttributeTok{iter.startup =} \DecValTok{10}\NormalTok{, }\AttributeTok{iter.layer =} \DecValTok{100}\NormalTok{, }\AttributeTok{verbose =} \ConstantTok{FALSE}\NormalTok{)}
 
@@ -1245,81 +1129,27 @@ Finally, we can find biclusters from cross-correlation data.
 ## An object of class Biclust 
 ## 
 ## call:
-##  biclust(x = correlations$cor, method = BCPlaid(), fit.model = y ~ 
-##      m, background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+##  biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m, 
+##      background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
 ##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
 ## 
-## Number of Clusters found:  3 
-## 
-## First  3  Cluster sizes:
-##                    BC 1 BC 2 BC 3
-## Number of Rows:      12   13    8
-## Number of Columns:    3    5    4
+## There was one cluster found with
+##   4 Rows and  6 columns
 \end{verbatim}
-
-To get cluster information into right format, we can use functions from OMA book.
-They add cluster for those features that were not assigned to any cluster.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{\# Functions for obtaining biclust information}
-
-\CommentTok{\# Get clusters for rows and columns}
-\NormalTok{.get\_biclusters\_from\_biclust }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(bc, assay)\{}
-  \CommentTok{\# Get cluster information for columns and rows}
-\NormalTok{  bc\_columns }\OtherTok{\textless{}{-}} \FunctionTok{t}\NormalTok{(bc}\SpecialCharTok{@}\NormalTok{NumberxCol)}
-\NormalTok{  bc\_columns }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(bc\_columns)}
-\NormalTok{  bc\_rows }\OtherTok{\textless{}{-}}\NormalTok{ bc}\SpecialCharTok{@}\NormalTok{RowxNumber}
-\NormalTok{  bc\_rows }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(bc\_rows)}
-  
-  \CommentTok{\# Get data into right format}
-\NormalTok{  bc\_columns }\OtherTok{\textless{}{-}} \FunctionTok{.manipulate\_bc\_data}\NormalTok{(bc\_columns, assay, }\StringTok{"col"}\NormalTok{)}
-\NormalTok{  bc\_rows }\OtherTok{\textless{}{-}} \FunctionTok{.manipulate\_bc\_data}\NormalTok{(bc\_rows, assay, }\StringTok{"row"}\NormalTok{)}
-  
-  \FunctionTok{return}\NormalTok{(}\FunctionTok{list}\NormalTok{(}\AttributeTok{bc\_columns =}\NormalTok{ bc\_columns, }\AttributeTok{bc\_rows =}\NormalTok{ bc\_rows))}
-\NormalTok{\}}
-
-\CommentTok{\# Input clusters, and how many observations there should be, i.e., the number of samples or features}
-\NormalTok{.manipulate\_bc\_data }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(bc\_clusters, assay, row\_col)\{}
-  \CommentTok{\# Get right dimension}
-\NormalTok{  dim }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(row\_col }\SpecialCharTok{==} \StringTok{"col"}\NormalTok{, }\FunctionTok{ncol}\NormalTok{(assay), }\FunctionTok{nrow}\NormalTok{(assay))}
-  \CommentTok{\# Get column/row names}
-  \ControlFlowTok{if}\NormalTok{( row\_col }\SpecialCharTok{==} \StringTok{"col"}\NormalTok{ )\{}
-\NormalTok{    names }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(assay)}
-\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{\{}
-\NormalTok{    names }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(assay)}
-\NormalTok{  \}}
-  
-  \CommentTok{\# If no clusters were found, create one. Otherwise create additional cluster which}
-  \CommentTok{\# contain those samples that are not included in clusters that were found.}
-  \ControlFlowTok{if}\NormalTok{( }\FunctionTok{nrow}\NormalTok{(bc\_clusters) }\SpecialCharTok{!=}\NormalTok{ dim )\{}
-\NormalTok{      bc\_clusters }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{cluster =} \FunctionTok{rep}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{, dim))}
-\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
-      \CommentTok{\# Create additional cluster that includes those samples/features that}
-      \CommentTok{\# are not included in other clusters.}
-\NormalTok{      vec }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(}\FunctionTok{rowSums}\NormalTok{(bc\_clusters) }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{, }\ConstantTok{TRUE}\NormalTok{)}
-      \CommentTok{\# If additional cluster contains samples, then add it}
-      \ControlFlowTok{if}\NormalTok{ ( }\FunctionTok{any}\NormalTok{(vec) )\{}
-\NormalTok{          bc\_clusters }\OtherTok{\textless{}{-}} \FunctionTok{cbind}\NormalTok{(bc\_clusters, vec)}
-\NormalTok{      \}}
-\NormalTok{  \}}
-  \CommentTok{\# Adjust row and column names}
-  \FunctionTok{rownames}\NormalTok{(bc\_clusters) }\OtherTok{\textless{}{-}}\NormalTok{ names}
-  \FunctionTok{colnames}\NormalTok{(bc\_clusters) }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"cluster\_"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(bc\_clusters))}
-  \FunctionTok{return}\NormalTok{(bc\_clusters)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-Then we can use the functions.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Get biclusters}
-\NormalTok{bcs }\OtherTok{\textless{}{-}} \FunctionTok{.get\_biclusters\_from\_biclust}\NormalTok{(bc, correlations}\SpecialCharTok{$}\NormalTok{cor)}
+\NormalTok{bicluster\_rows }\OtherTok{\textless{}{-}}\NormalTok{ bc}\SpecialCharTok{@}\NormalTok{RowxNumber}
+\NormalTok{bicluster\_columns }\OtherTok{\textless{}{-}}\NormalTok{ bc}\SpecialCharTok{@}\NormalTok{NumberxCol}
 
-\NormalTok{bicluster\_rows }\OtherTok{\textless{}{-}}\NormalTok{ bcs}\SpecialCharTok{$}\NormalTok{bc\_rows}
-\NormalTok{bicluster\_columns }\OtherTok{\textless{}{-}}\NormalTok{ bcs}\SpecialCharTok{$}\NormalTok{bc\_columns}
+\CommentTok{\# Convert them into data.frames}
+\NormalTok{bicluster\_rows }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(bicluster\_rows)}
+\NormalTok{bicluster\_columns }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{t}\NormalTok{(bc}\SpecialCharTok{@}\NormalTok{NumberxCol))}
+
+\CommentTok{\# Adjust names of clusters}
+\FunctionTok{colnames}\NormalTok{(bicluster\_rows) }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"cluster\_"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(bicluster\_rows))}
+\FunctionTok{colnames}\NormalTok{(bicluster\_columns) }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"cluster\_"}\NormalTok{, }\DecValTok{1}\SpecialCharTok{:}\FunctionTok{ncol}\NormalTok{(bicluster\_columns))}
 
 \CommentTok{\# Print biclusters for rows}
 \FunctionTok{head}\NormalTok{(bicluster\_rows)}
@@ -1327,13 +1157,13 @@ Then we can use the functions.
 \end{Shaded}
 
 \begin{verbatim}
-##                               cluster_1 cluster_2 cluster_3 cluster_4
-## Genus:Escherichia-Shigella        FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminiclostridium 5          TRUE     FALSE      TRUE     FALSE
-## Genus:Lactobacillus               FALSE     FALSE     FALSE      TRUE
-## Genus:Ruminococcaceae UCG-014      TRUE     FALSE     FALSE     FALSE
-## Genus:Lactococcus                 FALSE     FALSE     FALSE      TRUE
-## Genus:Mucispirillum               FALSE     FALSE     FALSE      TRUE
+##   cluster_1
+## 1     FALSE
+## 2     FALSE
+## 3     FALSE
+## 4     FALSE
+## 5     FALSE
+## 6     FALSE
 \end{verbatim}
 
 Now, we can add bicluster information into the heatmap that we already made.
@@ -1341,45 +1171,36 @@ Now, we can add bicluster information into the heatmap that we already made.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Convert boolean values into factors}
-\NormalTok{bicluster\_columns }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(bicluster\_columns, }\DecValTok{2}\NormalTok{, as.factor))}
-\NormalTok{bicluster\_rows }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(bicluster\_rows, }\DecValTok{2}\NormalTok{, as.factor))}
+\NormalTok{bicluster\_columns[ , }\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(bicluster\_columns[, }\DecValTok{1}\NormalTok{] )}
+\NormalTok{bicluster\_rows[ , }\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(bicluster\_rows[ , }\DecValTok{1}\NormalTok{])}
 
-\CommentTok{\# Adjust colors for all clusters}
-\ControlFlowTok{if}\NormalTok{( }\FunctionTok{ncol}\NormalTok{(bicluster\_rows) }\SpecialCharTok{\textgreater{}} \FunctionTok{ncol}\NormalTok{(bicluster\_columns) )\{}
-\NormalTok{  cluster\_names }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(bicluster\_rows)}
-\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
-\NormalTok{  cluster\_names }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(bicluster\_columns)}
-\NormalTok{\}}
-\NormalTok{annotation\_colors }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
-\ControlFlowTok{for}\NormalTok{(name }\ControlFlowTok{in}\NormalTok{ cluster\_names)\{}
-\NormalTok{  annotation\_colors[[name]] }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"TRUE"} \OtherTok{=} \StringTok{"red"}\NormalTok{, }\StringTok{"FALSE"} \OtherTok{=} \StringTok{"white"}\NormalTok{)}
-\NormalTok{\}}
+\CommentTok{\# Adjust their rownames}
+\FunctionTok{rownames}\NormalTok{(bicluster\_columns) }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor)}
+\FunctionTok{rownames}\NormalTok{(bicluster\_rows) }\OtherTok{\textless{}{-}} \FunctionTok{rownames}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor)}
 
 \CommentTok{\# Get correlation values that are over thresholds}
 \NormalTok{p\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.01}
-\NormalTok{corr\_threshold }\OtherTok{\textless{}{-}} \FloatTok{0.6}
-\NormalTok{corr\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{p\_adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold }\SpecialCharTok{\&} 
-                          \FunctionTok{abs}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor)}\SpecialCharTok{\textgreater{}}\NormalTok{corr\_threshold , }\FunctionTok{round}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor,}\DecValTok{1}\NormalTok{), }\StringTok{""}\NormalTok{)}
+\NormalTok{corr\_values }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{p\_adj}\SpecialCharTok{\textless{}}\NormalTok{p\_threshold, }\FunctionTok{round}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor,}\DecValTok{1}\NormalTok{), }\StringTok{""}\NormalTok{)}
 
 \CommentTok{\# Create a heatmap}
-\FunctionTok{pheatmap}\NormalTok{(correlations}\SpecialCharTok{$}\NormalTok{cor,}
+\FunctionTok{pheatmap}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor,}
          \AttributeTok{annotation\_col =}\NormalTok{ bicluster\_columns, }
          \AttributeTok{annotation\_row =}\NormalTok{ bicluster\_rows,}
-         \AttributeTok{annotation\_colors =}\NormalTok{ annotation\_colors,}
+         
          \AttributeTok{display\_numbers =}\NormalTok{ corr\_values,}
-               \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Correlations between bacteria and metabolites }
-\StringTok{              (correlation over threshold (corr \textgreater{} "}\NormalTok{, corr\_threshold,}
-              \StringTok{", p \textless{} "}\NormalTok{, p\_threshold,}\StringTok{") marked)"}\NormalTok{),}
-               \AttributeTok{fontsize =} \DecValTok{10}\NormalTok{,}
-               \AttributeTok{breaks =}\NormalTok{ breaks,}
-               \AttributeTok{color =}\NormalTok{ colors, }
-               \AttributeTok{fontsize\_number =} \DecValTok{6}\NormalTok{, }
-         \AttributeTok{number\_color =} \StringTok{"yellow"}\NormalTok{,}
-         \AttributeTok{annotation\_legend =} \ConstantTok{FALSE}\NormalTok{)}
+   
+         \AttributeTok{main =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Correlations between bacteria and metabolites }
+\StringTok{                       (correlation over threshold (p \textless{} "}\NormalTok{, p\_threshold,}\StringTok{") marked)"}\NormalTok{),}
+         
+         \AttributeTok{breaks =}\NormalTok{ breaks,}
+         \AttributeTok{color =}\NormalTok{ colors, }
+   
+         \AttributeTok{fontsize\_number =} \DecValTok{6}\NormalTok{, }
+         \AttributeTok{number\_color =} \StringTok{"yellow"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{07-unsupML_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 \hypertarget{supervised-learning}{%
 \chapter{Supervised learning}\label{supervised-learning}}

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 7 Cross-correlation &amp; Unsupervised learning | Introduction to multi-omics data analysis</title>
+  <meta name="description" content="Workshop material" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 7 Cross-correlation &amp; Unsupervised learning | Introduction to multi-omics data analysis" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="Workshop material" />
+  <meta name="github-repo" content="microbiome/course_2022_FindingPheno" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 7 Cross-correlation &amp; Unsupervised learning | Introduction to multi-omics data analysis" />
+  
+  <meta name="twitter:description" content="Workshop material" />
+  
+
+<meta name="author" content="University of Turku" />
+
+
+<meta name="date" content="2022-01-14" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="beta-diversity.html"/>
+<link rel="next" href="supervised-learning.html"/>
+<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+<script src="libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Introduction to multiomic data analysis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#introduction"><i class="fa fa-check"></i><b>1.1</b> Introduction</a></li>
+<li class="chapter" data-level="1.2" data-path="index.html"><a href="index.html#learning-goals"><i class="fa fa-check"></i><b>1.2</b> Learning goals</a></li>
+<li class="chapter" data-level="1.3" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i><b>1.3</b> Acknowledgments</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="program.html"><a href="program.html"><i class="fa fa-check"></i><b>2</b> Program</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="program.html"><a href="program.html#day-1"><i class="fa fa-check"></i><b>2.1</b> Day 1</a></li>
+<li class="chapter" data-level="2.2" data-path="program.html"><a href="program.html#day-2"><i class="fa fa-check"></i><b>2.2</b> Day 2</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="getting-started.html"><a href="getting-started.html"><i class="fa fa-check"></i><b>3</b> Getting started</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="getting-started.html"><a href="getting-started.html#checklist-before-the-workshop"><i class="fa fa-check"></i><b>3.1</b> Checklist (before the workshop)</a></li>
+<li class="chapter" data-level="3.2" data-path="getting-started.html"><a href="getting-started.html#support-and-resources"><i class="fa fa-check"></i><b>3.2</b> Support and resources</a></li>
+<li class="chapter" data-level="3.3" data-path="getting-started.html"><a href="getting-started.html#installing-and-loading-the-required-r-packages"><i class="fa fa-check"></i><b>3.3</b> Installing and loading the required R packages</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="data.html"><a href="data.html"><i class="fa fa-check"></i><b>4</b> Data</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="data.html"><a href="data.html#data-structure"><i class="fa fa-check"></i><b>4.1</b> Data structure</a></li>
+<li class="chapter" data-level="4.2" data-path="data.html"><a href="data.html#example-data"><i class="fa fa-check"></i><b>4.2</b> Example data</a></li>
+<li class="chapter" data-level="4.3" data-path="data.html"><a href="data.html#importing-data-in-r"><i class="fa fa-check"></i><b>4.3</b> Importing data in R</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="microbiome-data-exploration.html"><a href="microbiome-data-exploration.html"><i class="fa fa-check"></i><b>5</b> Microbiome data exploration</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="microbiome-data-exploration.html"><a href="microbiome-data-exploration.html#data-structure-1"><i class="fa fa-check"></i><b>5.1</b> Data structure</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="microbiome-data-exploration.html"><a href="microbiome-data-exploration.html#transformations"><i class="fa fa-check"></i><b>5.1.1</b> Transformations</a></li>
+<li class="chapter" data-level="5.1.2" data-path="microbiome-data-exploration.html"><a href="microbiome-data-exploration.html#aggregation"><i class="fa fa-check"></i><b>5.1.2</b> Aggregation</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="microbiome-data-exploration.html"><a href="microbiome-data-exploration.html#visualization"><i class="fa fa-check"></i><b>5.2</b> Visualization</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="beta-diversity.html"><a href="beta-diversity.html"><i class="fa fa-check"></i><b>6</b> Beta diversity</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="beta-diversity.html"><a href="beta-diversity.html#examples-of-pcoa-with-different-settings"><i class="fa fa-check"></i><b>6.1</b> Examples of PCoA with different settings</a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="beta-diversity.html"><a href="beta-diversity.html#pcoa-for-asv-level-data-with-bray-curtis"><i class="fa fa-check"></i><b>6.1.1</b> PCoA for ASV-level data with Bray-Curtis</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="beta-diversity.html"><a href="beta-diversity.html#highlighting-external-variables"><i class="fa fa-check"></i><b>6.2</b> Highlighting external variables</a></li>
+<li class="chapter" data-level="6.3" data-path="beta-diversity.html"><a href="beta-diversity.html#estimating-associations-with-an-external-variable"><i class="fa fa-check"></i><b>6.3</b> Estimating associations with an external variable</a></li>
+<li class="chapter" data-level="6.4" data-path="beta-diversity.html"><a href="beta-diversity.html#community-typing"><i class="fa fa-check"></i><b>6.4</b> Community typing</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html"><i class="fa fa-check"></i><b>7</b> Cross-correlation &amp; Unsupervised learning</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#cross-correlation"><i class="fa fa-check"></i><b>7.1</b> Cross-correlation</a></li>
+<li class="chapter" data-level="7.2" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#unsupervised-learning"><i class="fa fa-check"></i><b>7.2</b> Unsupervised learning</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="cross-correlation-unsupervised-learning.html"><a href="cross-correlation-unsupervised-learning.html#biclustering"><i class="fa fa-check"></i><b>7.2.1</b> Biclustering</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="supervised-learning.html"><a href="supervised-learning.html"><i class="fa fa-check"></i><b>8</b> Supervised learning</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="supervised-learning.html"><a href="supervised-learning.html#data-curation"><i class="fa fa-check"></i><b>8.1</b> Data curation</a></li>
+<li class="chapter" data-level="8.2" data-path="supervised-learning.html"><a href="supervised-learning.html#regression-with-random-forests"><i class="fa fa-check"></i><b>8.2</b> Regression with random forests</a></li>
+<li class="chapter" data-level="8.3" data-path="supervised-learning.html"><a href="supervised-learning.html#classification-with-random-forests"><i class="fa fa-check"></i><b>8.3</b> Classification with random forests</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Introduction to multi-omics data analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="cross-correlation-unsupervised-learning" class="section level1" number="7">
+<h1><span class="header-section-number">Chapter 7</span> Cross-correlation &amp; Unsupervised learning</h1>
+<div id="cross-correlation" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Cross-correlation</h2>
+<p>With cross-correlation analysis, we can analyze how strongly and how differently variables
+are associated between each other. For instance, we can analyze if higher presence of a
+specific taxon equals to higher levels of a biomolecule.</p>
+<p><strong>TASK</strong>
+1. Run installation script to load packages into the session
+2. Import HintikkaXO data
+3. Subset <em>microbiota</em> data (rank = “Phylum,” prevalence = 0.2, detection = 0.001) (<a href="https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering">subsetByPrevalentTaxa</a>)
+4. Apply clr-transform to <em>microbiota</em> data and log10-tranform to <em>metabolites</em> data (<a href="https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation">transformSamples</a>)
+5. Remove uncultured and ambiguous taxa (as it’s hard to interpret their results) ( USE THIS: mae[[1]] &lt;- mae[[1]][-grep(“uncultured|Ambiguous_taxa,” names(mae[[1]])),] )
+5. Calculate cross-correlation between <em>microbiota</em> (clr) and <em>metabolites</em> (log10) (<a href="https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses">testExperimentCrossCorrelation</a>)
+6. Create a heatmap from cross-correlation matrix <a href="https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap">pheatmap</a></p>
+</div>
+<div id="unsupervised-learning" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> Unsupervised learning</h2>
+<p>Unsupervised learning is a part of machine learning where we try to find information
+from unknown data. It is also called data mining. Usually this means finding of
+clusters, for instance. Cluster refers to group of samples/features that are similar
+between each other. For example, based on clinical data we can try to find patient
+groups that have similar response to used drug.</p>
+<div id="biclustering" class="section level3" number="7.2.1">
+<h3><span class="header-section-number">7.2.1</span> Biclustering</h3>
+<p>Biclustering is a clustering method, which simultaneously clusters rows and columns.
+In this example, the aim is to find clusters where subset of taxa share similar
+pattern over subset of metabolites. In our case, we try to find clusters where
+taxa and metabolites correlate similarly.</p>
+<p>Check more from OMA which has dedicated chapter on
+<a href="https://microbiome.github.io/OMA/biclustering.html">biclustering</a>.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="cross-correlation-unsupervised-learning.html#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load package</span></span>
+<span id="cb30-2"><a href="cross-correlation-unsupervised-learning.html#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(biclust)</span></code></pre></div>
+<pre><code>## Loading required package: MASS</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## 
+## Attaching package: &#39;grid&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:Biostrings&#39;:
+## 
+##     pattern</code></pre>
+<pre><code>## Loading required package: colorspace</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="cross-correlation-unsupervised-learning.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find biclusters</span></span>
+<span id="cb37-2"><a href="cross-correlation-unsupervised-learning.html#cb37-2" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">biclust</span>(corr<span class="sc">$</span>cor, <span class="at">method=</span><span class="fu">BCPlaid</span>(), <span class="at">fit.model =</span> y <span class="sc">~</span> m,</span>
+<span id="cb37-3"><a href="cross-correlation-unsupervised-learning.html#cb37-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">background =</span> <span class="cn">TRUE</span>, <span class="at">shuffle =</span> <span class="dv">100</span>, <span class="at">back.fit =</span> <span class="dv">0</span>, <span class="at">max.layers =</span> <span class="dv">10</span>,</span>
+<span id="cb37-4"><a href="cross-correlation-unsupervised-learning.html#cb37-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">iter.startup =</span> <span class="dv">10</span>, <span class="at">iter.layer =</span> <span class="dv">100</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-5"><a href="cross-correlation-unsupervised-learning.html#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="cross-correlation-unsupervised-learning.html#cb37-6" aria-hidden="true" tabindex="-1"></a>bc</span></code></pre></div>
+<pre><code>## 
+## An object of class Biclust 
+## 
+## call:
+##  biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m, 
+##      background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
+## 
+## There was one cluster found with
+##   4 Rows and  6 columns</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="cross-correlation-unsupervised-learning.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get biclusters</span></span>
+<span id="cb39-2"><a href="cross-correlation-unsupervised-learning.html#cb39-2" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> bc<span class="sc">@</span>RowxNumber</span>
+<span id="cb39-3"><a href="cross-correlation-unsupervised-learning.html#cb39-3" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> bc<span class="sc">@</span>NumberxCol</span>
+<span id="cb39-4"><a href="cross-correlation-unsupervised-learning.html#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="cross-correlation-unsupervised-learning.html#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert them into data.frames</span></span>
+<span id="cb39-6"><a href="cross-correlation-unsupervised-learning.html#cb39-6" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(bicluster_rows)</span>
+<span id="cb39-7"><a href="cross-correlation-unsupervised-learning.html#cb39-7" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">t</span>(bc<span class="sc">@</span>NumberxCol))</span>
+<span id="cb39-8"><a href="cross-correlation-unsupervised-learning.html#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-9"><a href="cross-correlation-unsupervised-learning.html#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust names of clusters</span></span>
+<span id="cb39-10"><a href="cross-correlation-unsupervised-learning.html#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_rows))</span>
+<span id="cb39-11"><a href="cross-correlation-unsupervised-learning.html#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_columns))</span>
+<span id="cb39-12"><a href="cross-correlation-unsupervised-learning.html#cb39-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-13"><a href="cross-correlation-unsupervised-learning.html#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
+<span id="cb39-14"><a href="cross-correlation-unsupervised-learning.html#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
+<pre><code>##   cluster_1
+## 1     FALSE
+## 2     FALSE
+## 3     FALSE
+## 4     FALSE
+## 5     FALSE
+## 6     FALSE</code></pre>
+<p>Now, we can add bicluster information into the heatmap that we already made.</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="cross-correlation-unsupervised-learning.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into factors</span></span>
+<span id="cb41-2"><a href="cross-correlation-unsupervised-learning.html#cb41-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bicluster_columns[, <span class="dv">1</span>] )</span>
+<span id="cb41-3"><a href="cross-correlation-unsupervised-learning.html#cb41-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
+<span id="cb41-4"><a href="cross-correlation-unsupervised-learning.html#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="cross-correlation-unsupervised-learning.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust their rownames</span></span>
+<span id="cb41-6"><a href="cross-correlation-unsupervised-learning.html#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(corr<span class="sc">$</span>cor)</span>
+<span id="cb41-7"><a href="cross-correlation-unsupervised-learning.html#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(corr<span class="sc">$</span>cor)</span>
+<span id="cb41-8"><a href="cross-correlation-unsupervised-learning.html#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="cross-correlation-unsupervised-learning.html#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation values that are over thresholds</span></span>
+<span id="cb41-10"><a href="cross-correlation-unsupervised-learning.html#cb41-10" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb41-11"><a href="cross-correlation-unsupervised-learning.html#cb41-11" aria-hidden="true" tabindex="-1"></a>corr_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(corr<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="fu">round</span>(corr<span class="sc">$</span>cor,<span class="dv">1</span>), <span class="st">&quot;&quot;</span>)</span>
+<span id="cb41-12"><a href="cross-correlation-unsupervised-learning.html#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="cross-correlation-unsupervised-learning.html#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
+<span id="cb41-14"><a href="cross-correlation-unsupervised-learning.html#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(corr<span class="sc">$</span>cor,</span>
+<span id="cb41-15"><a href="cross-correlation-unsupervised-learning.html#cb41-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col =</span> bicluster_columns, </span>
+<span id="cb41-16"><a href="cross-correlation-unsupervised-learning.html#cb41-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_row =</span> bicluster_rows,</span>
+<span id="cb41-17"><a href="cross-correlation-unsupervised-learning.html#cb41-17" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb41-18"><a href="cross-correlation-unsupervised-learning.html#cb41-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> corr_values,</span>
+<span id="cb41-19"><a href="cross-correlation-unsupervised-learning.html#cb41-19" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb41-20"><a href="cross-correlation-unsupervised-learning.html#cb41-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
+<span id="cb41-21"><a href="cross-correlation-unsupervised-learning.html#cb41-21" aria-hidden="true" tabindex="-1"></a><span class="st">                       (correlation over threshold (p &lt; &quot;</span>, p_threshold,<span class="st">&quot;) marked)&quot;</span>),</span>
+<span id="cb41-22"><a href="cross-correlation-unsupervised-learning.html#cb41-22" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb41-23"><a href="cross-correlation-unsupervised-learning.html#cb41-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> breaks,</span>
+<span id="cb41-24"><a href="cross-correlation-unsupervised-learning.html#cb41-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> colors, </span>
+<span id="cb41-25"><a href="cross-correlation-unsupervised-learning.html#cb41-25" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb41-26"><a href="cross-correlation-unsupervised-learning.html#cb41-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">fontsize_number =</span> <span class="dv">6</span>, </span>
+<span id="cb41-27"><a href="cross-correlation-unsupervised-learning.html#cb41-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
+<p><img src="07-unsupML_files/figure-html/unnamed-chunk-11-1.png" width="960" /></p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="beta-diversity.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="supervised-learning.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["FindingPheno2022_material.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

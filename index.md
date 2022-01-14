@@ -1,7 +1,7 @@
 --- 
 title: "Introduction to multi-omics data analysis"
 author: "University of Turku"
-date: "2022-01-12"
+date: "2022-01-14"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [packages.bib]
