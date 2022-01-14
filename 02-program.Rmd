@@ -40,6 +40,7 @@ support from the course assistants.
    * Microbiome data exploration 
 	 
    * Visualization
+   * Beta-diversity
    
  * R Code:
  
@@ -71,7 +72,7 @@ support from the course assistants.
 
  * Topics: 
 
-   * Unsupervised learning: Beta-diversity and biclustering
+   * Unsupervised learning: Cross-correlation based biclustering and multi-omics factor analysis
  
    * Supervised learning: Regression and classification with random forests
  
