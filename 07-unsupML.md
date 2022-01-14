@@ -14,14 +14,14 @@ specific taxon equals to higher levels of a biomolecule.
 
 2. Import HintikkaXO data
 
-3. Subset _microbiota_ data (rank = "Phylum", prevalence = 0.2, detection = 0.001) ([subsetByPrevalentTaxa](https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering))
+3. Subset _microbiota_ data (rank = "Genus", prevalence = 0.2, detection = 0.001) ([subsetByPrevalentTaxa](https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering))
 
 4. Apply clr-transform to _microbiota_ data and log10-tranform to _metabolites_ data ([transformSamples](https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation))
 
 5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: _mae[[1]] <- mae[[1]][-grep("uncultured|Ambiguous_taxa", names(mae[[1]])),]_ )
 
-5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_ as an argument)
-([testExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
+5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_, _test_significance = TRUE_, and _mode = "matrix"_ as an arguments)
+([getExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
 
 6. Create a heatmap from cross-correlation matrix [pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap)
 
@@ -94,42 +94,10 @@ library(biclust)
 
 ```r
 # Find biclusters
-bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m)
-```
+bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m, 
+              background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+              iter.startup = 10, iter.layer = 100, verbose = FALSE)
 
-```
-## layer: 0 
-##  0.07131276
-## layer: 1 
-## [1]  0 10 15
-## [1]  1  8 12
-## [1]  2  8 10
-## [1] 3 8 8
-## [1] 30  8  8
-## [1] 31  5  8
-## [1] 32  5  6
-## [1] 33  4  6
-## [1] 34  4  6
-## [1] 35  4  6
-## [1] 60  4  6
-## [1] 4
-## [1] 3.75515 0.00000 0.00000 0.00000
-## back fitting 2 times
-## layer: 2 
-## [1]  0 11 17
-## [1]  1  8 13
-## [1]  2  7 12
-## [1] 30  7 12
-## [1] 31  0 12
-## [1] 32
-## [1] 0 0 0 0
-##      
-## Layer Rows Cols Df   SS   MS Convergence Rows Released Cols Released
-##     0   23   38  1 0.00 0.00          NA            NA            NA
-##     1    4    6  1 3.97 3.97           1             4             2
-```
-
-```r
 bc
 ```
 
@@ -138,10 +106,12 @@ bc
 ## An object of class Biclust 
 ## 
 ## call:
-## 	biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m)
+## 	biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m, 
+## 	    background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
+## 	    iter.startup = 10, iter.layer = 100, verbose = FALSE)
 ## 
 ## There was one cluster found with
-##   4 Rows and  6 columns
+##   6 Rows and  7 columns
 ```
 
 
@@ -150,9 +120,9 @@ bc
 bicluster_rows <- bc@RowxNumber
 bicluster_columns <- bc@NumberxCol
 
-# Convert them into data.frames
-bicluster_rows <- data.frame(bicluster_rows)
-bicluster_columns <- data.frame(t(bc@NumberxCol))
+# Convert into data.frames
+bicluster_rows <- as.data.frame(bicluster_rows)
+bicluster_columns <- as.data.frame(t(bicluster_columns))
 
 # Adjust names of clusters
 colnames(bicluster_rows) <- paste0("cluster_", 1:ncol(bicluster_rows))
@@ -165,7 +135,7 @@ head(bicluster_rows)
 ```
 ##   cluster_1
 ## 1     FALSE
-## 2     FALSE
+## 2      TRUE
 ## 3     FALSE
 ## 4     FALSE
 ## 5     FALSE
@@ -177,7 +147,7 @@ Now, we can add bicluster information into the heatmap that we already made.
 
 ```r
 # Convert boolean values into numeric
-bicluster_columns[ , 1] <- as.numeric(bicluster_columns[, 1] )
+bicluster_columns[ , 1] <- as.numeric(bicluster_columns[ , 1])
 bicluster_rows[ , 1] <- as.numeric(bicluster_rows[ , 1])
 
 # Adjust their rownames
@@ -201,7 +171,7 @@ pheatmap(corr$cor,
          breaks = breaks,
          color = colors, 
    
-         fontsize_number = 6, 
+         fontsize_number = 8, 
          number_color = "yellow")
 ```
 
