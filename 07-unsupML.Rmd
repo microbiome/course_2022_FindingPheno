@@ -64,11 +64,11 @@ corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Genus"),
 head(corr$cor,2)
 ```
 
-```{r fig.height=6, fig.width=10, message=FALSE, warning=FALSE, include=FALSE}
+```{r fig.height=10, fig.width=16, message=FALSE, warning=FALSE, include=FALSE}
 pheatmap(corr$cor)
 ```
 
-```{r fig.height=6, fig.width=10, message=FALSE, warning=FALSE, include=FALSE}
+```{r fig.height=10, fig.width=14, message=FALSE, warning=FALSE, include=FALSE}
 mat <- corr$cor
 # Determines the scaling of colors
 # Scale colors
@@ -124,6 +124,10 @@ bc
 bicluster_rows <- bc@RowxNumber
 bicluster_columns <- bc@NumberxCol
 
+# Convert into data.frames
+bicluster_rows <- as.data.frame(bicluster_rows)
+bicluster_columns <- as.data.frame(t(bicluster_columns))
+
 # Adjust names of clusters
 colnames(bicluster_rows) <- paste0("cluster_", 1:ncol(bicluster_rows))
 colnames(bicluster_columns) <- paste0("cluster_", 1:ncol(bicluster_columns))
@@ -134,7 +138,7 @@ head(bicluster_rows)
 
 Now, we can add bicluster information into the heatmap that we already made.
 
-```{r, message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
+```{r, message=FALSE, warning=FALSE, fig.height=10, fig.width=16}
 # Convert boolean values into numeric
 bicluster_columns[ , 1] <- as.numeric(bicluster_columns[ , 1])
 bicluster_rows[ , 1] <- as.numeric(bicluster_rows[ , 1])
@@ -160,6 +164,6 @@ pheatmap(corr$cor,
          breaks = breaks,
          color = colors, 
    
-         fontsize_number = 6, 
+         fontsize_number = 8, 
          number_color = "yellow")
 ```
