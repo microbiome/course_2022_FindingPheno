@@ -29,7 +29,7 @@ mae <- microbiomeDataSets::HintikkaXOData()
 # Drop off those bacteria that do not include information in Phylum or lower levels
 mae[[1]] <- mae[[1]][!is.na(rowData(mae[[1]])$Phylum), ]
 
-# Clean taxonomy data, so that names do not include addtional characters
+# Clean taxonomy data, so that names do not include additional characters
 rowData(mae[[1]]) <- DataFrame(apply(rowData(mae[[1]]), 2, 
                                      str_remove, pattern = "._[0-9]__"))
 
