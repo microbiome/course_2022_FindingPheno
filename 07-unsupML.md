@@ -94,10 +94,42 @@ library(biclust)
 
 ```r
 # Find biclusters
-bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m,
-              background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10,
-              iter.startup = 10, iter.layer = 100, verbose = FALSE)
+bc <- biclust(corr$cor, method=BCPlaid(), fit.model = y ~ m)
+```
 
+```
+## layer: 0 
+##  0.07131276
+## layer: 1 
+## [1]  0 10 15
+## [1]  1  8 12
+## [1]  2  8 10
+## [1] 3 8 8
+## [1] 30  8  8
+## [1] 31  5  8
+## [1] 32  5  6
+## [1] 33  4  6
+## [1] 34  4  6
+## [1] 35  4  6
+## [1] 60  4  6
+## [1] 4
+## [1] 3.75515 0.00000 0.00000 0.00000
+## back fitting 2 times
+## layer: 2 
+## [1]  0 11 17
+## [1]  1  8 13
+## [1]  2  7 12
+## [1] 30  7 12
+## [1] 31  0 12
+## [1] 32
+## [1] 0 0 0 0
+##      
+## Layer Rows Cols Df   SS   MS Convergence Rows Released Cols Released
+##     0   23   38  1 0.00 0.00          NA            NA            NA
+##     1    4    6  1 3.97 3.97           1             4             2
+```
+
+```r
 bc
 ```
 
@@ -106,9 +138,7 @@ bc
 ## An object of class Biclust 
 ## 
 ## call:
-## 	biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m, 
-## 	    background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
-## 	    iter.startup = 10, iter.layer = 100, verbose = FALSE)
+## 	biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m)
 ## 
 ## There was one cluster found with
 ##   4 Rows and  6 columns

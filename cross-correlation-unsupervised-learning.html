@@ -283,35 +283,59 @@ taxa and metabolites correlate similarly.</p>
 <pre><code>## Loading required package: colorspace</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="cross-correlation-unsupervised-learning.html#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find biclusters</span></span>
-<span id="cb37-2"><a href="cross-correlation-unsupervised-learning.html#cb37-2" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">biclust</span>(corr<span class="sc">$</span>cor, <span class="at">method=</span><span class="fu">BCPlaid</span>(), <span class="at">fit.model =</span> y <span class="sc">~</span> m,</span>
-<span id="cb37-3"><a href="cross-correlation-unsupervised-learning.html#cb37-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">background =</span> <span class="cn">TRUE</span>, <span class="at">shuffle =</span> <span class="dv">100</span>, <span class="at">back.fit =</span> <span class="dv">0</span>, <span class="at">max.layers =</span> <span class="dv">10</span>,</span>
-<span id="cb37-4"><a href="cross-correlation-unsupervised-learning.html#cb37-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">iter.startup =</span> <span class="dv">10</span>, <span class="at">iter.layer =</span> <span class="dv">100</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb37-5"><a href="cross-correlation-unsupervised-learning.html#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-6"><a href="cross-correlation-unsupervised-learning.html#cb37-6" aria-hidden="true" tabindex="-1"></a>bc</span></code></pre></div>
+<span id="cb37-2"><a href="cross-correlation-unsupervised-learning.html#cb37-2" aria-hidden="true" tabindex="-1"></a>bc <span class="ot">&lt;-</span> <span class="fu">biclust</span>(corr<span class="sc">$</span>cor, <span class="at">method=</span><span class="fu">BCPlaid</span>(), <span class="at">fit.model =</span> y <span class="sc">~</span> m)</span></code></pre></div>
+<pre><code>## layer: 0 
+##  0.07131276
+## layer: 1 
+## [1]  0 10 15
+## [1]  1  8 12
+## [1]  2  8 10
+## [1] 3 8 8
+## [1] 30  8  8
+## [1] 31  5  8
+## [1] 32  5  6
+## [1] 33  4  6
+## [1] 34  4  6
+## [1] 35  4  6
+## [1] 60  4  6
+## [1] 4
+## [1] 3.75515 0.00000 0.00000 0.00000
+## back fitting 2 times
+## layer: 2 
+## [1]  0 11 17
+## [1]  1  8 13
+## [1]  2  7 12
+## [1] 30  7 12
+## [1] 31  0 12
+## [1] 32
+## [1] 0 0 0 0
+##      
+## Layer Rows Cols Df   SS   MS Convergence Rows Released Cols Released
+##     0   23   38  1 0.00 0.00          NA            NA            NA
+##     1    4    6  1 3.97 3.97           1             4             2</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="cross-correlation-unsupervised-learning.html#cb39-1" aria-hidden="true" tabindex="-1"></a>bc</span></code></pre></div>
 <pre><code>## 
 ## An object of class Biclust 
 ## 
 ## call:
-##  biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m, 
-##      background = TRUE, shuffle = 100, back.fit = 0, max.layers = 10, 
-##      iter.startup = 10, iter.layer = 100, verbose = FALSE)
+##  biclust(x = corr$cor, method = BCPlaid(), fit.model = y ~ m)
 ## 
 ## There was one cluster found with
 ##   4 Rows and  6 columns</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="cross-correlation-unsupervised-learning.html#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get biclusters</span></span>
-<span id="cb39-2"><a href="cross-correlation-unsupervised-learning.html#cb39-2" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> bc<span class="sc">@</span>RowxNumber</span>
-<span id="cb39-3"><a href="cross-correlation-unsupervised-learning.html#cb39-3" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> bc<span class="sc">@</span>NumberxCol</span>
-<span id="cb39-4"><a href="cross-correlation-unsupervised-learning.html#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-5"><a href="cross-correlation-unsupervised-learning.html#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert them into data.frames</span></span>
-<span id="cb39-6"><a href="cross-correlation-unsupervised-learning.html#cb39-6" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(bicluster_rows)</span>
-<span id="cb39-7"><a href="cross-correlation-unsupervised-learning.html#cb39-7" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">t</span>(bc<span class="sc">@</span>NumberxCol))</span>
-<span id="cb39-8"><a href="cross-correlation-unsupervised-learning.html#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-9"><a href="cross-correlation-unsupervised-learning.html#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust names of clusters</span></span>
-<span id="cb39-10"><a href="cross-correlation-unsupervised-learning.html#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_rows))</span>
-<span id="cb39-11"><a href="cross-correlation-unsupervised-learning.html#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_columns))</span>
-<span id="cb39-12"><a href="cross-correlation-unsupervised-learning.html#cb39-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-13"><a href="cross-correlation-unsupervised-learning.html#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
-<span id="cb39-14"><a href="cross-correlation-unsupervised-learning.html#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="cross-correlation-unsupervised-learning.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get biclusters</span></span>
+<span id="cb41-2"><a href="cross-correlation-unsupervised-learning.html#cb41-2" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> bc<span class="sc">@</span>RowxNumber</span>
+<span id="cb41-3"><a href="cross-correlation-unsupervised-learning.html#cb41-3" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> bc<span class="sc">@</span>NumberxCol</span>
+<span id="cb41-4"><a href="cross-correlation-unsupervised-learning.html#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="cross-correlation-unsupervised-learning.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert them into data.frames</span></span>
+<span id="cb41-6"><a href="cross-correlation-unsupervised-learning.html#cb41-6" aria-hidden="true" tabindex="-1"></a>bicluster_rows <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(bicluster_rows)</span>
+<span id="cb41-7"><a href="cross-correlation-unsupervised-learning.html#cb41-7" aria-hidden="true" tabindex="-1"></a>bicluster_columns <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">t</span>(bc<span class="sc">@</span>NumberxCol))</span>
+<span id="cb41-8"><a href="cross-correlation-unsupervised-learning.html#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="cross-correlation-unsupervised-learning.html#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust names of clusters</span></span>
+<span id="cb41-10"><a href="cross-correlation-unsupervised-learning.html#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_rows))</span>
+<span id="cb41-11"><a href="cross-correlation-unsupervised-learning.html#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cluster_&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="fu">ncol</span>(bicluster_columns))</span>
+<span id="cb41-12"><a href="cross-correlation-unsupervised-learning.html#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-13"><a href="cross-correlation-unsupervised-learning.html#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Print biclusters for rows</span></span>
+<span id="cb41-14"><a href="cross-correlation-unsupervised-learning.html#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bicluster_rows)</span></code></pre></div>
 <pre><code>##   cluster_1
 ## 1     FALSE
 ## 2     FALSE
@@ -320,33 +344,33 @@ taxa and metabolites correlate similarly.</p>
 ## 5     FALSE
 ## 6     FALSE</code></pre>
 <p>Now, we can add bicluster information into the heatmap that we already made.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="cross-correlation-unsupervised-learning.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into numeric</span></span>
-<span id="cb41-2"><a href="cross-correlation-unsupervised-learning.html#cb41-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_columns[, <span class="dv">1</span>] )</span>
-<span id="cb41-3"><a href="cross-correlation-unsupervised-learning.html#cb41-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
-<span id="cb41-4"><a href="cross-correlation-unsupervised-learning.html#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-5"><a href="cross-correlation-unsupervised-learning.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust their rownames</span></span>
-<span id="cb41-6"><a href="cross-correlation-unsupervised-learning.html#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(corr<span class="sc">$</span>cor)</span>
-<span id="cb41-7"><a href="cross-correlation-unsupervised-learning.html#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(corr<span class="sc">$</span>cor)</span>
-<span id="cb41-8"><a href="cross-correlation-unsupervised-learning.html#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-9"><a href="cross-correlation-unsupervised-learning.html#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation values that are over thresholds</span></span>
-<span id="cb41-10"><a href="cross-correlation-unsupervised-learning.html#cb41-10" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
-<span id="cb41-11"><a href="cross-correlation-unsupervised-learning.html#cb41-11" aria-hidden="true" tabindex="-1"></a>corr_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(corr<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="fu">round</span>(corr<span class="sc">$</span>cor,<span class="dv">1</span>), <span class="st">&quot;&quot;</span>)</span>
-<span id="cb41-12"><a href="cross-correlation-unsupervised-learning.html#cb41-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-13"><a href="cross-correlation-unsupervised-learning.html#cb41-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
-<span id="cb41-14"><a href="cross-correlation-unsupervised-learning.html#cb41-14" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(corr<span class="sc">$</span>cor,</span>
-<span id="cb41-15"><a href="cross-correlation-unsupervised-learning.html#cb41-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col =</span> bicluster_columns, </span>
-<span id="cb41-16"><a href="cross-correlation-unsupervised-learning.html#cb41-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_row =</span> bicluster_rows,</span>
-<span id="cb41-17"><a href="cross-correlation-unsupervised-learning.html#cb41-17" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb41-18"><a href="cross-correlation-unsupervised-learning.html#cb41-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> corr_values,</span>
-<span id="cb41-19"><a href="cross-correlation-unsupervised-learning.html#cb41-19" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb41-20"><a href="cross-correlation-unsupervised-learning.html#cb41-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
-<span id="cb41-21"><a href="cross-correlation-unsupervised-learning.html#cb41-21" aria-hidden="true" tabindex="-1"></a><span class="st">                       (correlation over threshold (p &lt; &quot;</span>, p_threshold,<span class="st">&quot;) marked)&quot;</span>),</span>
-<span id="cb41-22"><a href="cross-correlation-unsupervised-learning.html#cb41-22" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb41-23"><a href="cross-correlation-unsupervised-learning.html#cb41-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> breaks,</span>
-<span id="cb41-24"><a href="cross-correlation-unsupervised-learning.html#cb41-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> colors, </span>
-<span id="cb41-25"><a href="cross-correlation-unsupervised-learning.html#cb41-25" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb41-26"><a href="cross-correlation-unsupervised-learning.html#cb41-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">fontsize_number =</span> <span class="dv">6</span>, </span>
-<span id="cb41-27"><a href="cross-correlation-unsupervised-learning.html#cb41-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="cross-correlation-unsupervised-learning.html#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into numeric</span></span>
+<span id="cb43-2"><a href="cross-correlation-unsupervised-learning.html#cb43-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_columns[, <span class="dv">1</span>] )</span>
+<span id="cb43-3"><a href="cross-correlation-unsupervised-learning.html#cb43-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
+<span id="cb43-4"><a href="cross-correlation-unsupervised-learning.html#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="cross-correlation-unsupervised-learning.html#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust their rownames</span></span>
+<span id="cb43-6"><a href="cross-correlation-unsupervised-learning.html#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(corr<span class="sc">$</span>cor)</span>
+<span id="cb43-7"><a href="cross-correlation-unsupervised-learning.html#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_rows) <span class="ot">&lt;-</span> <span class="fu">rownames</span>(corr<span class="sc">$</span>cor)</span>
+<span id="cb43-8"><a href="cross-correlation-unsupervised-learning.html#cb43-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-9"><a href="cross-correlation-unsupervised-learning.html#cb43-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Get correlation values that are over thresholds</span></span>
+<span id="cb43-10"><a href="cross-correlation-unsupervised-learning.html#cb43-10" aria-hidden="true" tabindex="-1"></a>p_threshold <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb43-11"><a href="cross-correlation-unsupervised-learning.html#cb43-11" aria-hidden="true" tabindex="-1"></a>corr_values <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(corr<span class="sc">$</span>p_adj<span class="sc">&lt;</span>p_threshold, <span class="fu">round</span>(corr<span class="sc">$</span>cor,<span class="dv">1</span>), <span class="st">&quot;&quot;</span>)</span>
+<span id="cb43-12"><a href="cross-correlation-unsupervised-learning.html#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-13"><a href="cross-correlation-unsupervised-learning.html#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a heatmap</span></span>
+<span id="cb43-14"><a href="cross-correlation-unsupervised-learning.html#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(corr<span class="sc">$</span>cor,</span>
+<span id="cb43-15"><a href="cross-correlation-unsupervised-learning.html#cb43-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_col =</span> bicluster_columns, </span>
+<span id="cb43-16"><a href="cross-correlation-unsupervised-learning.html#cb43-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">annotation_row =</span> bicluster_rows,</span>
+<span id="cb43-17"><a href="cross-correlation-unsupervised-learning.html#cb43-17" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb43-18"><a href="cross-correlation-unsupervised-learning.html#cb43-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">display_numbers =</span> corr_values,</span>
+<span id="cb43-19"><a href="cross-correlation-unsupervised-learning.html#cb43-19" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb43-20"><a href="cross-correlation-unsupervised-learning.html#cb43-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="fu">paste0</span>(<span class="st">&quot;Correlations between bacteria and metabolites </span></span>
+<span id="cb43-21"><a href="cross-correlation-unsupervised-learning.html#cb43-21" aria-hidden="true" tabindex="-1"></a><span class="st">                       (correlation over threshold (p &lt; &quot;</span>, p_threshold,<span class="st">&quot;) marked)&quot;</span>),</span>
+<span id="cb43-22"><a href="cross-correlation-unsupervised-learning.html#cb43-22" aria-hidden="true" tabindex="-1"></a>         </span>
+<span id="cb43-23"><a href="cross-correlation-unsupervised-learning.html#cb43-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">breaks =</span> breaks,</span>
+<span id="cb43-24"><a href="cross-correlation-unsupervised-learning.html#cb43-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> colors, </span>
+<span id="cb43-25"><a href="cross-correlation-unsupervised-learning.html#cb43-25" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb43-26"><a href="cross-correlation-unsupervised-learning.html#cb43-26" aria-hidden="true" tabindex="-1"></a>         <span class="at">fontsize_number =</span> <span class="dv">6</span>, </span>
+<span id="cb43-27"><a href="cross-correlation-unsupervised-learning.html#cb43-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">number_color =</span> <span class="st">&quot;yellow&quot;</span>)</span></code></pre></div>
 <p><img src="07-unsupML_files/figure-html/unnamed-chunk-11-1.png" width="960" /></p>
 
 </div>
