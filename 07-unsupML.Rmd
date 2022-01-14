@@ -19,7 +19,7 @@ specific taxon equals to higher levels of a biomolecule.
 
 2. Import HintikkaXO data
 
-3. Subset _microbiota_ data (rank = "Phylum", prevalence = 0.2, detection = 0.001) ([subsetByPrevalentTaxa](https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering))
+3. Subset _microbiota_ data (rank = "Genus", prevalence = 0.2, detection = 0.001) ([subsetByPrevalentTaxa](https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering))
 
 4. Apply clr-transform to _microbiota_ data and log10-tranform to _metabolites_ data ([transformSamples](https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation))
 
@@ -38,23 +38,23 @@ mae
 
 ```{r include=FALSE}
 mae[[1]] <- as(mae[[1]], "TreeSummarizedExperiment")
-altExp(mae[[1]], "Family") <- subsetByPrevalentTaxa(mae[[1]], rank = "Family", prevalence = 0.2, detection = 0.001)
-altExp(mae[[1]], "Family")
+altExp(mae[[1]], "Genus") <- subsetByPrevalentTaxa(mae[[1]], rank = "Genus", prevalence = 0.2, detection = 0.001)
+altExp(mae[[1]], "Genus")
 ```
 
 ```{r include=FALSE}
-altExp(mae[[1]], "Family") <- transformSamples(altExp(mae[[1]], "Family"), method = "clr", pseudocount = 1)
+altExp(mae[[1]], "Genus") <- transformSamples(altExp(mae[[1]], "Genus"), method = "clr", pseudocount = 1)
 mae[[2]] <- transformSamples(mae[[2]], abund_values = "nmr", method = "log10")
 ```
 
 ```{r include=FALSE}
-altExp(mae[[1]], "Family") <-altExp(mae[[1]], "Family")[-grep("uncultured|Ambiguous_taxa", 
-                                                              names(altExp(mae[[1]], "Family"))),]
+altExp(mae[[1]], "Genus") <-altExp(mae[[1]], "Genus")[-grep("uncultured|Ambiguous_taxa", 
+                                                              names(altExp(mae[[1]], "Genus"))),]
 ```
 
 
 ```{r include=FALSE}
-corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Family"), 
+corr <- getExperimentCrossCorrelation(altExp(mae[[1]], "Genus"), 
                                       mae[[2]], 
                                       "clr", 
                                       "log10", 
