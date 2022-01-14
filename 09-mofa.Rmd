@@ -41,7 +41,7 @@ head(train_opts)
 ```
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
-reticulate::install_miniconda()
+reticulate::install_miniconda(force = TRUE)
 reticulate::use_miniconda()
 reticulate::py_install(packages = c("mofapy2"), pip = TRUE)
 ```
