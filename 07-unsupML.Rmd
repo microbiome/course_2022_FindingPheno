@@ -135,7 +135,7 @@ head(bicluster_rows)
 
 Now, we can add bicluster information into the heatmap that we already made.
 
-```{r, message=FALSE, warning=FALSE, fig.height=8, fig.width=10}
+```{r, message=FALSE, warning=FALSE, fig.height=8, fig.width=12}
 # Convert boolean values into numeric
 bicluster_columns[ , 1] <- as.numeric(bicluster_columns[, 1] )
 bicluster_rows[ , 1] <- as.numeric(bicluster_rows[ , 1])
