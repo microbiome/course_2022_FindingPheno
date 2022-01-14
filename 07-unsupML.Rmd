@@ -223,10 +223,16 @@ model.prepared <- prepare_mofa(
 model.trained <- run_mofa(model.prepared)
 ```
 
-Visualizing the variance explained per assay and group:
+Visualizing the variance explained:
 
-```{r, message=FALSE, warning=FALSE, fig.height=6, fig.width=10}
-plot_variance_explained(model.trained, x="view", y="factor", plot_total = T)[[2]]
+```{r, message=FALSE, warning=FALSE, fig.height=8, fig.width=10}
+library(patchwork)
+wrap_plots(
+    plot_variance_explained(model.trained, x="view", y="factor", plot_total = T),
+    nrow = 2
+) + plot_annotation(title = "Varience Explained per factor and assay",
+                    theme = theme(plot.title = element_text(hjust = 0.5)))
+
 ```
 
 The top weights for metabolites using the three first factors:
