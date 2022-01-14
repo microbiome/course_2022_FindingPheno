@@ -244,14 +244,17 @@ div.csl-indent {
 <p>With cross-correlation analysis, we can analyze how strongly and how differently variables
 are associated between each other. For instance, we can analyze if higher presence of a
 specific taxon equals to higher levels of a biomolecule.</p>
-<p><strong>TASK</strong>
-1. Run installation script to load packages into the session
-2. Import HintikkaXO data
-3. Subset <em>microbiota</em> data (rank = “Phylum,” prevalence = 0.2, detection = 0.001) (<a href="https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering">subsetByPrevalentTaxa</a>)
-4. Apply clr-transform to <em>microbiota</em> data and log10-tranform to <em>metabolites</em> data (<a href="https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation">transformSamples</a>)
-5. Remove uncultured and ambiguous taxa (as it’s hard to interpret their results) ( USE THIS: mae[[1]] &lt;- mae[[1]][-grep(“uncultured|Ambiguous_taxa,” names(mae[[1]])),] )
-5. Calculate cross-correlation between <em>microbiota</em> (clr) and <em>metabolites</em> (log10) (<a href="https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses">testExperimentCrossCorrelation</a>)
-6. Create a heatmap from cross-correlation matrix <a href="https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap">pheatmap</a></p>
+<p><strong>TASK</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Run installation script to load packages into the session</p></li>
+<li><p>Import HintikkaXO data</p></li>
+<li><p>Subset <em>microbiota</em> data (rank = “Phylum,” prevalence = 0.2, detection = 0.001) (<a href="https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering">subsetByPrevalentTaxa</a>)</p></li>
+<li><p>Apply clr-transform to <em>microbiota</em> data and log10-tranform to <em>metabolites</em> data (<a href="https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation">transformSamples</a>)</p></li>
+<li><p>Remove uncultured and ambiguous taxa (as it’s hard to interpret their results) ( USE THIS: <em>mae[[1]] &lt;- mae[[1]][-grep(“uncultured|Ambiguous_taxa,” names(mae[[1]])),]</em> )</p></li>
+<li><p>Calculate cross-correlation between <em>microbiota</em> (clr) and <em>metabolites</em> (log10) (Use <em>show_warnings = FALSE</em> as an argument)
+(<a href="https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses">testExperimentCrossCorrelation</a>)</p></li>
+<li><p>Create a heatmap from cross-correlation matrix <a href="https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap">pheatmap</a></p></li>
+</ol>
 </div>
 <div id="unsupervised-learning" class="section level2" number="7.2">
 <h2><span class="header-section-number">7.2</span> Unsupervised learning</h2>
@@ -317,9 +320,9 @@ taxa and metabolites correlate similarly.</p>
 ## 5     FALSE
 ## 6     FALSE</code></pre>
 <p>Now, we can add bicluster information into the heatmap that we already made.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="cross-correlation-unsupervised-learning.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into factors</span></span>
-<span id="cb41-2"><a href="cross-correlation-unsupervised-learning.html#cb41-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bicluster_columns[, <span class="dv">1</span>] )</span>
-<span id="cb41-3"><a href="cross-correlation-unsupervised-learning.html#cb41-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="cross-correlation-unsupervised-learning.html#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert boolean values into numeric</span></span>
+<span id="cb41-2"><a href="cross-correlation-unsupervised-learning.html#cb41-2" aria-hidden="true" tabindex="-1"></a>bicluster_columns[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_columns[, <span class="dv">1</span>] )</span>
+<span id="cb41-3"><a href="cross-correlation-unsupervised-learning.html#cb41-3" aria-hidden="true" tabindex="-1"></a>bicluster_rows[ , <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(bicluster_rows[ , <span class="dv">1</span>])</span>
 <span id="cb41-4"><a href="cross-correlation-unsupervised-learning.html#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb41-5"><a href="cross-correlation-unsupervised-learning.html#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust their rownames</span></span>
 <span id="cb41-6"><a href="cross-correlation-unsupervised-learning.html#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(bicluster_columns) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(corr<span class="sc">$</span>cor)</span>

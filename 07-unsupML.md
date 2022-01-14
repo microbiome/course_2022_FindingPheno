@@ -9,12 +9,20 @@ are associated between each other. For instance, we can analyze if higher presen
 specific taxon equals to higher levels of a biomolecule.
 
 **TASK**
+
 1. Run installation script to load packages into the session
+
 2. Import HintikkaXO data
+
 3. Subset _microbiota_ data (rank = "Phylum", prevalence = 0.2, detection = 0.001) ([subsetByPrevalentTaxa](https://microbiome.github.io/OMA/differential-abundance.html#prevalence-filtering))
+
 4. Apply clr-transform to _microbiota_ data and log10-tranform to _metabolites_ data ([transformSamples](https://microbiome.github.io/OMA/taxonomic-information.html#data-transformation))
-5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: mae[[1]] <- mae[[1]][-grep("uncultured|Ambiguous_taxa", names(mae[[1]])),] )
-5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) ([testExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
+
+5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: _mae[[1]] <- mae[[1]][-grep("uncultured|Ambiguous_taxa", names(mae[[1]])),]_ )
+
+5. Calculate cross-correlation between _microbiota_ (clr) and _metabolites_ (log10) (Use _show_warnings = FALSE_ as an argument)
+([testExperimentCrossCorrelation](https://microbiome.github.io/OMA/multi-assay_analyses.html#multi-assay_analyses))
+
 6. Create a heatmap from cross-correlation matrix [pheatmap](https://microbiome.github.io/OMA/microbiome-community.html#composition-heatmap)
 
 
@@ -138,9 +146,9 @@ Now, we can add bicluster information into the heatmap that we already made.
 
 
 ```r
-# Convert boolean values into factors
-bicluster_columns[ , 1] <- as.factor(bicluster_columns[, 1] )
-bicluster_rows[ , 1] <- as.factor(bicluster_rows[ , 1])
+# Convert boolean values into numeric
+bicluster_columns[ , 1] <- as.numeric(bicluster_columns[, 1] )
+bicluster_rows[ , 1] <- as.numeric(bicluster_rows[ , 1])
 
 # Adjust their rownames
 rownames(bicluster_columns) <- colnames(corr$cor)

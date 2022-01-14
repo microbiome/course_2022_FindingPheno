@@ -1051,13 +1051,25 @@ are associated between each other. For instance, we can analyze if higher presen
 specific taxon equals to higher levels of a biomolecule.
 
 \textbf{TASK}
-1. Run installation script to load packages into the session
-2. Import HintikkaXO data
-3. Subset \emph{microbiota} data (rank = ``Phylum'', prevalence = 0.2, detection = 0.001) (\href{https://microbiome.github.io/OMA/differential-abundance.html\#prevalence-filtering}{subsetByPrevalentTaxa})
-4. Apply clr-transform to \emph{microbiota} data and log10-tranform to \emph{metabolites} data (\href{https://microbiome.github.io/OMA/taxonomic-information.html\#data-transformation}{transformSamples})
-5. Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: mae{[}{[}1{]}{]} \textless- mae{[}{[}1{]}{]}{[}-grep(``uncultured\textbar Ambiguous\_taxa'', names(mae{[}{[}1{]}{]})),{]} )
-5. Calculate cross-correlation between \emph{microbiota} (clr) and \emph{metabolites} (log10) (\href{https://microbiome.github.io/OMA/multi-assay_analyses.html\#multi-assay_analyses}{testExperimentCrossCorrelation})
-6. Create a heatmap from cross-correlation matrix \href{https://microbiome.github.io/OMA/microbiome-community.html\#composition-heatmap}{pheatmap}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Run installation script to load packages into the session
+\item
+  Import HintikkaXO data
+\item
+  Subset \emph{microbiota} data (rank = ``Phylum'', prevalence = 0.2, detection = 0.001) (\href{https://microbiome.github.io/OMA/differential-abundance.html\#prevalence-filtering}{subsetByPrevalentTaxa})
+\item
+  Apply clr-transform to \emph{microbiota} data and log10-tranform to \emph{metabolites} data (\href{https://microbiome.github.io/OMA/taxonomic-information.html\#data-transformation}{transformSamples})
+\item
+  Remove uncultured and ambiguous taxa (as it's hard to interpret their results) ( USE THIS: \emph{mae{[}{[}1{]}{]} \textless- mae{[}{[}1{]}{]}{[}-grep(``uncultured\textbar Ambiguous\_taxa'', names(mae{[}{[}1{]}{]})),{]}} )
+\item
+  Calculate cross-correlation between \emph{microbiota} (clr) and \emph{metabolites} (log10) (Use \emph{show\_warnings = FALSE} as an argument)
+  (\href{https://microbiome.github.io/OMA/multi-assay_analyses.html\#multi-assay_analyses}{testExperimentCrossCorrelation})
+\item
+  Create a heatmap from cross-correlation matrix \href{https://microbiome.github.io/OMA/microbiome-community.html\#composition-heatmap}{pheatmap}
+\end{enumerate}
 
 \hypertarget{unsupervised-learning}{%
 \section{Unsupervised learning}\label{unsupervised-learning}}
@@ -1170,9 +1182,9 @@ Now, we can add bicluster information into the heatmap that we already made.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Convert boolean values into factors}
-\NormalTok{bicluster\_columns[ , }\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(bicluster\_columns[, }\DecValTok{1}\NormalTok{] )}
-\NormalTok{bicluster\_rows[ , }\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(bicluster\_rows[ , }\DecValTok{1}\NormalTok{])}
+\CommentTok{\# Convert boolean values into numeric}
+\NormalTok{bicluster\_columns[ , }\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(bicluster\_columns[, }\DecValTok{1}\NormalTok{] )}
+\NormalTok{bicluster\_rows[ , }\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(bicluster\_rows[ , }\DecValTok{1}\NormalTok{])}
 
 \CommentTok{\# Adjust their rownames}
 \FunctionTok{rownames}\NormalTok{(bicluster\_columns) }\OtherTok{\textless{}{-}} \FunctionTok{colnames}\NormalTok{(corr}\SpecialCharTok{$}\NormalTok{cor)}
