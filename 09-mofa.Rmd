@@ -40,14 +40,20 @@ train_opts <- get_default_training_options(model)
 head(train_opts)
 ```
 
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+reticulate::install_miniconda()
+reticulate::use_miniconda()
+reticulate::py_install(packages = c("mofapy2"), pip = TRUE)
+```
+
+
 ```{r, message=FALSE, warning=FALSE}
-library(reticulate)
-use_condaenv(condaenv = "base")
+
 model.prepared <- prepare_mofa(
   object = model,
   model_options = model_opts
 )
-model.trained <- run_mofa(model.prepared) 
+model.trained <- run_mofa(model.prepared)
 ```
 
 ```{r, message=FALSE, warning=FALSE}

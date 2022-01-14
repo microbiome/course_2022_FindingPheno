@@ -47,7 +47,7 @@ if (!requireNamespace("BiocManager")) {
 packages <- c("ggplot2", "pheatmap", "stringr", "igraph", "ANCOMBC",
              "microbiome", "httpuv", "microbiomeDataSets", "mia", "caret", "ranger",
             "dplyr", "miaViz", "knitr", "kableExtra", "vegan", "ecodist", "biclust",
-            "patchwork", "pdp", "MLmetrics", "precrec", "MOFA2")
+            "patchwork", "pdp", "MLmetrics", "precrec","reticulate", "MOFA2")
 
 ```
  
